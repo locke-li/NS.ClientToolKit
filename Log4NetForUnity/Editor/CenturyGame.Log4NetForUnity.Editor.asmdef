@@ -1,0 +1,16 @@
+{
+    "name": "CenturyGame.Log4NetForUnity.Editor",
+    "references": [
+        "CenturyGame.Log4NetForUnity.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

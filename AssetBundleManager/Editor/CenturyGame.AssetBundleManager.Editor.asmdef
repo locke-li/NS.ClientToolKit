@@ -1,0 +1,16 @@
+{
+    "name": "CenturyGame.AssetBundleManager.Editor",
+    "references": [
+        "CenturyGame.AssetBundleManager"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

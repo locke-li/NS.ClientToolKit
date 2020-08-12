@@ -1,0 +1,14 @@
+{
+    "name": "CenturyGame.AppBuilder.Runtime",
+    "references": [
+        "XNode"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

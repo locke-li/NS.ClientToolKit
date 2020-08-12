@@ -1,0 +1,19 @@
+{
+    "name": "CenturyGame.AssetGraph.EditorTests",
+    "references": [
+        "Unity.AssetGraph",
+        "CenturyGame.AssetGraph.Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

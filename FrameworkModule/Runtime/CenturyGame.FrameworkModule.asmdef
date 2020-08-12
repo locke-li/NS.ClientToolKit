@@ -1,0 +1,17 @@
+{
+    "name": "CenturyGame.FrameworkModule",
+    "references": [
+        "CenturyGame.LuaModule.Runtime",
+        "CenturyGame.AssetBundleManager",
+        "CenturyGame.LoggerModule.Runtime",
+        "CenturyGame.Log4NetForUnity.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

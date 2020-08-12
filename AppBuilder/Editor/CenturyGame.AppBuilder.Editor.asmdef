@@ -1,0 +1,24 @@
+{
+    "name": "CenturyGame.AppBuilder.Editor",
+    "references": [
+        "CenturyGame.AppUpdater.Runtime",
+        "CenturyGame.AssetBundleManager",
+        "CenturyGame.Core",
+        "YamlDotNet",
+        "CenturyGame.AssetGraph.Editor",
+        "XNode",
+        "XNodeEditor",
+        "CenturyGame.AppBuilder.Runtime",
+        "CenturyGame.LoggerModule.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

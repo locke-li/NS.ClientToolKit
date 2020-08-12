@@ -1,0 +1,16 @@
+{
+    "name": "CenturyGame.AssetBundleManager",
+    "references": [
+        "CenturyGame.Core",
+        "CenturyGame.AppUpdater.Runtime",
+        "CenturyGame.LoggerModule.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

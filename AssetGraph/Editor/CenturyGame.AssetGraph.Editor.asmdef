@@ -1,0 +1,17 @@
+{
+    "name": "CenturyGame.AssetGraph.Editor",
+    "references": [
+        "Unity.AssetGraph",
+        "CenturyGame.AssetBundleBrowser.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
