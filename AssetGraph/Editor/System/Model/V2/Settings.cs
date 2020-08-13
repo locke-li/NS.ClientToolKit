@@ -114,7 +114,7 @@ namespace UnityEngine.AssetGraph.DataModel.Version2 {
         public static class Path
         {
 
-	        public static string PackagePath => "Packages/com.centurygame.assetgraph";
+	        public static string PackagePath => "Packages/com.centurygame.clienttoolkit/AssetGraph";
 	        
 	        public static string DefaultBasePath => "Assets/CenturyGamePackageRes/AssetGraph";
 
