@@ -44,15 +44,16 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 string[] files = Directory.GetFiles(srcPath, "*.lua");
                 for (int i = 0; i < files.Length; i++)
                 {
-                    File.Copy(srcPath + "\\" + Path.GetFileName(files[i]), dstPath + "\\" + Path.GetFileName(files[i]));
+                    File.Copy(srcPath + "/" + Path.GetFileName(files[i]), dstPath + "/" + Path.GetFileName(files[i]));
                 }
 
                 string[] dirs = Directory.GetDirectories(srcPath);
                 for (int i = 0; i < dirs.Length; i++)
                 {
-                    int idx = dirs[i].LastIndexOf('\\');
+                    dirs[i] = EditorUtils.OptimazePath(dirs[i]);
+                    int idx = dirs[i].LastIndexOf('/');
                     string subFolder = dirs[i].Substring(idx + 1);
-                    CopyScripts(filter, input, srcPath + "\\" + subFolder, dstPath + "\\" + subFolder);
+                    CopyScripts(filter, input, srcPath + "/" + subFolder, dstPath + "/" + subFolder);
                 }
             }
             catch (Exception e)
