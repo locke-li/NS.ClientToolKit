@@ -148,7 +148,7 @@ namespace CenturyGame.Log4NetForUnity.Editor
         [MenuItem(CopyLog4NetLinkXml, priority = 1)]
         public static void CopyLinkXMl()
         {
-            string path = Path.GetFullPath("Packages/com.centurygame.log4netforunity/link.xml");
+            string path = Path.GetFullPath("Packages/com.centurygame.clienttoolkit/Log4NetForUnity/link.xml");
 
             if (!File.Exists(path))
             {
