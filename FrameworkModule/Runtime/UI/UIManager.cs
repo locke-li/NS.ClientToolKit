@@ -49,6 +49,7 @@ namespace CenturyGame.Framework.UI
                 UIGroup uiGroup = new UIGroup(layer, layerObj.transform, i);
                 groupMap.Add(layer, uiGroup);
             }
+            Object.DontDestroyOnLoad(uiRoot);
         }
 
         internal override void Update(float elapseTime, float realElapseTime)
