@@ -28,11 +28,12 @@ namespace CenturyGame.Framework.Editor
         private int lastComponentIndex = -1;
         private int removeEventIndex = -1;
         private UIComponentAssetData selectComponentData;
-        private readonly string dataRoot = "Assets/AssetData/UIWnd/";
+        private readonly string dataRoot = "Assets/CenturyGamePackageRes/UIAssetData/";
         private bool IsGenerateLogic = false;
         private static readonly GUIContent eventLabelContent = new GUIContent("事件类型");
         private EUIComponentType lastSelectComponentType = default;
         private EUIComponentType componentFilterType = default;
+        private Vector2 scrollPos;
         #region 组件分类
         private string[] m_GameObjectNames = new string[0];
         private string[] m_GameObjectPaths = new string[0];
@@ -144,9 +145,11 @@ namespace CenturyGame.Framework.Editor
             }
 
             EditorGUILayout.BeginHorizontal();
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(240), GUILayout.Height(360));
             EditorGUILayout.BeginVertical("box", GUILayout.Width(240), GUILayout.Height(360));
             selectComponentIndex = GUILayout.SelectionGrid(selectComponentIndex, componentNames, 1, GUILayout.Width(200));
             EditorGUILayout.EndVertical();
+            EditorGUILayout.EndScrollView();
             if (selectComponentIndex != lastComponentIndex)
             {
                 if (selectComponentIndex != -1)
