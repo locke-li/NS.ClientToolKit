@@ -650,7 +650,20 @@ public class ABMgrHandle : MonoBehaviour
 
 #if UNITY_EDITOR
 
-    internal static string RESOURCE_FOLDER = "ResourcesAB";
+    private static string m_sResourcesFolder = "ResourcesAB";
+
+    internal static string RESOURCE_FOLDER
+    {
+        get
+        {
+            return m_sResourcesFolder;
+        }
+        set
+        {
+            m_sResourcesFolder = value;
+            AbHelp.ResourcesPath = $@"Assets/{value}";
+        }
+    }
 
     private static string GetScenePathRelativeProject(string sceneName)
     {

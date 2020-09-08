@@ -398,7 +398,10 @@ public partial class AbHelp
     public static ResManifest AbConfig = null;
     public static StringBuilder TmpSB = new StringBuilder();
 
-    public static readonly string ResourcesPath = "Assets/ResourcesAB";
+
+#if UNITY_EDITOR
+    internal static string ResourcesPath = "Assets/ResourcesAB";
+#endif
 
     //public static readonly string HotfixInfoName = "Hotfix.x";
     //public static readonly string AbConfigName = "FileList.x";

@@ -102,6 +102,10 @@ namespace CenturyGame.AssetBundleManager.Runtime
             {
                 ABMgrHandle.RESOURCE_FOLDER = folderName;
             }
+            else
+            {
+                s_mLogger.Value.Warn($"Set assets root folder that name is \'{folderName}\' failure!");
+            }
         }
 
         private static bool CheckResourceFolderName(string folderName)
