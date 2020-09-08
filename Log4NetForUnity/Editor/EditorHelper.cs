@@ -71,7 +71,7 @@ namespace CenturyGame.Log4NetForUnity.Editor
 
         private void ReplaceLinkXml()
         {
-            GUILayout.Label("当前link.xml文件角旧，请覆盖此文件!");
+            GUILayout.Label("当前link.xml文件较旧，请覆盖此文件!");
 
             if (GUILayout.Button("覆盖当前的link.xml文件"))
             {
