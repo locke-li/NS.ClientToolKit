@@ -19,16 +19,12 @@ public sealed class ABRequest
     private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
         LoggerManager.GetLogger("ABItem"));
 
-    /// <summary>
-    /// 资源场景必须放到ResourcesAB文件夹下的abscene文件夹
-    /// </summary>
-    public const string SCENE_FOLDER_NAME = "abscene";
-
-    public ABRequest(string path , ABItem abItem) 
+    
+    public ABRequest(string path , ABItem abItem, bool isScene = false) 
     {
         Path = path;
         ABHandle = abItem;
-        if (path.StartsWith(SCENE_FOLDER_NAME)) 
+        if (isScene) 
         {
             this.IsScene = true;
         }

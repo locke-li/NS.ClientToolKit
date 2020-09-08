@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AssetBundleManager.Runtime;
-using CenturyGame.AssetBundleManager.Runtime.Diagnostics;
 using CenturyGame.LoggerModule.Runtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,6 +35,18 @@ public class ABMgrHandle : MonoBehaviour
         LoggerManager.GetLogger("ABMgrHandle"));
 
     protected static ABMgrHandle mInstance;
+
+
+    private static string m_sSceneFolderName = "abscene";
+
+    /// <summary>
+    /// 资源场景必须放到ResourcesAB文件夹下的abscene文件夹
+    /// </summary>
+    internal static string SCENE_FOLDER_NAME
+    {
+        set { m_sSceneFolderName = value; }
+        get { return m_sSceneFolderName; }
+    }
 
     protected virtual void Awake()
     {
@@ -528,8 +539,8 @@ public class ABMgrHandle : MonoBehaviour
     
     private static ABRequest loadSceneBase(string sceneName, LoadSceneMode mode = LoadSceneMode.Single , bool isAsync = false , ABRequestCallBack callback = null)
     {
-        string scenePath = $"{ABRequest.SCENE_FOLDER_NAME}/{sceneName}".ToLower();
-        ABRequest result = ABConfigOperate.GetRequest(scenePath);
+        string scenePath = $"{SCENE_FOLDER_NAME}/{sceneName}".ToLower();
+        ABRequest result = ABConfigOperate.GetRequest(scenePath,true);
         if(result == null)
         {
             s_mLogger.Value?.Debug($"loadSceneBase failure ! scenePath : \"{scenePath}\" .");
@@ -543,7 +554,7 @@ public class ABMgrHandle : MonoBehaviour
 
     private static ABRequest unLoadSceneBase(string sceneName)
     {
-        string scenePath = $"{ABRequest.SCENE_FOLDER_NAME}/{sceneName}".ToLower();
+        string scenePath = $"{SCENE_FOLDER_NAME}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath);
         if (result == null)
         {
@@ -650,24 +661,24 @@ public class ABMgrHandle : MonoBehaviour
 
 #if UNITY_EDITOR
 
-    private static string m_sResourcesFolder = "ResourcesAB";
+    private static string _mSResourcesesFolder = "ResourcesAB";
 
-    internal static string RESOURCE_FOLDER
+    internal static string ResourcesFolder
     {
         get
         {
-            return m_sResourcesFolder;
+            return _mSResourcesesFolder;
         }
         set
         {
-            m_sResourcesFolder = value;
+            _mSResourcesesFolder = value;
             AbHelp.ResourcesPath = $@"Assets/{value}";
         }
     }
 
     private static string GetScenePathRelativeProject(string sceneName)
     {
-        string scenePath = $"Assets/{RESOURCE_FOLDER}/{ABRequest.SCENE_FOLDER_NAME}/{sceneName}.unity";
+        string scenePath = $"Assets/{ResourcesFolder}/{SCENE_FOLDER_NAME}/{sceneName}.unity";
         s_mLogger.Value.Info($"scenePath : \"{scenePath}\" .");
         return scenePath;
     }

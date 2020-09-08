@@ -101,7 +101,7 @@ public sealed class ABConfigHandle
     /// </summary>
     /// <param name="pathName"></param>
     /// <returns></returns>
-    public ABRequest GetRequest(string pathName)
+    internal ABRequest GetRequest(string pathName, bool isScene = false)
     {
         if (Cache.ContainsKey(pathName))
         {
@@ -110,10 +110,10 @@ public sealed class ABConfigHandle
 
         if (ABItemList.ContainsKey(pathName))
         {
-            return CreateAndAdd(ABItemList[pathName],pathName);
+            return CreateAndAdd(ABItemList[pathName],pathName, isScene);
         }
 
-        ABRequest request = TestAbPath(pathName);
+        ABRequest request = TestAbPath(pathName, isScene);
 
         return request;
     }
@@ -127,7 +127,7 @@ public sealed class ABConfigHandle
         return request;
     }
 
-    private ABRequest TestAbPath(string pathName)
+    private ABRequest TestAbPath(string pathName, bool isScene = false)
     {
         string[] pathSplit = pathName.Split('/');
         int splitLength = pathSplit.Length;
@@ -152,7 +152,7 @@ public sealed class ABConfigHandle
                 abName = this.mTempSb.ToString();
                 if (ABItemList.ContainsKey(abName))
                 {
-                    return CreateAndAdd(ABItemList[abName], pathName);
+                    return CreateAndAdd(ABItemList[abName], pathName, isScene);
                 }
 
                 lastIdx++;
@@ -162,9 +162,9 @@ public sealed class ABConfigHandle
     }
 
 
-    private ABRequest CreateAndAdd(ABItem abItem, string path)
+    private ABRequest CreateAndAdd(ABItem abItem, string path , bool isScene = false)
     {
-        ABRequest req = new ABRequest(path , abItem);
+        ABRequest req = new ABRequest(path , abItem , isScene);
         req.AddListHandle = addAsyncRequest;
         Cache[req.Path] = req;
 

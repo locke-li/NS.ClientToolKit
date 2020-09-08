@@ -100,7 +100,7 @@ namespace CenturyGame.AssetBundleManager.Runtime
         {
             if (CheckResourceFolderName(folderName))
             {
-                ABMgrHandle.RESOURCE_FOLDER = folderName;
+                ABMgrHandle.ResourcesFolder = folderName;
             }
             else
             {
@@ -121,8 +121,12 @@ namespace CenturyGame.AssetBundleManager.Runtime
         /// </summary>
         /// <param name="onInitCompleted">初始化完成回调</param>
         /// <param name="onInitError">初始化异常回调</param>
-        public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null)
+        public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null , string sceneFolderName = "")
         {
+            if (!string.IsNullOrEmpty(sceneFolderName))
+            {
+                ABMgrHandle.sceneFolderName = sceneFolderName;
+            }
             var go = new GameObject("AssetBundleManager", typeof(AssetBundleManager));
             DontDestroyOnLoad(go);
             ABMgrHandle = go.AddComponent<ABMgrHandle>();
