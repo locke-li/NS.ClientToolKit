@@ -90,6 +90,28 @@ namespace CenturyGame.AssetBundleManager.Runtime
         #region Methods
         //--------------------------------------------------------------
 
+#if UNITY_EDITOR
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="folderName"></param>
+        public static void SetAssetsRootFolder(string folderName)
+        {
+            if (CheckResourceFolderName(folderName))
+            {
+                ABMgrHandle.RESOURCE_FOLDER = folderName;
+            }
+        }
+
+        private static bool CheckResourceFolderName(string folderName)
+        {
+            if (string.IsNullOrEmpty(folderName))
+                return false;
+            return System.IO.Directory.Exists($"Assets/{folderName}");
+        }
+#endif
+
         /// <summary>
         /// 初始化AssetBundleManager
         /// </summary>

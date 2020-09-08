@@ -650,9 +650,11 @@ public class ABMgrHandle : MonoBehaviour
 
 #if UNITY_EDITOR
 
+    internal static string RESOURCE_FOLDER = "ResourcesAB";
+
     private static string GetScenePathRelativeProject(string sceneName)
     {
-        string scenePath = $"Assets/ResourcesAB/{ABRequest.SCENE_FOLDER_NAME}/{sceneName}.unity";
+        string scenePath = $"Assets/{RESOURCE_FOLDER}/{ABRequest.SCENE_FOLDER_NAME}/{sceneName}.unity";
         s_mLogger.Value.Info($"scenePath : \"{scenePath}\" .");
         return scenePath;
     }
