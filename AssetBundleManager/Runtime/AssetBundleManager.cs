@@ -121,6 +121,7 @@ namespace CenturyGame.AssetBundleManager.Runtime
         /// </summary>
         /// <param name="onInitCompleted">初始化完成回调</param>
         /// <param name="onInitError">初始化异常回调</param>
+        /// <param name="sceneFolderName">资源文件夹下的场景文件夹名</param>
         public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null , string sceneFolderName = "")
         {
             if (!string.IsNullOrEmpty(sceneFolderName))

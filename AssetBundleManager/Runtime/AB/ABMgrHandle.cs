@@ -40,7 +40,7 @@ public class ABMgrHandle : MonoBehaviour
     private static string m_sSceneFolderName = "abscene";
 
     /// <summary>
-    /// 资源场景必须放到ResourcesAB文件夹下的abscene文件夹
+    /// 资源场景相对于资源根目录的文件夹名
     /// </summary>
     internal static string sceneFolderName
     {
@@ -539,7 +539,7 @@ public class ABMgrHandle : MonoBehaviour
     
     private static ABRequest loadSceneBase(string sceneName, LoadSceneMode mode = LoadSceneMode.Single , bool isAsync = false , ABRequestCallBack callback = null)
     {
-        string scenePath = $"{sceneFolderName}/{sceneName}".ToLower();
+        string scenePath = $"{m_sSceneFolderName}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath,true);
         if(result == null)
         {
@@ -554,7 +554,7 @@ public class ABMgrHandle : MonoBehaviour
 
     private static ABRequest unLoadSceneBase(string sceneName)
     {
-        string scenePath = $"{sceneFolderName}/{sceneName}".ToLower();
+        string scenePath = $"{m_sSceneFolderName}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath);
         if (result == null)
         {
@@ -661,24 +661,24 @@ public class ABMgrHandle : MonoBehaviour
 
 #if UNITY_EDITOR
 
-    private static string _mSResourcesesFolder = "ResourcesAB";
+    private static string m_sResourcesesFolder = "ResourcesAB";
 
     internal static string ResourcesFolder
     {
         get
         {
-            return _mSResourcesesFolder;
+            return m_sResourcesesFolder;
         }
         set
         {
-            _mSResourcesesFolder = value;
+            m_sResourcesesFolder = value;
             AbHelp.ResourcesPath = $@"Assets/{value}";
         }
     }
 
     private static string GetScenePathRelativeProject(string sceneName)
     {
-        string scenePath = $"Assets/{ResourcesFolder}/{sceneFolderName}/{sceneName}.unity";
+        string scenePath = $"Assets/{m_sResourcesesFolder}/{m_sSceneFolderName}/{sceneName}.unity";
         s_mLogger.Value.Info($"scenePath : \"{scenePath}\" .");
         return scenePath;
     }
