@@ -82,6 +82,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             }
         }
 
+        [Header("当前工程资源根目录名(相对于Assets文件夹)")]
+        public string ResourcesFolder = "ResourcesAB";
+
         public string LastBuildVersionPath => BuildInfoFolder + @"/"+ LastBuildVersionName;
         public string LastBuildInfoPath => BuildInfoFolder + @"/" + LastBuildInfoName;
 

@@ -65,11 +65,17 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             PatternManifest = ".manifest",
             VersionFormat = "yyyyMMddHHmmss",
             Temporary = "Temporary",
-            ResourcesFolder = "ResourcesAB",
+           
             Rules = "rules",
             DataRes = "Conf",
             BuildReportFolderName = "BuildReporters",
             RemoteManifestFolderName = "version_list";
+
+
+        public string ResourcesFolder
+        {
+            get { return AppBuildConfig.GetAppBuildConfigInst().ResourcesFolder; }
+        }
 
         #endregion
 
