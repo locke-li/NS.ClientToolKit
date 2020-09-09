@@ -42,7 +42,7 @@ public class ABMgrHandle : MonoBehaviour
     /// <summary>
     /// 资源场景必须放到ResourcesAB文件夹下的abscene文件夹
     /// </summary>
-    internal static string SCENE_FOLDER_NAME
+    internal static string sceneFolderName
     {
         set { m_sSceneFolderName = value; }
         get { return m_sSceneFolderName; }
@@ -539,7 +539,7 @@ public class ABMgrHandle : MonoBehaviour
     
     private static ABRequest loadSceneBase(string sceneName, LoadSceneMode mode = LoadSceneMode.Single , bool isAsync = false , ABRequestCallBack callback = null)
     {
-        string scenePath = $"{SCENE_FOLDER_NAME}/{sceneName}".ToLower();
+        string scenePath = $"{sceneFolderName}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath,true);
         if(result == null)
         {
@@ -554,7 +554,7 @@ public class ABMgrHandle : MonoBehaviour
 
     private static ABRequest unLoadSceneBase(string sceneName)
     {
-        string scenePath = $"{SCENE_FOLDER_NAME}/{sceneName}".ToLower();
+        string scenePath = $"{sceneFolderName}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath);
         if (result == null)
         {
@@ -602,7 +602,7 @@ public class ABMgrHandle : MonoBehaviour
         }
         else
         {
-            //string scenePath = $"{Application.dataPath}/ResourcesAB/{ABRequest.SCENE_FOLDER_NAME}/{sceneName}.unity";
+            //string scenePath = $"{Application.dataPath}/ResourcesAB/{ABRequest.sceneFolderName}/{sceneName}.unity";
             //if (!File.Exists(scenePath))
             //{
             //    throw new FileNotFoundException($"The scene that name is \"{sceneName}\" is not found !");
@@ -678,7 +678,7 @@ public class ABMgrHandle : MonoBehaviour
 
     private static string GetScenePathRelativeProject(string sceneName)
     {
-        string scenePath = $"Assets/{ResourcesFolder}/{SCENE_FOLDER_NAME}/{sceneName}.unity";
+        string scenePath = $"Assets/{ResourcesFolder}/{sceneFolderName}/{sceneName}.unity";
         s_mLogger.Value.Info($"scenePath : \"{scenePath}\" .");
         return scenePath;
     }
