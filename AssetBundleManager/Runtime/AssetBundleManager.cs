@@ -121,13 +121,9 @@ namespace CenturyGame.AssetBundleManager.Runtime
         /// </summary>
         /// <param name="onInitCompleted">初始化完成回调</param>
         /// <param name="onInitError">初始化异常回调</param>
-        /// <param name="sceneFolderName">资源文件夹下的场景文件夹名</param>
-        public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null , string sceneFolderName = "")
+        public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null)
         {
-            if (!string.IsNullOrEmpty(sceneFolderName))
-            {
-                ABMgrHandle.sceneFolderName = sceneFolderName;
-            }
+            
             var go = new GameObject("AssetBundleManager", typeof(AssetBundleManager));
             DontDestroyOnLoad(go);
             ABMgrHandle = go.AddComponent<ABMgrHandle>();
@@ -143,6 +139,18 @@ namespace CenturyGame.AssetBundleManager.Runtime
                     onInitError?.Invoke(error);
                     s_mLogger.Value.Error($"AssetBundleManager initialize fail! Error : {error} .");
                 });
+        }
+
+        /// <summary>
+        /// 设置当前需要编译成AssetBundle的场景资源文件夹名
+        /// </summary>
+        /// <param name="sceneFolderName">资源文件夹下的场景文件夹名</param>
+        public static void SetSceneFolderName(string sceneFolderName = "")
+        {
+            if (!string.IsNullOrEmpty(sceneFolderName))
+            {
+                ABMgrHandle.sceneFolderName = sceneFolderName;
+            }
         }
 
         /// <summary>
