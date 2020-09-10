@@ -56,7 +56,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         public MakeVersionMode makeVersionMode = MakeVersionMode.UnKnow;
 
         public readonly string AssetsTitle = "Assets:",
-            AbExportFolder = "AB",
             StreamingAssetsFolder = "Assets/StreamingAssets",
             DependenciesTitle = "Dependencies:",
             DependenciesTitleError = "Dependencies: []",
@@ -71,6 +70,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             BuildReportFolderName = "BuildReporters",
             RemoteManifestFolderName = "version_list";
 
+
+        public string AbExportFolder
+        {
+            get { return AppBuildConfig.GetAppBuildConfigInst().AssetBundleExportFolderName; }
+        }
 
         public string ResourcesFolder
         {
