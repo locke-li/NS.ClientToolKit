@@ -86,6 +86,9 @@ namespace CenturyGame.Framework.Network
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
+                socket = null;
+                bufferStream.Dispose();
+                sendStream.Dispose();
                 Trace.Instance.debug("EndConnect.");
             }
             catch (Exception e)
@@ -103,6 +106,8 @@ namespace CenturyGame.Framework.Network
         {
             try
             {
+                if (!IsConnected)
+                    return;
                 int bytesRead = socket.EndReceive(result);
                 if (bytesRead > 0)
                 {
