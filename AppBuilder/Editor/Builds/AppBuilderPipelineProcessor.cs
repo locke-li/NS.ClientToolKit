@@ -16,6 +16,7 @@
 
 
 using System;
+using System.Linq;
 using System.Text;
 using CenturyGame.AppBuilder.Runtime.Configuration;
 using CenturyGame.Core.Pipeline;
@@ -72,7 +73,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         {
             foreach (var filterConfig in config.Filters)
             {
-                var filterType = Type.GetType(filterConfig.TypeFullName);
+                var filterType = GetActionType(filterConfig.TypeFullName);
                 var instance = (IFilter)System.Activator.CreateInstance(filterType);
                 this.Register(instance);
                 if (filterConfig.Action.IsActionQueue)
@@ -80,19 +81,37 @@ namespace CenturyGame.AppBuilder.Editor.Builds
                     var queueActionsFilter = instance as QueueActionsPipelineFilter;
                     foreach (var childAction in filterConfig.Action.Childs)
                     {
-                        var actionType = Type.GetType(childAction.TypeFullName);
+                        var actionType = GetActionType(childAction.TypeFullName);
                         var actionInst = (IPipelineFilterAction)Activator.CreateInstance(actionType);
                         queueActionsFilter.Enqueue(actionInst);
                     }
                 }
                 else
                 {
-                    var actionType = Type.GetType(filterConfig.Action.TypeFullName);
+                    var actionType = GetActionType(filterConfig.Action.TypeFullName);
                     var actionInst = (IPipelineFilterAction)Activator.CreateInstance(actionType);
                     BasePipelineFilter basePipelineFilter = instance as BasePipelineFilter;
                     basePipelineFilter.SetAction(actionInst);
                 }
             }
+        }
+
+        private Type GetActionType(string typeFullName)
+        {
+            var actionType = Type.GetType(typeFullName);
+            if (actionType == null)
+            {
+                actionType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    where !(assembly.ManifestModule is System.Reflection.Emit.ModuleBuilder)
+                    from type in assembly.GetExportedTypes()
+                    where
+                        type.FullName == typeFullName
+                    select type).FirstOrDefault();
+            }
+
+            if(actionType == null)
+                throw new TypeLoadException($"Invallid type , full name is \"{typeFullName}\" .");
+            return actionType;
         }
 
         private static AppBuildProcessConfig GetAppBuildProcessConfig(string configPath)

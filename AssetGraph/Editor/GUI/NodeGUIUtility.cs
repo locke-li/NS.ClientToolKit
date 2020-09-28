@@ -14,7 +14,11 @@ namespace UnityEngine.AssetGraph
 		public static Texture2D LoadTextureFromFile (string path)
 		{
 			Texture2D texture = new Texture2D (1, 1);
-			texture.LoadImage (File.ReadAllBytes (path));
+            if (File.Exists(path))
+            {
+				texture.LoadImage(File.ReadAllBytes(path));
+			}
+			
 			return texture;
 		}
 

@@ -202,5 +202,19 @@ namespace CenturyGame.Log4NetForUnity.Editor
         }
 
 
+        private const string ShowLogsContent = "CenturyGame/log4net/Show Logs";
+        [MenuItem(ShowLogsContent, priority = 3)]
+        static void ShowLogFolder()
+        {
+            string logFilePath = Path.Combine(Application.persistentDataPath, $"GameLogs");
+            logFilePath = Path.GetFullPath(logFilePath);
+            logFilePath = logFilePath.Replace(@"\", "/");
+
+            if(Directory.Exists(logFilePath))
+                EditorUtility.RevealInFinder(logFilePath);
+            else
+                Debug.LogWarning("The target logs folder is not created！");
+        }
+
     }
 }

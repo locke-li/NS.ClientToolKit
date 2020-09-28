@@ -76,6 +76,29 @@ namespace CenturyGame.AssetBundleManager.Runtime
 
         static int m_SimulateAssetBundleInEditor = -1;
         const string kSimulateAssetBundles = "SimulateAssetBundles";
+
+
+        public static bool LuaDevelopmentModeInEditor
+        {
+            get
+            {
+                if (m_LuaDevelopmentMode == -1)
+                    m_LuaDevelopmentMode = EditorPrefs.GetBool(kLuaDevelopmentMode, false) ? 1 : 0;
+
+                return m_LuaDevelopmentMode != 0;
+            }
+            set
+            {
+                int newValue = value ? 1 : 0;
+                if (newValue != m_LuaDevelopmentMode)
+                {
+                    m_LuaDevelopmentMode = newValue;
+                    EditorPrefs.SetBool(kLuaDevelopmentMode, value);
+                }
+            }
+        }
+        static int m_LuaDevelopmentMode = -1;
+        const string kLuaDevelopmentMode = "LuaDevelopmentMode";
 #endif
 
         #endregion
@@ -93,7 +116,7 @@ namespace CenturyGame.AssetBundleManager.Runtime
 #if UNITY_EDITOR
 
         /// <summary>
-        /// 
+        /// 设置资源目录
         /// </summary>
         /// <param name="folderName"></param>
         public static void SetAssetsRootFolder(string folderName)
@@ -123,7 +146,11 @@ namespace CenturyGame.AssetBundleManager.Runtime
         /// <param name="onInitError">初始化异常回调</param>
         public static void Initialize(Action onInitCompleted = null, Action<ResourceLoadInitError> onInitError = null)
         {
-            
+            if (s_mInitialize)
+            {
+                s_mLogger.Value.Error($"AssetBundleManager is initialized!");
+                return;
+            }
             var go = new GameObject("AssetBundleManager", typeof(AssetBundleManager));
             DontDestroyOnLoad(go);
             ABMgrHandle = go.AddComponent<ABMgrHandle>();
@@ -158,34 +185,84 @@ namespace CenturyGame.AssetBundleManager.Runtime
         /// </summary>
         /// <param name="path">资源相对路径。该路径相对于"Assets/ResourcesAB" ，例如：abscene/test，且不带后缀名</param>
         /// <returns></returns>
+        [Obsolete("This method is deprecated.Use Load(string path, System.Type type) instead.",false)]
         public static Object Load(string path)
         {
-            CheckIsInitialize("Load1");
+            CheckIsInitialize("Load(string path)");
             return ABMgrHandle.Load(path);
         }
 
+        [Obsolete("This method is deprecated.Use LoadAsync(string path, System.Type type, ObjectCallBack callBack) instead.", false)]
         public static void LoadAsync(string path, ObjectCallBack callback)
         {
-            CheckIsInitialize("LoadAsync1");
+            CheckIsInitialize("LoadAsync(string path, ObjectCallBack callback)");
             ABMgrHandle.LoadAsync(path, callback);
         }
 
+        /// <summary>
+        /// 加载资源
+        /// </summary>
+        /// <param name="path">资源相对路径.该路径相对于资源根目录 ，例如：abscene/test，且不带后缀名</param>
+        /// <param name="type">需要加载的资源类型</param>
+        /// <returns>资源对象</returns>
         public static Object Load(string path, System.Type type)
         {
-            CheckIsInitialize("Load2");
+            CheckIsInitialize("Load(string path, System.Type type)");
             return ABMgrHandle.Load(path, type);
         }
 
         public static void LoadAsync(string path, System.Type type, ObjectCallBack callBack)
         {
-            CheckIsInitialize("LoadAsync2");
+            CheckIsInitialize("LoadAsync(string path, System.Type type, ObjectCallBack callBack)");
             ABMgrHandle.LoadAsync(path, type, callBack);
         }
+
+        public static T Load<T>(string path) where T : Object
+        {
+            CheckIsInitialize("Load<T>");
+            s_mLogger.Value.Debug($" Load<T> : {path} , asset type : {typeof(T)} .");
+            return ABMgrHandle.Load<T>(path);
+        }
+
+        public static void LoadAsync<T>(string path, ObjectCallBack callBack) where T : Object
+        {
+            CheckIsInitialize("LoadAsync<T>(string path, ObjectCallBack callBack)");
+            s_mLogger.Value.Debug($" LoadAsync<T> : {path} , asset type : {typeof(T)} .");
+            ABMgrHandle.LoadAsync<T>(path, callBack);
+        }
+
+        /// <summary>
+        /// 只加载资源的AssetBundle
+        /// </summary>
+        /// <param name="path">资源路径</param>
+        public static void LoadBundleOnly(string path)
+        {
+            CheckIsInitialize("LoadBundleOnly");
+            ABMgrHandle.LoadBundleOnly(path);
+        }
+
+        /// <summary>
+        /// 只加载资源的AssetBundle，异步模式（Simulation Mode下由于实现机制，暂时未实现异步Load）
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="callback"></param>
+        public static void LoadBundleOnlyAsync(string path, BundleLoadCompletedCallBack callback)
+        {
+            CheckIsInitialize("LoadBundleOnlyAsync(string path, BundleLoadCompletedCallBack callback)");
+            ABMgrHandle.LoadBundleOnlyAsync(path, callback);
+        }
+
+        public static void ReleaseBundle(string path)
+        {
+            CheckIsInitialize("ReleaseBundle(string path)");
+            ABMgrHandle.UnLoadBundle(path);
+        }
+
 
         public static T LoadFromResourceFolder<T>(string path)
             where T : Object
         {
-            CheckIsInitialize("LoadFromResourceFolder");
+            CheckIsInitialize("LoadFromResourceFolder<T>(string path)");
             return ABMgrHandle.LoadFromResource<T>(path);
         }
 

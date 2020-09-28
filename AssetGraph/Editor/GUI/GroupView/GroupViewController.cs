@@ -4,8 +4,8 @@ using UnityEditor.IMGUI.Controls;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
-
 using Model=UnityEngine.AssetGraph.DataModel.Version2;
 
 namespace UnityEngine.AssetGraph {
@@ -132,6 +132,11 @@ namespace UnityEngine.AssetGraph {
                 EditorGUILayout.HelpBox(selectedAsset, MessageType.None);
             }
 
+            if (GUILayout.Button("Export"))
+            {
+                this.ExportConnectInfo();
+            }
+
             //if (m_selectedAsset != null) {
             //    var aaSettings = AddressableAssetSettingsDefaultObject.GetSettings(false);
             //    if (aaSettings != null) {
@@ -146,6 +151,38 @@ namespace UnityEngine.AssetGraph {
             //    }
             //}
 		}
+
+
+        private void ExportConnectInfo()
+        {
+            var groups = m_groups;
+            var filePath = EditorUtility.SaveFilePanel("Save connection info", Directory.GetCurrentDirectory(), "","json");
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                JSONObject json = new JSONObject();
+                StreamWriter sw = new StreamWriter(File.OpenWrite(filePath),
+                    new System.Text.UTF8Encoding(false, true));
+                foreach (var kvp in groups)
+                {
+                    JSONObject obj = JSONObject.arr;
+                    
+                    foreach (var val in kvp.Value)
+                    {
+                        obj.Add(val.path);
+                    }
+                    json.AddField(kvp.Key,obj);
+                }
+
+                sw.Write(json.Print(true));
+                sw.Close();
+
+                Debug.Log("Export conection info completed!");
+            }
+            else
+            {
+                Debug.Log("You cancel to export conection info!");
+            }
+        }
 
         public void ReloadAndSelect() {
             m_groupListTree.Reload ();

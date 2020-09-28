@@ -63,6 +63,38 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
+            var lastVersionInfo = this.GetLastBuildInfo(filter, input);
+            if (lastVersionInfo != null)
+            {
+                var appBuildContext = AppBuildContext;
+                var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
+                string versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
+                Version baseVersion = new Version(versionStr);
+
+                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+
+                var result = baseVersion.CompareTo(lastVersion);
+
+                if (AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild)
+                {
+                    if (result > Version.VersionCompareResult.Equal)//制作Patch时，基础版本不能大于上次制作的Patch版本号
+                    {
+                        appBuildContext.ErrorSb.AppendLine($"Large VersionCompareResult.Equal , curVersion : {versionStr.ToString()} , lastVersion : {lastVersion} .");
+                        return false;
+                    }
+
+                    if (result < Version.VersionCompareResult.LowerForPatch)//制作Patch时，基础版本只能在Patch级别小于上次制作的版本号
+                    {
+                        appBuildContext.ErrorSb.AppendLine($"Large VersionCompareResult.HigherForPatch , curVersion : {versionStr.ToString()} , lastVersion : {lastVersion} .");
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                throw new LastBuildVersionFileNotFoundException("Last build version file is not found！");
+            }
+
             return true;
         }
 
@@ -217,15 +249,16 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             {
                 var lastVersion = new Version(lastVersionInfo.versionInfo.version);
 
-                var result = curVersion.CompareTo(lastVersion);
-
-                if (result < Version.VersionCompareResult.Equal)
-                    //如果发现将要制作的基础版本的版本号小于上次制作的版本号，则认为编译此版本的目标版本号是不合法的
+                if (AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild)
                 {
-                    throw new BuildAppVersionException(versionStr, lastVersionInfo.versionInfo.version);
+                    lastVersion.IncrementOneForPatch();
+                    curVersion = lastVersion.Clone();
                 }
             }
-
+            else
+            {
+                throw  new LastBuildVersionFileNotFoundException(versionStr); 
+            }
             return curVersion;
         }
 

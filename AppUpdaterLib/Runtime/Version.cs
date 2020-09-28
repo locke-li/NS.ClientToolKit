@@ -34,7 +34,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
             LowerForPatch,//Major,Minor一样，Patch更低
 
-            Equal,//版本号一样
+            Equal,//版本号一样 
 
             HigherForPatch,//Major，Minor一样，Patch更高
 
@@ -121,12 +121,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.Prase(versionStr);
         }
 
+        public Version()
+        {
+            this.mIsValid = true;
+        }
+
         #endregion
 
         //--------------------------------------------------------------
         #region Methods
         //--------------------------------------------------------------
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -208,6 +213,27 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 throw new InvalidOperationForVersionException("IncrementOneForPatch");
             var patchNum = this.PatchNum + 1;
             this.Patch = patchNum.ToString();
+        }
+
+
+        public Version Clone()
+        {
+            if (!this.mIsValid)
+                throw new InvalidOperationForVersionException("Clone");
+            Version result = new Version();
+            result.Major = this.Major;
+            result.Minor = this.Minor;
+            result.Patch = this.Patch;
+            return result;
+        }
+
+        public override string ToString()
+        {
+            if (!this.mIsValid)
+            {
+                return "Invalid Version!";
+            }
+            return $"Version : {this.Major}.{this.Minor}.{this.Patch}";
         }
 
         #endregion

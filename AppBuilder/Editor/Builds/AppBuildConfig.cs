@@ -95,7 +95,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds
 
         public AppVersion targetAppVersion;
 
-        [Tooltip("此路径需要包含“Assets/”前缀，举例：Assets/AssetGraphConfig/demo.asset")]
+        [Header("此路径需要包含“Assets/”前缀，举例：Assets/AssetGraphConfig/demo.asset")]
         public string targetAssetGraphConfigRelativeToProjectPath = "";
 
         public string TargetAssetGraphConfigAssetsPath => $"{targetAssetGraphConfigRelativeToProjectPath}";
@@ -105,10 +105,13 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         /// </summary>
         public string dataResAbsolutePath = "";
 
-        [Tooltip("负责亚马逊S3上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
+        [Header("制作Patch版本时自增修订号")]
+        public bool incrementRevisionNumberForPatchBuild = true;
+
+        [Header("负责亚马逊S3上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
         public string AmazonS3UpLoadEngineRelativeToAssetsPath = "";
 
-        [Tooltip("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
+        [Header("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
         public string TencentCloudUpLoadEngineRelativeToAssetsPath = "";
 
         /// <summary>

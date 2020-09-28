@@ -15,11 +15,13 @@
 ***************************************************************/
 
 
+using System;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.LoggerModule.Runtime;
 using System.IO;
 using UnityEngine;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
+using Object = UnityEngine.Object;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 {
@@ -84,6 +86,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="requester"></param>
         public static void AppUpdaterSetAppUpdaterRequester(IAppUpdaterRequester requester)
         {
+            CheckIsInitialize("AppUpdaterSetAppUpdaterRequester");
             s_mService.SetAppUpdaterRequester(requester);
         }
 
@@ -93,6 +96,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="callback"></param>
         public static void AppUpdaterSetErrorCallback(AppUpdaterErrorCallback callback)
         {
+            CheckIsInitialize("AppUpdaterSetErrorCallback");
             s_mService.SetErrorCallback(callback);
         }
 
@@ -102,6 +106,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="callback"></param>
         public static void AppUpdaterSetServerMaintenanceCallback(AppUpdaterServerMaintenanceCallback callback)
         {
+            CheckIsInitialize("AppUpdaterSetServerMaintenanceCallback");
             s_mService.SetServerMaintenanceCallback(callback);
         }
 
@@ -111,6 +116,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="callback"></param>
         public static void AppUpdaterSetForceUpdateCallback(AppUpdaterForceUpdateCallback callback)
         {
+            CheckIsInitialize("AppUpdaterSetForceUpdateCallback");
             s_mService.SetForceUpdateCallback(callback);
         }
 
@@ -120,6 +126,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="callback"></param>
         public static void AppUpdaterSetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
         {
+            CheckIsInitialize("AppUpdaterSetPerformCompletedCallback");
             s_mService.SetPerformCompletedCallback(callback);
         }
 
@@ -129,7 +136,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="provider"></param>
         public static void SetStorageInfoProvider(IStorageInfoProvider provider)
         {
+            CheckIsInitialize("SetStorageInfoProvider");
             s_mService.SetStorageInfoProvider(provider);
+        }
+
+        /// <summary>
+        /// 获取热更新进度数据
+        /// </summary>
+        /// <returns></returns>
+        public static AppUpdaterProgressData GetAppUpdaterProgressData()
+        {
+            CheckIsInitialize("GetAppUpdaterProgressData");
+            return AppUpdaterContext.Current.ProgressData;
         }
 
 #if DEBUG_APP_UPDATER
@@ -138,6 +156,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// </summary>
         public static void AppUpdaterStartUpdateAgain()
         {
+            CheckIsInitialize("AppUpdaterStartUpdateAgain");
             s_mService.StartUpdateAgain();
         }
 #endif
@@ -165,6 +184,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             }
         }
 
+
+        private static void CheckIsInitialize(string methodName)
+        {
+            if (!s_mInitialized)
+                throw new NullReferenceException($"Your want to use \"AppUpdaterManager\" that not initialized ! Call method :  \"{methodName}\" .");
+        }
 
 
         #endregion

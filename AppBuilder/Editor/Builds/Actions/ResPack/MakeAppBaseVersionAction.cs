@@ -56,6 +56,23 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
+            var lastVersionInfo = this.GetLastBuildInfo(filter, input);
+            if (lastVersionInfo != null)
+            {
+                var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
+                string versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
+                Version baseVersion = new Version(versionStr);
+
+                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+
+                var result = baseVersion.CompareTo(lastVersion);
+
+                if (result < Version.VersionCompareResult.HigherForMinor)//制作的基础版本必须比上一次的版本在Minor级别更高
+                {
+                    throw new BuildAppVersionException(versionStr, lastVersionInfo.versionInfo.version);
+                }
+            }
+
             return true;
         }
 
@@ -106,19 +123,19 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
             string versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
             Version curVersion = new Version(versionStr);
-            var lastVersionInfo = this.GetLastBuildInfo(filter,input);
-            if (lastVersionInfo != null)
-            {
-                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+            //var lastVersionInfo = this.GetLastBuildInfo(filter,input);
+            //if (lastVersionInfo != null)
+            //{
+            //    var lastVersion = new Version(lastVersionInfo.versionInfo.version);
 
-                var result = curVersion.CompareTo(lastVersion);
+            //    var result = curVersion.CompareTo(lastVersion);
 
-                if (result < Version.VersionCompareResult.Equal)
-                    //如果发现将要制作的基础版本的版本号小于上次制作的版本号，则认为编译此版本的目标版本号是不合法的
-                {
-                    throw new BuildAppVersionException(versionStr,lastVersionInfo.versionInfo.version);
-                }
-            }
+            //    if (result < Version.VersionCompareResult.Equal)
+            //        //如果发现将要制作的基础版本的版本号小于上次制作的版本号，则认为编译此版本的目标版本号是不合法的
+            //    {
+            //        throw new BuildAppVersionException(versionStr,lastVersionInfo.versionInfo.version);
+            //    }
+            //}
 
             return curVersion;
         }

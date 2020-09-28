@@ -3,12 +3,39 @@ using UnityEditor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditorInternal;
 using UnityEngine.Profiling;
 using Model=UnityEngine.AssetGraph.DataModel.Version2;
 
 namespace UnityEngine.AssetGraph {
-    [CustomNode("Configure Bundle/Extract Shared Assets", 71)]
-    public class ExtractSharedAssets : Node {
+    [CustomNode("Configure Bundle/Extract Shared Assets Extend V0", 200)]
+    public class ExtractSharedAssets2 : Node {
+
+        //[Serializable]
+        //public class SharedGroupAssets
+        //{
+        //    public string assetsNames;
+        //}
+
+
+        /// <summary>
+        /// 需要被编组的文件夹
+        /// </summary>
+        [Serializable]
+        public class NeedToGroupedFolder
+        {
+            public string folder;
+        }
+
+        /// <summary>
+        /// 需要被过滤的文件夹
+        /// </summary>
+        [Serializable]
+        public class NeedToFilterFolder
+        {
+            public string folder;
+        }
 
         enum GroupingType : int {
             ByFileSize,
@@ -16,11 +43,23 @@ namespace UnityEngine.AssetGraph {
         };
 
         [SerializeField] private string m_bundleNameTemplate;
+        [SerializeField] private string m_groupedNameTemplate;
         [SerializeField] private SerializableMultiTargetInt m_groupExtractedAssets;
         [SerializeField] private SerializableMultiTargetInt m_groupSizeByte;
         [SerializeField] private SerializableMultiTargetInt m_groupingType;
 
-    	public override string ActiveStyle {
+
+        //[SerializeField] private List<SharedGroupAssets> m_SharedGroupAssets;
+        //ReorderableList m_SharedGroupList;
+
+        //[SerializeField] private List<NeedToGroupedFolder> m_NeedToGroupedFolders;
+        //ReorderableList m_NeedToGroupedFolderList;
+
+
+        [SerializeField] private List<NeedToFilterFolder> m_NeedToFilterFolders = null;
+        ReorderableList m_NeedToFilteredFolderList;
+
+        public override string ActiveStyle {
     		get {
     			return "node 3 on";
     		}
@@ -52,6 +91,7 @@ namespace UnityEngine.AssetGraph {
 
     	public override void Initialize(Model.NodeData data) {
     		m_bundleNameTemplate = "shared_*";
+            m_groupedNameTemplate = "needed_grouped_*";
             m_groupExtractedAssets = new SerializableMultiTargetInt();
             m_groupSizeByte = new SerializableMultiTargetInt();
             m_groupingType = new SerializableMultiTargetInt();
@@ -60,17 +100,107 @@ namespace UnityEngine.AssetGraph {
     	}
 
     	public override Node Clone(Model.NodeData newData) {
-    		var newNode = new ExtractSharedAssets();
+    		var newNode = new ExtractSharedAssets2();
             newNode.m_groupExtractedAssets = new SerializableMultiTargetInt(m_groupExtractedAssets);
             newNode.m_groupSizeByte = new SerializableMultiTargetInt(m_groupSizeByte);
             newNode.m_groupingType = new SerializableMultiTargetInt(m_groupingType);
     		newNode.m_bundleNameTemplate = m_bundleNameTemplate;
-    		newData.AddDefaultInputPoint();
+            newNode.m_groupedNameTemplate = m_groupedNameTemplate;
+            newData.AddDefaultInputPoint();
     		newData.AddDefaultOutputPoint();
     		return newNode;
     	}
 
     	public override void OnInspectorGUI(NodeGUI node, AssetReferenceStreamManager streamManager, NodeGUIEditor editor, Action onValueChanged) {
+            /*
+            if (m_NeedToGroupedFolderList == null)
+            {
+                m_NeedToGroupedFolderList = new ReorderableList(this.m_NeedToGroupedFolders, typeof(NeedToGroupedFolder), 
+                    true, true, true, true);
+                m_NeedToGroupedFolderList.onReorderCallback = list=>
+                {
+                    this.m_NeedToGroupedFolders.Sort((x, y) =>
+                    {
+                        int xIndex = m_NeedToGroupedFolders.FindIndex(f => f == x);
+                        int yIndex = m_NeedToGroupedFolders.FindIndex(f => f == y);
+
+                        return xIndex - yIndex;
+                    });
+                };
+                m_NeedToGroupedFolderList.onAddCallback = list =>
+                {
+                    this.m_NeedToGroupedFolders.Add(new NeedToGroupedFolder());
+                };
+                m_NeedToGroupedFolderList.onRemoveCallback = list =>
+                {
+                    this.m_NeedToGroupedFolders.RemoveAt(list.index);
+                };
+                m_NeedToGroupedFolderList.onCanRemoveCallback = list =>
+                {
+                    int index = list.index;
+
+                    return !(index < 0 || index > m_NeedToGroupedFolders.Count);
+                };
+                m_NeedToGroupedFolderList.drawHeaderCallback = rect =>
+                {
+                    EditorGUI.LabelField(rect,"需要被编组的文件夹路径");
+                };
+                m_NeedToGroupedFolderList.drawElementCallback = (rect,index,selected, focused) =>
+                {
+                    bool oldEnabled = GUI.enabled;
+                    GUI.enabled = !(index < 0 || index > m_NeedToGroupedFolders.Count);
+                    var folder = this.m_NeedToGroupedFolders[index];
+                    folder.folder = EditorGUI.TextField(rect, $"Folder_{index}", folder.folder);
+
+
+                    GUI.enabled = oldEnabled;
+                };
+            }*/
+
+            if (m_NeedToFilteredFolderList == null)
+            {
+                m_NeedToFilteredFolderList = new ReorderableList(m_NeedToFilterFolders, typeof(NeedToFilterFolder),
+                    true, false, true, true);
+                m_NeedToFilteredFolderList.onReorderCallback = list =>
+                {
+                    this.m_NeedToFilterFolders.Sort((x, y) =>
+                    {
+                        int xIndex = m_NeedToFilterFolders.FindIndex(f => f == x);
+                        int yIndex = m_NeedToFilterFolders.FindIndex(f => f == y);
+
+                        return xIndex - yIndex;
+                    });
+                }; 
+                m_NeedToFilteredFolderList.onAddCallback = list =>
+                {
+                    this.m_NeedToFilterFolders.Add(new NeedToFilterFolder());
+                };
+                m_NeedToFilteredFolderList.onRemoveCallback = list =>
+                {
+                    this.m_NeedToFilterFolders.RemoveAt(list.index);
+                };
+                m_NeedToFilteredFolderList.onCanRemoveCallback = list =>
+                {
+                    int index = list.index;
+                    return !(index < 0 || index > m_NeedToFilterFolders.Count);
+                };
+                m_NeedToFilteredFolderList.drawHeaderCallback = rect =>
+                {
+                    EditorGUI.LabelField(rect, "需要被过滤的文件夹路径");
+                };
+                m_NeedToFilteredFolderList.drawElementCallback = (rect, index, selected, focused) =>
+                {
+                    bool oldEnabled = GUI.enabled;
+                    bool enabled = !(index < 0 || index > m_NeedToFilterFolders.Count);
+                    GUI.enabled = enabled;
+                    var folder = this.m_NeedToFilterFolders[index];
+
+                    folder.folder = EditorGUI.TextField(rect, $"Folder_{index}", folder.folder);
+
+                    GUI.enabled = oldEnabled;
+                };
+
+            }
 
     		EditorGUILayout.HelpBox("Extract Shared Assets: Extract shared assets between asset bundles and add bundle configurations.", MessageType.Info);
     		editor.UpdateNodeName(node);
@@ -85,11 +215,17 @@ namespace UnityEngine.AssetGraph {
     			}
     		}
 
-            GUILayout.Space(10f);
+            newValue = EditorGUILayout.TextField("Need Grouped Bundle Name Template", m_groupedNameTemplate);
+            if (newValue != m_groupedNameTemplate)
+            {
+                using (new RecordUndoScope("Need Grouped Bundle Name Template Change", node, true))
+                {
+                    m_groupedNameTemplate = newValue;
+                    onValueChanged();
+                }
+            }
 
-            //bool checkAssetRefWarning = GUILayout.Button("Check bundle assets");
-            //if (checkAssetRefWarning) CheckBundleAssets();
-            //GUILayout.Space(10f);
+            GUILayout.Space(10f);
 
             //Show target configuration tab
             editor.DrawPlatformSelector(node);
@@ -142,21 +278,18 @@ namespace UnityEngine.AssetGraph {
             }
 
     		EditorGUILayout.HelpBox("Bundle Name Template replaces \'*\' with number.", MessageType.Info);
-    	}
+
+            //m_NeedToGroupedFolderList.DoLayoutList();
+            GUILayout.Space(10);
+            m_NeedToFilteredFolderList.DoLayoutList();
+        }
 
 
 
-        //private void CheckBundleAssets()
-        //{
-            
-        //}
-
-
-
-    	/**
+        /**
     	 * Prepare is called whenever graph needs update. 
-    	 */ 
-    	public override void Prepare (BuildTarget target, 
+    	 */
+        public override void Prepare (BuildTarget target, 
     		Model.NodeData node, 
     		IEnumerable<PerformGraph.AssetGroups> incoming, 
     		IEnumerable<Model.ConnectionData> connectionsToOutput, 
@@ -185,6 +318,8 @@ namespace UnityEngine.AssetGraph {
     				var sharedDependency = new Dictionary<string, List<AssetReference>>();
     				var groupNameMap = new Dictionary<string, string>();
                     HashSet<string> allMainAssets = new HashSet<string>();
+                    
+
                     // build dependency map
                     foreach (var ag in incoming) {
     					foreach (var key in ag.assetGroups.Keys) {
@@ -195,8 +330,27 @@ namespace UnityEngine.AssetGraph {
                                 {
                                     allMainAssets.Add(a.importFrom);
                                 }
-                                CollectDependencies(key, new string[] { a.importFrom }, ref dependencyCollector);
-    						}
+
+                                bool needCollectAssets = true;
+                                if (this.m_NeedToFilterFolders != null && this.m_NeedToFilterFolders.Count > 0)
+                                {
+                                    foreach (var folder in m_NeedToFilterFolders)
+                                    {
+                                        if (!string.IsNullOrEmpty(folder.folder))
+                                        {
+                                            if (a.importFrom.Contains(folder.folder))
+                                            {
+                                                needCollectAssets = false;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (needCollectAssets)
+                                {
+                                    CollectDependencies(key, new string[] { a.importFrom }, ref dependencyCollector);
+                                }
+                            }
     					}
     				}
 
@@ -208,34 +362,58 @@ namespace UnityEngine.AssetGraph {
                             needRemovedSet.Add(entry.Key);
                         }
                     }
-                    foreach (var assetPath in needRemovedSet)
-                    {
-//#if USE_DEVCENTER
-//                        Debug.LogError($"Unwanted shared asset , path : {assetPath}.");
-//#endif
-                        dependencyCollector.Remove(assetPath);
-                    }
-                    needRemovedSet.Clear();
-
-
-                    //临时过滤timeline
-                    foreach (var entry in dependencyCollector)
-                    {
-                        if (entry.Key.Contains("Data/AB/Timeline/"))
-                        {
-                            needRemovedSet.Add(entry.Key);
-                        }
-                    }
 
                     foreach (var assetPath in needRemovedSet)
                     {
                         dependencyCollector.Remove(assetPath);
                     }
-                    needRemovedSet.Clear();
+
+                    //Dictionary<string, List<string>> nGroupedAssets = new Dictionary<string, List<string>>();
+                    //if (!string.IsNullOrEmpty(this.m_groupedNameTemplate))
+                    //{
+                    //    foreach (var entry in dependencyCollector)
+                    //    {
+                    //        if (entry.Value != null && entry.Value.Count > 1)
+                    //        {
+                    //            bool contains = false;
+                    //            foreach (var folder in (this.m_NeedToGroupedFolders))
+                    //            {
+                    //                if (!string.IsNullOrEmpty(folder.folder) && entry.Key.Contains(folder.folder))
+                    //                {
+                    //                    if (!nGroupedAssets.ContainsKey(folder.folder))
+                    //                    {
+                    //                        nGroupedAssets.Add(folder.folder,new List<string>());
+                    //                    }
+                    //                    nGroupedAssets[folder.folder].Add(entry.Key);
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+
+                    //    int nCounter = 0;
+                    //    foreach (var kvp in nGroupedAssets)
+                    //    {
+                    //        var assets = kvp.Value;
+                    //        var nGroupedAbName = m_groupedNameTemplate.Replace("*", nCounter.ToString());
+                    //        foreach (var asset in assets)
+                    //        {
+                    //            dependencyCollector.Remove(asset);
+                    //            if (!sharedDependency.ContainsKey(nGroupedAbName))
+                    //            {
+                    //                sharedDependency[nGroupedAbName] = new List<AssetReference>();
+                    //            }
+
+                    //            sharedDependency[nGroupedAbName].Add(AssetReference.CreateReference(asset));
+                    //        }
+                    //        nCounter++;
+                    //    }
+
+                    //}
 
                     foreach (var entry in dependencyCollector) {
     					if(entry.Value != null && entry.Value.Count > 1) {
-    						var joinedName = string.Join("-", entry.Value.ToArray());
+                            //sw.WriteLine(entry.Key);
+                            var joinedName = string.Join("-", entry.Value.ToArray());
     						if(!groupNameMap.ContainsKey(joinedName)) {
     							var count = groupNameMap.Count;
     							var newName = m_bundleNameTemplate.Replace("*", count.ToString());
@@ -252,8 +430,8 @@ namespace UnityEngine.AssetGraph {
     						sharedDependency[groupName].Add( AssetReference.CreateReference(entry.Key) );
     					}
     				}
-
-    				if(sharedDependency.Keys.Count > 0) {
+                   
+                    if (sharedDependency.Keys.Count > 0) {
                         // subgroup shared dependency bundles by size
                         if (m_groupExtractedAssets [target] != 0) {
                             List<string> devidingBundleNames = new List<string> (sharedDependency.Keys);
@@ -280,7 +458,7 @@ namespace UnityEngine.AssetGraph {
                             }
                         }
 
-                        foreach(var bundleName in sharedDependency.Keys) {
+                        foreach (var bundleName in sharedDependency.Keys) {
                             var bundleConfig = buildMap.GetAssetBundleWithNameAndVariant (node.Id, bundleName, string.Empty);
                             bundleConfig.AddAssets (node.Id, sharedDependency[bundleName].Select(a => a.importFrom));
                         }

@@ -29,7 +29,7 @@ using UnityEditor.SceneManagement;
 /// <summary>
 /// AB系统管理器类具体实现
 /// </summary>
-public class ABMgrHandle : MonoBehaviour
+internal class ABMgrHandle : MonoBehaviour
 {
     private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
         LoggerManager.GetLogger("ABMgrHandle"));
@@ -121,7 +121,7 @@ public class ABMgrHandle : MonoBehaviour
 
 
 #if UNITY_EDITOR
-    private static Dictionary<string, ABRequest> editorCacheList = new Dictionary<string, ABRequest>();
+    private static Dictionary<string, ABRequest> editorCacheList = new Dictionary<string, ABRequest>(StringComparer.OrdinalIgnoreCase);
     private static void initEditorCacheList()
     {
         if(editorCacheList.Count == 0)
@@ -191,7 +191,6 @@ public class ABMgrHandle : MonoBehaviour
     }
     public static Object Load(string path)
     {
-        path = path.ToLower();
         ABRequest req = LoadAB(path);
         if (req == null)
         {
@@ -256,6 +255,11 @@ public class ABMgrHandle : MonoBehaviour
         }
     }
 
+    public static T Load<T>(string path) where T : Object
+    {
+        return Load(path, typeof(T)) as T;
+    }
+
     public static void LoadAsync(string path, System.Type type, ObjectCallBack callback)
     {
 #if UNITY_EDITOR
@@ -293,6 +297,55 @@ public class ABMgrHandle : MonoBehaviour
         });
 #endif
     }
+
+
+    public static void LoadAsync<T>(string path, ObjectCallBack callback) where T : Object
+    {
+        LoadAsync(path,typeof(T),callback);
+    }
+
+
+    public static void LoadBundleOnly(string path)
+    { 
+        var req = LoadAB(path);
+        if (req == null)
+        {
+            s_mLogger.Value?.Error($"Load asset bundle failure , path : \"{path}\" .");
+        }
+    }
+
+    public static void LoadBundleOnlyAsync(string path, BundleLoadCompletedCallBack callback)
+    {
+#if UNITY_EDITOR
+        if (!AssetBundleManager.SimulateAssetBundleInEditor)
+        {
+            loadABAsync(path, delegate (ABRequest req)
+            {
+                callback?.Invoke(req != null);
+            });
+        }
+        else
+        {
+            ABRequest req = getABRequest(path);
+            if (req == null)
+            {
+                s_mLogger.Value?.Error($"Load asset bundle async failure , path : \"{path}\" .");
+            }
+            callback?.Invoke(req != null);
+        }
+#else
+        loadABAsync(path, delegate (ABRequest req)
+        {
+            callback?.Invoke(req != null);
+        });
+#endif
+    }
+
+    public static void UnLoadBundle(string path)
+    {
+        Delete(path);
+    }
+
 
     public static T LoadFromResource<T>(string path) where T : Object
     {
@@ -515,27 +568,27 @@ public class ABMgrHandle : MonoBehaviour
         }
         else
         {
-            Debug.LogErrorFormat("get ABRequest fail, path = {0}", path);
+            s_mLogger.Value?.Error($"get ABRequest fail, path = {path}");
             callback?.Invoke(null);
         }
     }
     
-    private static byte[] LoadLua(string path)
-    {
-        byte[] dat = null;
-        ABRequest result = ABConfigOperate.GetRequest(path);
-        if(result != null)
-        {
-            result.LoadAsset(null, false);
-            if (result.ABHandle.AB != null)
-            {
-                TextAsset txt = result.MainAsset as TextAsset;
-                if (txt != null)
-                    dat = txt.bytes;
-            }
-        }
-        return dat;
-    }
+    //private static byte[] LoadLua(string path)
+    //{
+    //    byte[] dat = null;
+    //    ABRequest result = ABConfigOperate.GetRequest(path);
+    //    if(result != null)
+    //    {
+    //        result.LoadAsset(null, false);
+    //        if (result.ABHandle.AB != null)
+    //        {
+    //            TextAsset txt = result.MainAsset as TextAsset;
+    //            if (txt != null)
+    //                dat = txt.bytes;
+    //        }
+    //    }
+    //    return dat;
+    //}
     
     private static ABRequest loadSceneBase(string sceneName, LoadSceneMode mode = LoadSceneMode.Single , bool isAsync = false , ABRequestCallBack callback = null)
     {
@@ -543,7 +596,7 @@ public class ABMgrHandle : MonoBehaviour
         ABRequest result = ABConfigOperate.GetRequest(scenePath,true);
         if(result == null)
         {
-            s_mLogger.Value?.Debug($"loadSceneBase failure ! scenePath : \"{scenePath}\" .");
+            s_mLogger.Value?.Error($"loadSceneBase failure ! scenePath : \"{scenePath}\" .");
         }
         else
         {
@@ -552,13 +605,14 @@ public class ABMgrHandle : MonoBehaviour
         return result;
     }
 
+
     private static ABRequest unLoadSceneBase(string sceneName)
     {
         string scenePath = $"{m_sSceneFolderName}/{sceneName}".ToLower();
         ABRequest result = ABConfigOperate.GetRequest(scenePath);
         if (result == null)
         {
-            s_mLogger.Value?.Debug($"unLoadSceneBase failure ! scenePath : \"{scenePath}\" .");
+            s_mLogger.Value?.Error($"unLoadSceneBase failure ! scenePath : \"{scenePath}\" .");
         }
         else
         {
@@ -622,7 +676,6 @@ public class ABMgrHandle : MonoBehaviour
         if (!AssetBundleManager.SimulateAssetBundleInEditor)
         {
             loadSceneBase(sceneName, mode);
-
             return SceneManager.LoadSceneAsync(sceneName, mode);
         }
         else

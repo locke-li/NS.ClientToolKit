@@ -2,7 +2,8 @@
     "name": "CenturyGame.AssetGraph.Editor",
     "references": [
         "Unity.AssetGraph",
-        "CenturyGame.AssetBundleBrowser.Editor"
+        "CenturyGame.AssetBundleBrowser.Editor",
+        "CenturyGame.Core"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

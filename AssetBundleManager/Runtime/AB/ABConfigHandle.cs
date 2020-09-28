@@ -16,10 +16,10 @@ public sealed class ABConfigHandle
     }
     public Dictionary<string, ABItem> ABItemList = null;
     public Dictionary<string, ABRequest> Cache = new Dictionary<string, ABRequest>(StringComparer.OrdinalIgnoreCase);
-    public List<ABItem> updateList = new List<ABItem>();
+    public LinkedList<ABItem> updateList = new LinkedList<ABItem>();
     private Queue<ABItemAsyncAction> itemActionList = new Queue<ABItemAsyncAction>();
     public ResManifest config;
-    private List<ABRequest> asyncReqList = new List<ABRequest>();
+    private LinkedList<ABRequest> asyncReqList = new LinkedList<ABRequest>();
 
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class ABConfigHandle
     }
     private void addUpdateList(ABItem item)
     {
-        updateList.Add(item);
+        updateList.AddLast(item);
     }
     private void addUploadListList(ABItemAsyncAction item)
     {
@@ -71,7 +71,7 @@ public sealed class ABConfigHandle
 
     private void addAsyncRequest(ABRequest req)
     {
-        asyncReqList.Add(req);
+        asyncReqList.AddLast(req);
     }
     
     /// <summary>
@@ -129,6 +129,25 @@ public sealed class ABConfigHandle
 
     private ABRequest TestAbPath(string pathName, bool isScene = false)
     {
+        string bundleName = pathName;
+        while (true)
+        {
+            int lastIdx = bundleName.LastIndexOf('/');
+            if (lastIdx != -1)
+            {
+                bundleName = bundleName.Substring(0,lastIdx);
+                if (ABItemList.ContainsKey(bundleName))
+                {
+                    return CreateAndAdd(ABItemList[bundleName], pathName, isScene);
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        return null;
+        /*
         string[] pathSplit = pathName.Split('/');
         int splitLength = pathSplit.Length;
         if (splitLength != 0)
@@ -159,6 +178,7 @@ public sealed class ABConfigHandle
             }
         }
         return null;
+        */
     }
 
 
@@ -176,16 +196,37 @@ public sealed class ABConfigHandle
     /// </summary>
     public void UpdateItem()
     {
-        for (int i = 0; i < updateList.Count; i++)
+        int processCount = 0;
+        ABItem item;
+        var upe = updateList.First;
+        var uptnode = upe;
+        while(upe != null)
         {
-            ABItem item = updateList[i];
+            item = upe.Value;
+            uptnode = upe.Next;
             item.Update();
             if (item.AB != null)
             {
-                updateList.RemoveAt(i);
-                i--;
+                updateList.Remove(upe);
             }
+            // 一次最大处理10个
+            if (processCount > 10)
+            {
+                break;
+            }
+
+            upe = uptnode;
         }
+        //for (int i = 0; i < updateList.Count; i++)
+        //{
+        //    ABItem item = updateList[i];
+        //    item.Update();
+        //    if (item.AB != null)
+        //    {
+        //        updateList.RemoveAt(i);
+        //        i--;
+        //    }
+        //}
         
         long lastTick = DateTime.Now.Ticks;
         long allTick = 0;
@@ -200,16 +241,27 @@ public sealed class ABConfigHandle
                 break;
             }
         }
-
-        for (int i = 0; i < asyncReqList.Count; i++)
+        // TODO: 这个地方会导致加载完成和请求加载的顺序不一致，是否会出现异常
+        ABRequest t;
+        var reqe = asyncReqList.First;
+        var reqtnode = reqe;
+        processCount = 0;
+        while(reqe != null)
         {
-            ABRequest req = asyncReqList[i];
-            req.Update();
-            if (req.AsyncRequest == null)
+            t = reqe.Value;
+            t.Update();
+            reqtnode = reqe.Next;
+            if (t.AsyncRequest == null)
             {
-                asyncReqList.RemoveAt(i);
-                i--;
+                asyncReqList.Remove(reqe);
             }
+            ++processCount;
+            // 一次最大处理10个
+            if (processCount > 10)
+            {
+                break;
+            }
+            reqe = reqtnode;
         }
     }
 

@@ -57,6 +57,15 @@ namespace CenturyGame.LoggerModule.Runtime
         }
 
         /// <summary>
+        /// LoggerProvider是否存在
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsLoggerProviderExist()
+        {
+            return _sMLoggerProvider != null;
+        }
+
+        /// <summary>
         /// 获取指定名字的Logger
         /// </summary>
         /// <param name="name"></param>

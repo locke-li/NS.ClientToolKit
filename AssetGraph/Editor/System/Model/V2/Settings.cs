@@ -113,10 +113,26 @@ namespace UnityEngine.AssetGraph.DataModel.Version2 {
 
         public static class Path
         {
+            
+            //public static string PackagePath => "Packages/com.centurygame.clienttoolkit/AssetGraph";
+            //public static string PackagePath => "Assets/ClientToolKit/AssetGraph";
 
-	        public static string PackagePath => "Packages/com.centurygame.clienttoolkit/AssetGraph";
-	        
-	        public static string DefaultBasePath => "Assets/CenturyGamePackageRes/AssetGraph";
+            private static readonly string m_sPackagePath = "Packages/com.centurygame.clienttoolkit/AssetGraph";
+
+            private static readonly string m_sAssetsFolderPackagePath = "Assets/ClientToolKit/AssetGraph";
+
+            public static string PackagePath
+            {
+                get
+                {
+                    if (System.IO.File.Exists(m_sPackagePath))
+                    {
+                        return m_sPackagePath;
+                    }
+                    return m_sAssetsFolderPackagePath;
+                }
+            }
+            public static string DefaultBasePath => "Assets/CenturyGamePackageRes/AssetGraph";
 
 	        public static string BasePath => UserSettings.ConfigBaseDir;
 

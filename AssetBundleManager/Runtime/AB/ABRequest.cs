@@ -49,16 +49,16 @@ public sealed class ABRequest
         AssetPath = assetPath;
     }
 
-#if UNITY_EDITOR
-    public List<string> StackStr = new List<string>();
-#endif
+//#if UNITY_EDITOR
+//    public List<string> StackStr = new List<string>();
+//#endif
 
     private Queue<ABRequestCallBack> calls = new Queue<ABRequestCallBack>();
 
     private static Dictionary<int, ABRequest> objCache = new Dictionary<int, ABRequest>();
 
     /// <summary>
-    /// AB的路径（相对路劲）
+    /// AB的路径（相对路径）
     /// </summary>
     public string Path;
     
@@ -179,13 +179,13 @@ public sealed class ABRequest
     public void LoadAsset(ABRequestCallBack req , bool async)
     {
         Async = async;
-#if UNITY_EDITOR
-        StackStr.Add(AbHelp.GetStackTraceModelName());
-        if (StackStr.Count > 20)
-        {
-            StackStr.RemoveAt(0);
-        }
-#endif
+//#if UNITY_EDITOR
+//        StackStr.Add(AbHelp.GetStackTraceModelName());
+//        if (StackStr.Count > 20)
+//        {
+//            StackStr.RemoveAt(0);
+//        }
+//#endif
         AddUseCount();
         if (req != null)
         {
@@ -193,6 +193,19 @@ public sealed class ABRequest
         }
         ABHandle.LoadItem(requestCallBack, Async);
     }
+
+
+    //public void LoadABOnly(ABRequestCallBack req, bool async)
+    //{
+    //    Async = async;
+
+    //    if (req != null)
+    //    {
+    //        calls.Enqueue(req);
+    //    }
+    //    ABHandle.LoadItem(requestCallBack, Async);
+    //}
+
 
     /// <summary>
     /// 开始加载物体请求
@@ -202,14 +215,9 @@ public sealed class ABRequest
     public void LoadScene(ABRequestCallBack req, bool async, LoadSceneMode mode = LoadSceneMode.Single)
     {
         this.LoadSceneMode = mode;
-        Async = async;
-        AddUseCount();
-        if (req != null)
-        {
-            calls.Enqueue(req);
-        }
-        ABHandle.LoadItem(requestCallBack, Async);
+        this.LoadAsset(req,async);
     }
+
 
     /// <summary>
     /// 请求引用计数
@@ -275,9 +283,9 @@ public sealed class ABRequest
         if (deleteState())
         {
             IsDone = false;
-#if UNITY_EDITOR
-            StackStr.Clear();
-#endif
+//#if UNITY_EDITOR
+//            StackStr.Clear();
+//#endif
         }
         if (ABHandle != null)
             ABHandle.Delete();
@@ -407,6 +415,9 @@ public sealed class ABRequest
         }
         else
         {
+#if UNITY_EDITOR
+            s_mLogger.Value.Debug($"Load<T>  AssetPath : {AssetPath}  type name {type.Name}");
+#endif
             return ABHandle.AB.LoadAssetAsync(AssetPath, type);
         }
     }
@@ -416,10 +427,23 @@ public sealed class ABRequest
         if (AsyncRequest != null && AsyncRequest.isDone)
         {
             if (AsyncRequest.asset == null)
-                Debug.LogErrorFormat("load asset async return a null, path = {0}", AssetPath);
+                s_mLogger.Value.Error($"load asset async return a null, Path = {Path}");
             foreach (ObjectCallBack task in AsyncLoadTasks)
             {
-                task?.Invoke(AsyncRequest.asset);
+                try
+                {
+                    var asset = AsyncRequest.asset;
+                    if (asset == null)
+                    {
+                        s_mLogger.Value.Error($"Async load asset failure , asset path is \"{this.Path}\" .");
+                    }
+
+                    task?.Invoke(asset);
+                }
+                catch (Exception e)
+                {
+                    s_mLogger.Value.Fatal($"Load asset exception , error message : {e.Message} \n  stackTrace : {e.StackTrace}");
+                }
             }
             AsyncLoadTasks.Clear();
             AsyncRequest = null;
@@ -428,3 +452,4 @@ public sealed class ABRequest
 }
 public delegate void ABRequestCallBack(ABRequest ab);
 public delegate void ObjectCallBack(UnityEngine.Object obj);
+public delegate void BundleLoadCompletedCallBack(bool success);
