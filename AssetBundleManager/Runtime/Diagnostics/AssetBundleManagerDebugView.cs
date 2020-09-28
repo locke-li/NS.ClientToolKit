@@ -241,7 +241,7 @@ namespace CenturyGame.AssetBundleManager.Runtime.Diagnostics
                 {
                     if (GUILayout.Button("Load"))
                     {
-                        AssetBundleManager.Load(this.mCurSelectedAbItem.Table.Name);
+                        AssetBundleManager.Load(this.mCurSelectedAbItem.Table.Name,typeof(UnityEngine.Object));
                     }
 
                     if (GUILayout.Button("LoadAndInit"))

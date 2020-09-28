@@ -90,7 +90,7 @@ namespace CenturyGame.Framework.UI
             if (!uiPrefabDic.ContainsKey(uiName))
             {
                 string prefabPath = string.Concat(path, uiName);
-                Object uiPrefab = AssetBundleManager.Load(prefabPath);
+                Object uiPrefab = AssetBundleManager.Load<GameObject>(prefabPath);
                 if (uiPrefab != null)
                 {
                     UIPrefabData pData = new UIPrefabData
