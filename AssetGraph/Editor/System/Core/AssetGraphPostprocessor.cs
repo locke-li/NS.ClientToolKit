@@ -117,7 +117,7 @@ namespace UnityEngine.AssetGraph {
                 }
                 
             }
-
+            
             foreach (string str in deletedAssets) 
             {
                 AssetReferenceDatabase.DeleteReference(str);
