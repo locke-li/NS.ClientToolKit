@@ -29,7 +29,7 @@ using CenturyGame.AppBuilder.Editor.Builds.InnerLoggers;
 
 namespace CenturyGame.AppBuilder.Editor.Builds
 {
-    public class AppBuilderPipelineProcessor : BasePipelineProcessor
+    internal class AppBuilderPipelineProcessor : BasePipelineProcessor
     {
         //--------------------------------------------------------------
         #region Fields

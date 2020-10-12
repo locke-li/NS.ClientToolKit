@@ -83,6 +83,11 @@ namespace CenturyGame.AppBuilder.Editor.Commands
 
         static ProcessResult RunPipeline(string pipelineConfigPath)
         {
+            if (string.IsNullOrEmpty(pipelineConfigPath))
+            {
+                return ProcessResult.Create(ProcessState.Error,$"The pipeline config that path is \"{pipelineConfigPath}\" is not found!");
+            }
+
             LoggerManager.SetCurrentLoggerProvider(new AppBuilderLoggerProvider());
 
             var processor = AppBuilderPipelineProcessor.ReadFromBuildProcessConfig(pipelineConfigPath);
@@ -92,67 +97,6 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             return processor.Process(input);
         }
 
-
-        //[MenuItem("Commands/test make basic")]
-        static void MakeBaseVersionResources212()
-        {
-            string configPath = AppBuildConfig.GetAppBuildConfigInst().AppBuildConfigFolder + "/MakeBaseVersionTest.yaml";
-            var processor = AppBuilderPipelineProcessor.ReadFromBuildProcessConfig(configPath);
-
-            AppBuildPipelineInput input = new AppBuildPipelineInput();
-            var result = processor.Process(input);
-
-            if (result.State == ProcessState.Error)
-            {
-                Debug.LogError($"Build app failure , error message : {result.Message}");
-            }
-            else
-            {
-                Debug.Log("Build app completed!");
-            }
-        }
-
-        //[MenuItem("Commands/test make pathch")]
-        static void MakeBaseVersionResources23()
-        {
-            string configPath = AppBuildConfig.GetAppBuildConfigInst().AppBuildConfigFolder + "/MakePatchVersionTest.yaml";
-            var processor = AppBuilderPipelineProcessor.ReadFromBuildProcessConfig(configPath);
-
-            AppBuildPipelineInput input = new AppBuildPipelineInput();
-            var result = processor.Process(input);
-
-            if (result.State == ProcessState.Error)
-            {
-                Debug.LogError($"Build app failure , error message : {result.Message}");
-            }
-            else
-            {
-                Debug.Log("Build app completed!");
-            }
-        }
-
-        //[MenuItem("Commands/clear conf folder")]
-        static void MakeBaseVersionResources1()
-        {
-            var processor = new AppBuilderPipelineProcessor();
-            ResourcesProcessFilter filter = new ResourcesProcessFilter();
-            filter.Enqueue(new ProcessDataResAction());
-            filter.Enqueue(new FileVersionManifestGenerateAction());
-
-            processor.Register(filter);
-
-            AppBuildPipelineInput input = new AppBuildPipelineInput();
-            var result = processor.Process(input);
-
-            if (result.State == ProcessState.Error)
-            {
-                Debug.LogError($"Build app failure , error message : {result.Message}");
-            }
-            else
-            {
-                Debug.Log("Build app completed!");
-            }
-        }
 
         //[MenuItem("Commands/clear data folder")]
         private static void clearStreamingAssets()
@@ -181,33 +125,6 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             }
         }
 
-        //[MenuItem("Commands/Make local json")]
-        static void WriteJson()
-        {
-            //string json = File.ReadAllText(@"F:\SVNProjects\DianDianClient\Assets\StreamingAssets\res_data.json");
-
-            //VersionManifest vm = JsonUtility.FromJson<VersionManifest>(json);
-
-            //JSONObject doc = new JSONObject();
-
-            //doc.AddField("rawdata/ResourceVersion_conf.json", "efa665c93ade22908b5250a77ed21990#382");
-            //doc.AddField("rawdata/ResourceVersion_conf.json", "efa665c93ade22908b5250a77ed21990#382");
-            //doc.AddField("rawdata/ResourceVersion_conf.json", "efa665c93ade22908b5250a77ed21990#382");
-            //doc.AddField("rawdata/ResourceVersion_conf.json", "efa665c93ade22908b5250a77ed21990#382");
-
-
-            //for (int i = 0; i < vm.Datas.Count; i++)
-            //{
-            //    var data = vm.Datas[i];
-            //    var obj = new JSONObject(JSONObject.Type.STRING);
-            //    obj.str = data.N;
-            //    doc[i] = obj;
-            //}
-
-            //string str = doc.ToString();
-            //Debug.LogError(str);
-
-        }
 
         [MenuItem("CenturyGame/AppBuilder/Commands/清理编译缓存")]
         static void ClearBuildCacheFolder()
