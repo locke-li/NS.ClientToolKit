@@ -125,7 +125,7 @@ namespace UnityEngine.AssetGraph.DataModel.Version2 {
             {
                 get
                 {
-                    if (System.IO.File.Exists(m_sPackagePath))
+                    if (System.IO.Directory.Exists(m_sPackagePath))
                     {
                         return m_sPackagePath;
                     }
