@@ -257,20 +257,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             return path;
         }
 
-        public string GetLuaScriptsFolderPath()
-        {
-            string path = AppBuildConfig.GetAppBuildConfigInst().luaScriptsAbsoulutePath;
-
-            if (string.IsNullOrEmpty(path))
-            {
-                return string.Empty;
-            }
-
-            path = EditorUtils.OptimazePath(path);
-
-            return path;
-        }
-
         #region Local config load
 
         /// <summary>

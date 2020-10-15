@@ -2,24 +2,43 @@
 using UnityEngine;
 using System;
 using System.IO;
+using UnityEditor;
 
 namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 {
     public class LuaScriptsCopyAction : BaseBuildFilterAction
     {
+
+        string GetLuaRootPath()
+        {
+            string luaRootPath = $"{Application.dataPath}/../LuaProject";
+            luaRootPath = EditorUtils.OptimazePath(luaRootPath);
+            return luaRootPath;
+        }
+
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            return true;
+            var luaRootPath = GetLuaRootPath();
+
+            if (Directory.Exists(luaRootPath))
+            {
+                return true;
+            }
+
+            var appBuildContext = AppBuildContext;
+            appBuildContext.ErrorSb.AppendLine($"The luaRootPath that path is \"{luaRootPath}\" is not exist!");
+            return false;
         }
 
         public override void Execute(IFilter filter, IPipelineInput input)
         {
-            var context = AppBuildContext;
-            string luaRootPath = context.GetLuaScriptsFolderPath();
+            string luaRootPath = GetLuaRootPath();
             Logger.Info($"Lua Root Path : {luaRootPath}");
             string copyPath = EditorUtils.OptimazePath(Application.streamingAssetsPath + "/lua"); //(Application.streamingAssetsPath + "/lua").Replace('/', '\\');
             ClearOldScripts(filter, input, copyPath);
             CopyScripts(filter, input, luaRootPath, copyPath);
+
+            AssetDatabase.Refresh();
             this.State = ActionState.Completed;
         }
 

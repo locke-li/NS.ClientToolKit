@@ -26,6 +26,7 @@ using UnityEngine;
 using CenturyGame.AppBuilder.Editor.Builds.Contexts;
 using CenturyGame.LoggerModule.Runtime;
 using CenturyGame.AppBuilder.Editor.Builds.InnerLoggers;
+using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.AppBuilder.Editor.Builds
 {
@@ -42,6 +43,20 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         //--------------------------------------------------------------
 
         public override IPipelineContext Context { get; } = new AppBuildContext();
+
+
+        private ILogger mLogger;
+        protected override ILogger Logger
+        {
+            get
+            {
+                if (mLogger == null)
+                {
+                    mLogger = LoggerManager.GetLogger("AppBuilderPipelineProcessor");
+                }
+                return mLogger;
+            }
+        }
 
         #endregion
 

@@ -114,12 +114,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         [Header("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
         public string TencentCloudUpLoadEngineRelativeToAssetsPath = "";
 
-        /// <summary>
-        /// Lua脚本的根目录
-        /// </summary>
-        public string luaScriptsAbsoulutePath = "";
-
-
         public static AppBuildConfig GetAppBuildConfigInst()
         {
             var config = AssetDatabase.LoadAssetAtPath<AppBuildConfig>(GetConfigRelativeToProjectPath());
