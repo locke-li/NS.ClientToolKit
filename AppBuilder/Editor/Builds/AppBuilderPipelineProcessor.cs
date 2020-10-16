@@ -118,7 +118,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             {
                 actionType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                     where !(assembly.ManifestModule is System.Reflection.Emit.ModuleBuilder)
-                    from type in assembly.GetExportedTypes()
+                    from type in assembly.GetTypes()
                     where
                         type.FullName == typeFullName
                     select type).FirstOrDefault();
