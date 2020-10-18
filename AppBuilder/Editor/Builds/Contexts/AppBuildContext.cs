@@ -390,8 +390,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
                     Path.DirectorySeparatorChar,
                     StreamingAssetsFolder,
                     Path.DirectorySeparatorChar,
-                    Utility.AssetBundlesOutputPath,
-                    Path.DirectorySeparatorChar,
                     Utility.GetPlatformName()
                 );
             }
