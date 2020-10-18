@@ -159,9 +159,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         /// <returns></returns>
         public string GetBuiltinAppInfoFilePath()
         {
-            string path = string.Concat(System.Environment.CurrentDirectory
-                , Path.DirectorySeparatorChar
-                , this.StreamingAssetsFolder
+            string path = string.Concat(this.GetAssetsOutputPath()
                 , Path.DirectorySeparatorChar
                 , AssetsFileSystem.AppInfoFileName);
             path = EditorUtils.OptimazePath(path);
@@ -174,9 +172,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         /// <returns></returns>
         public string GetAssetsBundleResManifestPath()
         {
-            string path = string.Concat(System.Environment.CurrentDirectory
-                , Path.DirectorySeparatorChar
-                , this.StreamingAssetsFolder
+            string path = string.Concat(this.GetAssetsOutputPath()
                 , Path.DirectorySeparatorChar
                 , AssetsFileSystem.UnityABFileName);
             path = EditorUtils.OptimazePath(path);
@@ -191,9 +187,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         /// <returns></returns>
         public string GetLocalUnityResUpdateManifestPath()
         {
-            string path = string.Concat(System.Environment.CurrentDirectory
-                , Path.DirectorySeparatorChar
-                , this.StreamingAssetsFolder
+            string path = string.Concat(this.GetAssetsOutputPath()
                 , Path.DirectorySeparatorChar
                 , AssetsFileSystem.UnityResManifestNamePattern);
 
@@ -384,6 +378,29 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             }
 
             return path;
+        }
+
+
+        public string GetAssetsOutputPath()
+        {
+            string outputPath = string.Empty;
+            if (AppBuildConfig.GetAppBuildConfigInst().AppendPlatformNameToStreamingAssets)
+            {
+                outputPath = string.Concat(System.Environment.CurrentDirectory,
+                    Path.DirectorySeparatorChar,
+                    StreamingAssetsFolder,
+                    Path.DirectorySeparatorChar,
+                    Utility.AssetBundlesOutputPath,
+                    Path.DirectorySeparatorChar,
+                    Utility.GetPlatformName()
+                );
+            }
+            else
+            {
+                outputPath = string.Concat(System.Environment.CurrentDirectory, Path.DirectorySeparatorChar, StreamingAssetsFolder);
+            }
+            outputPath = EditorUtils.OptimazePath(outputPath);
+            return outputPath;
         }
 
         #endregion
