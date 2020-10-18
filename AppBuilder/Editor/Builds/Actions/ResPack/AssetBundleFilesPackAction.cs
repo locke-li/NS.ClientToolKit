@@ -89,7 +89,21 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 }
 
                 int pathLength = disk.FullName.Length;
-                string targetPath = string.Concat(System.Environment.CurrentDirectory, Path.DirectorySeparatorChar, appBuildContext.StreamingAssetsFolder);
+                string targetPath = string.Empty;
+                if (AppBuildConfig.GetAppBuildConfigInst().AppendPlatformNameToStreamingAssets)
+                {
+                    targetPath = string.Concat(System.Environment.CurrentDirectory,
+                        Path.DirectorySeparatorChar,
+                        Utility.AssetBundlesOutputPath,
+                        Path.DirectorySeparatorChar,
+                        Utility.GetPlatformName(),
+                        Path.DirectorySeparatorChar,
+                        appBuildContext.StreamingAssetsFolder);
+                }
+                else
+                {
+                    targetPath = string.Concat(System.Environment.CurrentDirectory, Path.DirectorySeparatorChar, appBuildContext.StreamingAssetsFolder);
+                }
                 List<ABTableItem> list = new List<ABTableItem>();
                 List<FileDesc> infoList = new List<FileDesc>();
 

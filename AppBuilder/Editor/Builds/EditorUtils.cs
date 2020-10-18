@@ -141,6 +141,5 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             }
             return sc.ToString();
         }
-
     }
 }

@@ -114,6 +114,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         [Header("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
         public string TencentCloudUpLoadEngineRelativeToAssetsPath = "";
 
+        [Header("追加平台名到StreamingAssets资源")]
+        public bool AppendPlatformNameToStreamingAssets = false;
+
         public static AppBuildConfig GetAppBuildConfigInst()
         {
             var config = AssetDatabase.LoadAssetAtPath<AppBuildConfig>(GetConfigRelativeToProjectPath());
