@@ -92,7 +92,7 @@ namespace CenturyGame.Core.Pipeline
                 catch (Exception ex)
                 {
                     var context = this.Processor.Context;
-                    context.AppendLog("Error message : " + ex.Message + " stackTrace : " + ex.StackTrace);
+                    context.AppendErrorLog("Error message : " + ex.Message + " stackTrace : " + ex.StackTrace);
                     this.State = FilterState.Error;
                 }
                

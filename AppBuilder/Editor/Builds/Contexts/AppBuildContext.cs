@@ -338,7 +338,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         #endregion
 
 
-        public void AppendLog(string message)
+        public void AppendErrorLog(string message)
         {
             this.ErrorSb.AppendLine(message);
         }

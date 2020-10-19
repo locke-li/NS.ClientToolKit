@@ -78,7 +78,7 @@ namespace CenturyGame.Core.Pipeline
                 {
                     Logger?.Error($"Error msg : {ex.Message} , stackTrace : {ex.StackTrace} .");
                     var context = this.Context;
-                    context.AppendLog(
+                    context.AppendErrorLog(
                             $"Exception name : {ex.GetType().Name} . The action that name is {pipelineFilterAction.GetType().Name} is execute failure! error msg : {ex.Message} , " +
                             $"error stackTrace : {ex.StackTrace}");
 
@@ -117,7 +117,7 @@ namespace CenturyGame.Core.Pipeline
 
                         this.State = ActionState.Error;
                         var context = this.Context;
-                        context.AppendLog(
+                        context.AppendErrorLog(
                                 $"The action that name is {pipelineFilterAction.GetType().Name} is execute failure!");
 
                         break;
@@ -127,7 +127,7 @@ namespace CenturyGame.Core.Pipeline
                 {
                     success = false;
                     var context = this.Context;
-                    context.AppendLog(
+                    context.AppendErrorLog(
                             $"Exception name : {ex.GetType().Name} . The action that name is {pipelineFilterAction.GetType().Name} is execute failure! error msg : {ex.Message} , " +
                             $"error stackTrace : {ex.StackTrace}");
                     this.State = ActionState.Error;

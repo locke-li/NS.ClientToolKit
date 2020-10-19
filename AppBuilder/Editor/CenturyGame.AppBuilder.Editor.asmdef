@@ -9,7 +9,8 @@
         "XNode",
         "XNodeEditor",
         "CenturyGame.AppBuilder.Runtime",
-        "CenturyGame.LoggerModule.Runtime"
+        "CenturyGame.LoggerModule.Runtime",
+        "CenturyGame.ClientToolKit.AppSetting.Runtime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

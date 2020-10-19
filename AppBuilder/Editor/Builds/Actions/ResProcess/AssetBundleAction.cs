@@ -18,6 +18,7 @@ using UnityEngine;
 using CenturyGame.Core.Pipeline;
 using System.IO;
 using CenturyGame.AppBuilder.Editor.Builds.Contexts;
+using CenturyGame.ClientToolKit.AppSetting.Runtime;
 using UnityEngine.Video;
 
 namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResProcess
@@ -58,6 +59,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResProcess
             {
                 var appBuildContext = AppBuildContext;
                 appBuildContext.ErrorSb.AppendLine($"The assetgraph config that path is \"{configPath}\" is not exist!");
+                return false;
+            }
+
+            var appSetting = Resources.Load<AppSetting>("AppSetting");
+            if (appSetting == null)
+            {
+                var appBuildContext = AppBuildContext;
+                appBuildContext.AppendErrorLog($"Pleause create a appSetting asset !");
                 return false;
             }
             return true;

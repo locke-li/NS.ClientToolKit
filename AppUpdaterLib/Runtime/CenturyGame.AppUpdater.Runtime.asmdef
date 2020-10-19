@@ -2,7 +2,8 @@
     "name": "CenturyGame.AppUpdater.Runtime",
     "references": [
         "CenturyGame.Core",
-        "CenturyGame.LoggerModule.Runtime"
+        "CenturyGame.LoggerModule.Runtime",
+        "CenturyGame.ClientToolKit.AppSetting.Runtime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

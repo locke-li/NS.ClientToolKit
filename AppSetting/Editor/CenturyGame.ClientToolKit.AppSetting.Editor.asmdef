@@ -1,9 +1,6 @@
 {
-    "name": "CenturyGame.AssetBundleManager",
+    "name": "CenturyGame.ClientToolKit.AppSetting.Editor",
     "references": [
-        "CenturyGame.Core",
-        "CenturyGame.AppUpdater.Runtime",
-        "CenturyGame.LoggerModule.Runtime",
         "CenturyGame.ClientToolKit.AppSetting.Runtime"
     ],
     "optionalUnityReferences": [],

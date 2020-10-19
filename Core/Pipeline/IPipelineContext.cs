@@ -21,6 +21,6 @@ namespace CenturyGame.Core.Pipeline
     {
         string Error { get; }
 
-        void AppendLog(string message);
+        void AppendErrorLog(string message);
     }
 }

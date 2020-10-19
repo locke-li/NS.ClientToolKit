@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using CenturyGame.ClientToolKit.AppSetting.Runtime;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -109,6 +110,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public static string GetStreamingAssetsPath(string path, string ext = null, bool loadAB = true)
         {
+            return GetStreamingAssetsPathInternal(path,ext,loadAB);
+        }
+
+        private static string GetStreamingAssetsPathInternal(string path, string ext, bool loadAB)
+        {
             if (loadAB && configList.ContainsKey(path))
             {
                 ABTableItemInfoClient item = configList[path];
@@ -118,28 +124,28 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             TmpSB.Length = 0;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-        if(loadAB)
-        {
-            TmpSB.Append(Application.dataPath);
-            TmpSB.Append("!assets/");
-        }
-        else
-        {
-            TmpSB.Append(Application.streamingAssetsPath);
-            TmpSB.Append("/");
-        }
+            if(loadAB)
+            {
+                TmpSB.Append(Application.dataPath);
+                TmpSB.Append("!assets/");
+            }
+            else
+            {
+                TmpSB.Append(Application.streamingAssetsPath);
+                TmpSB.Append("/");
+            }
 #elif UNITY_IPHONE && !UNITY_EDITOR
-        if(loadAB)
-        {
-            TmpSB.Append(Application.dataPath);
-            TmpSB.Append("/Raw/");
-        }
-        else
-        {
-            TmpSB.Append("file://");
-            TmpSB.Append(Application.streamingAssetsPath);
-            TmpSB.Append("/");
-        }
+            if(loadAB)
+            {
+                TmpSB.Append(Application.dataPath);
+                TmpSB.Append("/Raw/");
+            }
+            else
+            {
+                TmpSB.Append("file://");
+                TmpSB.Append(Application.streamingAssetsPath);
+                TmpSB.Append("/");
+            }
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (!loadAB)
             {
@@ -148,6 +154,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             TmpSB.Append(Application.streamingAssetsPath);
             TmpSB.Append("/");
 #endif
+            if (AppSetting.Instance.PlatformInStreamingAssets)
+            {
+                TmpSB.Append(Utility.GetPlatformName());
+                TmpSB.Append("/");
+            }
+
             TmpSB.Append(path);
             if (ext != null)
                 TmpSB.Append(ext);

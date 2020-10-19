@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace CenturyGame.AssetBundleManager.Runtime
+namespace CenturyGame.AppUpdaterLib.Runtime
 {
     public sealed class Utility
     {

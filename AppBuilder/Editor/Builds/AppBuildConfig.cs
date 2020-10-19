@@ -16,6 +16,7 @@
 
 using System;
 using System.IO;
+using CenturyGame.ClientToolKit.AppSetting.Runtime;
 using UnityEditor;
 using UnityEngine;
 
@@ -114,8 +115,19 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         [Header("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
         public string TencentCloudUpLoadEngineRelativeToAssetsPath = "";
 
-        [Header("追加平台名到StreamingAssets资源")]
-        public bool AppendPlatformNameToStreamingAssets = false;
+        public bool AppendPlatformNameToStreamingAssets
+        {
+            get
+            {
+                var appSetting = Resources.Load<AppSetting>("AppSetting");
+                if (appSetting == null)
+                {
+                    throw new InvalidDataException("The AppSetting is null!");
+                }
+
+                return appSetting.PlatformInStreamingAssets;
+            }
+        }
 
         public static AppBuildConfig GetAppBuildConfigInst()
         {

@@ -50,7 +50,7 @@
 //            return mAppBuildContext;
 //        }
 
-//        public void AppendLog(string message)
+//        public void AppendErrorLog(string message)
 //        {
 //            throw new System.NotImplementedException();
 //        }
