@@ -384,7 +384,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         {
             string outputPath = null;
 
-#if !INCLUDE_PLATFORM_NAME_TO_STREAMINGASSETS
+#if INCLUDE_PLATFORM_NAME_TO_STREAMINGASSETS
             outputPath = string.Concat(System.Environment.CurrentDirectory,
                     Path.DirectorySeparatorChar,
                     StreamingAssetsFolder,
