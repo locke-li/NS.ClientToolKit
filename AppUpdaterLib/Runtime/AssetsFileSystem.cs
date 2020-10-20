@@ -154,11 +154,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             TmpSB.Append(Application.streamingAssetsPath);
             TmpSB.Append("/");
 #endif
-            if (AppSetting.Instance.PlatformInStreamingAssets)
-            {
-                TmpSB.Append(Utility.GetPlatformName());
-                TmpSB.Append("/");
-            }
+
+#if INCLUDE_PLATFORM_NAME_TO_STREAMINGASSETS
+
+            TmpSB.Append(Utility.GetPlatformName());
+            TmpSB.Append("/");
+#endif
 
             TmpSB.Append(path);
             if (ext != null)
@@ -383,7 +384,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 #endif
         }
 
-        #endregion
+#endregion
 
     }
 }

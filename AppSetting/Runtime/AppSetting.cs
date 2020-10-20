@@ -14,12 +14,6 @@ namespace CenturyGame.ClientToolKit.AppSetting.Runtime
 
     public class AppSetting : ScriptableObject
     {
-        /// <summary>
-        /// StringingAssets
-        /// </summary>
-        public bool PlatformInStreamingAssets = false;
-
-
         private static AppSetting mInstance = null;
         public static AppSetting Instance
         {

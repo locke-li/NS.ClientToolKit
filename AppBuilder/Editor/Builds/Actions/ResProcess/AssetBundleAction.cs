@@ -62,13 +62,13 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResProcess
                 return false;
             }
 
-            var appSetting = Resources.Load<AppSetting>("AppSetting");
-            if (appSetting == null)
-            {
-                var appBuildContext = AppBuildContext;
-                appBuildContext.AppendErrorLog($"Pleause create a appSetting asset !");
-                return false;
-            }
+            //var appSetting = Resources.Load<AppSetting>("AppSetting");
+            //if (appSetting == null)
+            //{
+            //    var appBuildContext = AppBuildContext;
+            //    appBuildContext.AppendErrorLog($"Pleause create a appSetting asset !");
+            //    return false;
+            //}
             return true;
         }
 

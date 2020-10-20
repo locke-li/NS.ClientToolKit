@@ -20,7 +20,6 @@ using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AssetBundleManager.Runtime;
 using UnityEngine;
 using CenturyGame.Core.Pipeline;
-using System.Security.Cryptography;
 using CenturyGame.AppBuilder.Editor.Builds.BuildInfos;
 using CenturyGame.AppUpdaterLib.Runtime.Manifests;
 using UnityEditor;
@@ -383,25 +382,25 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
 
         public string GetAssetsOutputPath()
         {
-            string outputPath = string.Empty;
-            if (AppBuildConfig.GetAppBuildConfigInst().AppendPlatformNameToStreamingAssets)
-            {
-                outputPath = string.Concat(System.Environment.CurrentDirectory,
+            string outputPath = null;
+
+#if !INCLUDE_PLATFORM_NAME_TO_STREAMINGASSETS
+            outputPath = string.Concat(System.Environment.CurrentDirectory,
                     Path.DirectorySeparatorChar,
                     StreamingAssetsFolder,
                     Path.DirectorySeparatorChar,
                     Utility.GetPlatformName()
                 );
-            }
-            else
-            {
-                outputPath = string.Concat(System.Environment.CurrentDirectory, Path.DirectorySeparatorChar, StreamingAssetsFolder);
-            }
+#else
+            outputPath = string.Concat(System.Environment.CurrentDirectory, 
+                Path.DirectorySeparatorChar, 
+                StreamingAssetsFolder);
+#endif
             outputPath = EditorUtils.OptimazePath(outputPath);
             return outputPath;
         }
 
-        #endregion
+#endregion
 
     }
 }
