@@ -138,5 +138,11 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             Debug.Log("Clear build cache success !");
         }
 
+
+        static void ForceBuildBaseAppVersion()
+        {
+            ClearBuildCacheFolder();
+            MakePatchResouces();
+        }
     }
 }
