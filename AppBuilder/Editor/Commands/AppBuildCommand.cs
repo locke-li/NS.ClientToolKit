@@ -142,7 +142,7 @@ namespace CenturyGame.AppBuilder.Editor.Commands
         static void ForceBuildBaseAppVersion()
         {
             ClearBuildCacheFolder();
-            MakePatchResouces();
+            MakeBaseVersionResources();
         }
     }
 }
