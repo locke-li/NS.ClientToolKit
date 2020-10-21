@@ -92,6 +92,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 string targetPath = AppBuildContext.GetAssetsOutputPath();
 
                 Logger.Info($"Output path : {targetPath} .");
+                if (!Directory.Exists(targetPath))
+                {
+                    Directory.CreateDirectory(targetPath);
+                }
                 List<ABTableItem> list = new List<ABTableItem>();
                 List<FileDesc> infoList = new List<FileDesc>();
 
