@@ -155,7 +155,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             TmpSB.Append("/");
 #endif
 
-#if INCLUDE_PLATFORM_NAME_TO_STREAMINGASSETS
+#if APPEND_PLATFORM_NAME
 
             TmpSB.Append(Utility.GetPlatformName());
             TmpSB.Append("/");
