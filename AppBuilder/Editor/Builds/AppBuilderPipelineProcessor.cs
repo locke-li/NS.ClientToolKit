@@ -84,7 +84,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             
             if (result.State == ProcessState.Error)
             {
-                Logger.Error(Context.Error);
+                Logger?.Error(Context.Error);
             }
 
             return result;

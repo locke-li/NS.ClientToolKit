@@ -62,7 +62,11 @@ namespace CenturyGame.Core.Pipeline
 
         public virtual bool Test(IPipelineInput input)
         {
-            return pAction.Test(this,input);
+            var result = pAction.Test(this, input);
+
+            if(!result)
+                Logger?.Error($"Test failure ！Action name : {pAction.GetType().FullName} .");
+            return result;
         }
 
         public virtual void Execute(IPipelineInput input)
