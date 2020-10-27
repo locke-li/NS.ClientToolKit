@@ -66,9 +66,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 				case BuildTarget.StandaloneWindows:
 				case BuildTarget.StandaloneWindows64:
 					return "Windows";
+#if UNITY_2019_1_OR_NEWER
 				case BuildTarget.StandaloneLinux:
+#endif
 				case BuildTarget.StandaloneLinux64:
+#if UNITY_2019_1_OR_NEWER
 				case BuildTarget.StandaloneLinuxUniversal:
+#endif
 					return "Linux";
 				default:
 					return null;
@@ -76,7 +80,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 		}
 #endif
 
-		private static string GetPlatformForAssetBundles(RuntimePlatform platform)
+					private static string GetPlatformForAssetBundles(RuntimePlatform platform)
 		{
 			switch (platform)
 			{
