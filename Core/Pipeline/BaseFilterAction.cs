@@ -24,13 +24,25 @@ namespace CenturyGame.Core.Pipeline
         #region Fields
         //--------------------------------------------------------------
 
-        protected virtual ILogger Logger { get; }
-
         #endregion
 
         //--------------------------------------------------------------
         #region Properties & Events
         //--------------------------------------------------------------
+
+        private ILogger mLogger;
+        protected virtual ILogger Logger
+        {
+            get
+            {
+                if (mLogger == null)
+                {
+                    mLogger = LoggerManager.GetLogger(this.GetType().Name);
+                }
+                return mLogger;
+            }
+        }
+
         public ActionState State { get; set; }
 
         public virtual IPipelineContext Context { set; get; }
