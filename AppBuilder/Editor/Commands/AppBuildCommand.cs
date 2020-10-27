@@ -64,22 +64,22 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             }
         }
 
-        [MenuItem("CenturyGame/AppBuilder/Commands/压缩Lua代码到StreamAssets文件夹")]
-        static void ZipLuaFile()
-        {
-            string configPath = AppBuildConfig.GetAppBuildConfigInst().AppBuildConfigFolder + "/ZipLuaScript.yaml";
+        //[MenuItem("CenturyGame/AppBuilder/Commands/压缩Lua代码到StreamAssets文件夹")]
+        //static void ZipLuaFile()
+        //{
+        //    string configPath = AppBuildConfig.GetAppBuildConfigInst().AppBuildConfigFolder + "/ZipLuaScript.yaml";
 
-            var result = RunPipeline(configPath);
+        //    var result = RunPipeline(configPath);
 
-            if (result.State == ProcessState.Error)
-            {
-                Debug.LogError($"Build app failure , error message : {result.Message}");
-            }
-            else
-            {
-                Debug.Log("Build app completed!");
-            }
-        }
+        //    if (result.State == ProcessState.Error)
+        //    {
+        //        Debug.LogError($"Build app failure , error message : {result.Message}");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Build app completed!");
+        //    }
+        //}
 
         static ProcessResult RunPipeline(string pipelineConfigPath)
         {

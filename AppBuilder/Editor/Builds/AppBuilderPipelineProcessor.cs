@@ -72,12 +72,22 @@ namespace CenturyGame.AppBuilder.Editor.Builds
 
         public override ProcessResult Process(IPipelineInput input)
         {
+            ProcessResult result;
             if (!this.TestAll(input))
             {
-                return ProcessResult.Create(ProcessState.Error, $"Test failure , error info : {Context.Error} .");
+                result = ProcessResult.Create(ProcessState.Error, $"Test failure , error info : {Context.Error} .");
+            }
+            else
+            {
+                result = base.Process(input);
+            }
+            
+            if (result.State == ProcessState.Error)
+            {
+                Logger.Error(Context.Error);
             }
 
-            return base.Process(input);
+            return result;
         }
 
         /// <summary>
