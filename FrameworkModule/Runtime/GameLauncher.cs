@@ -44,8 +44,8 @@ namespace CenturyGame.Framework
 
         private void Start()
         {
-            InitFrameworkModules();
             LoggerManager.SetCurrentLoggerProvider(new Log4NetLoggerProvider());
+            InitFrameworkModules();
             AssetBundleManager.Initialize(OnABMgrInited, OnABMgrInitFailed);
         }
 
