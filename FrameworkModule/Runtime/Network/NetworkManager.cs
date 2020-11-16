@@ -132,6 +132,7 @@ namespace CenturyGame.Framework.Network
             Client.Connect(host, port);
         }
 
+        [Obsolete("This method is deprecated. Use SendMessage(byte[] data) instead.", false)]
         public void SendMessage(string fullName, byte[] data)
         {
             SendQueue.Enqueue(data);
