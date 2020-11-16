@@ -29,7 +29,7 @@ namespace CenturyGame.Framework.Network
 
         public NetworkClient Client { get; private set; }
 
-        private Queue<SendPackage> SendQueue = new Queue<SendPackage>(Const.Max_Msg_Capacity);
+        private Queue<byte[]> SendQueue = new Queue<byte[]>(Const.Max_Msg_Capacity);
         private Queue<OptionMsg> OptionQueue = new Queue<OptionMsg>(Const.Max_OptionMsg_Capacity);
         private Queue<byte[]> RecvQueue = new Queue<byte[]>(Const.Max_Msg_Capacity);
 
@@ -134,12 +134,12 @@ namespace CenturyGame.Framework.Network
 
         public void SendMessage(string fullName, byte[] data)
         {
-            SendPackage sp = new SendPackage
-            {
-                name = fullName,
-                data = data
-            };
-            SendQueue.Enqueue(sp);
+            SendQueue.Enqueue(data);
+        }
+
+        public void SendMessage(byte[] data)
+        {
+            SendQueue.Enqueue(data);
         }
 
         private void EnqueueRecvMsg(byte[] data)
@@ -169,9 +169,8 @@ namespace CenturyGame.Framework.Network
                 return;
             if (SendQueue.Count == 0)
                 return;
-            SendPackage sp = SendQueue.Dequeue();
-            Trace.Instance.debug("[SEND] {0}", sp.name);
-            Client.SendMessage(sp.data);
+            byte[] data = SendQueue.Dequeue();
+            Client.SendMessage(data);
         }
 
         public void Disconnect()
@@ -200,12 +199,6 @@ namespace CenturyGame.Framework.Network
         private void OnErrorResponse(int code, string message)
         {
             Trace.Instance.error("recv ErrorResponse. code = {0}, message = {1}", code, message);
-        }
-
-        sealed class SendPackage
-        {
-            public string name;
-            public byte[] data;
         }
     }
 }
