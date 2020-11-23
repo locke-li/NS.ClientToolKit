@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace CenturyGame.Framework.UI
 {
@@ -49,6 +50,16 @@ namespace CenturyGame.Framework.UI
                 UIGroup uiGroup = new UIGroup(layer, layerObj.transform, i);
                 groupMap.Add(layer, uiGroup);
             }
+
+            var eventSys = new GameObject("EventSystem")
+            {
+                layer = uiLayer
+            };
+            eventSys.transform.SetParent(uiRoot.transform);
+            eventSys.AddComponent<EventSystem>();
+            eventSys.AddComponent<StandaloneInputModule>();
+            
+
             Object.DontDestroyOnLoad(uiRoot);
         }
 
