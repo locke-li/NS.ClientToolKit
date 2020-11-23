@@ -42,6 +42,12 @@ namespace CenturyGame.Framework
             private set;
         }
 
+
+        void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
         private void Start()
         {
             LoggerManager.SetCurrentLoggerProvider(new Log4NetLoggerProvider());
