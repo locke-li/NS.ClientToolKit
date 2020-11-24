@@ -220,14 +220,12 @@ namespace CenturyGame.AssetBundleManager.Runtime
         public static T Load<T>(string path) where T : Object
         {
             CheckIsInitialize("Load<T>");
-            s_mLogger.Value.Debug($" Load<T> : {path} , asset type : {typeof(T)} .");
             return ABMgrHandle.Load<T>(path);
         }
 
         public static void LoadAsync<T>(string path, ObjectCallBack callBack) where T : Object
         {
             CheckIsInitialize("LoadAsync<T>(string path, ObjectCallBack callBack)");
-            s_mLogger.Value.Debug($" LoadAsync<T> : {path} , asset type : {typeof(T)} .");
             ABMgrHandle.LoadAsync<T>(path, callBack);
         }
 

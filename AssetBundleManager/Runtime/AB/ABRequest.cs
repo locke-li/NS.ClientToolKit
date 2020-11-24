@@ -415,9 +415,6 @@ public sealed class ABRequest
         }
         else
         {
-#if UNITY_EDITOR
-            s_mLogger.Value.Debug($"Load<T>  AssetPath : {AssetPath}  type name {type.Name}");
-#endif
             return ABHandle.AB.LoadAssetAsync(AssetPath, type);
         }
     }
