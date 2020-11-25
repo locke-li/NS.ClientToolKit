@@ -2,7 +2,7 @@
 	"name": "com.centurygame.clienttoolkit",
 	"displayName": "CenturyGame Client Toolkit",
 	"description": "Centurygame client tool set",
-	"version": "0.0.3-alpha26",
+	"version": "0.0.3-alpha27_ru1",
 	"unity": "2018.4",
 	"license": "MIT",
 	"dependencies": {}

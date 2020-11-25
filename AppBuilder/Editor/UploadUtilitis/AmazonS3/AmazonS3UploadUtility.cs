@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,41 +55,43 @@ namespace CenturyGame.AppBuilder.Editor.UploadUtilitis.AmazonS3
         //--------------------------------------------------------------
         public static void Start(string sourceDir)
         {
-            string commandLineArgs = sourceDir;
+            //string commandLineArgs = sourceDir;
 
 
-            var pStartInfo = new ProcessStartInfo();
-            pStartInfo.FileName = TARGET_UPLOAD_ENGINE_PATH;
+            //var pStartInfo = new ProcessStartInfo();
+            //pStartInfo.FileName = TARGET_UPLOAD_ENGINE_PATH;
 
-            pStartInfo.UseShellExecute = false;
+            //pStartInfo.UseShellExecute = false;
 
-            pStartInfo.RedirectStandardInput = false;
-            pStartInfo.RedirectStandardOutput = true;
-            pStartInfo.RedirectStandardError = true;
-            var workingDirectory = Path.GetDirectoryName(TARGET_UPLOAD_ENGINE_PATH);
-            workingDirectory = EditorUtils.OptimazePath(workingDirectory);
-            pStartInfo.WorkingDirectory = workingDirectory;
-            pStartInfo.CreateNoWindow = false;
-            pStartInfo.WindowStyle = ProcessWindowStyle.Normal;
-            pStartInfo.Arguments = commandLineArgs;
+            //pStartInfo.RedirectStandardInput = false;
+            //pStartInfo.RedirectStandardOutput = true;
+            //pStartInfo.RedirectStandardError = true;
+            //var workingDirectory = Path.GetDirectoryName(TARGET_UPLOAD_ENGINE_PATH);
+            //workingDirectory = EditorUtils.OptimazePath(workingDirectory);
+            //pStartInfo.WorkingDirectory = workingDirectory;
+            //pStartInfo.CreateNoWindow = false;
+            //pStartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            //pStartInfo.Arguments = commandLineArgs;
 
-            pStartInfo.StandardErrorEncoding = System.Text.UTF8Encoding.UTF8;
-            pStartInfo.StandardOutputEncoding = System.Text.UTF8Encoding.UTF8;
+            //pStartInfo.StandardErrorEncoding = System.Text.UTF8Encoding.UTF8;
+            //pStartInfo.StandardOutputEncoding = System.Text.UTF8Encoding.UTF8;
 
-            var proces = Process.Start(pStartInfo);
+            //var proces = Process.Start(pStartInfo);
 
-            string standardOutput = proces.StandardOutput.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(standardOutput))
-                UnityEngine.Debug.Log(standardOutput);
+            //string standardOutput = proces.StandardOutput.ReadToEnd();
+            //if (!string.IsNullOrWhiteSpace(standardOutput))
+            //    UnityEngine.Debug.Log(standardOutput);
 
-            string standardErroOutput = proces.StandardError.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(standardErroOutput))
-                UnityEngine.Debug.LogError(standardErroOutput);
+            //string standardErroOutput = proces.StandardError.ReadToEnd();
+            //if (!string.IsNullOrWhiteSpace(standardErroOutput))
+            //    UnityEngine.Debug.LogError(standardErroOutput);
 
-            proces.WaitForExit();
-            proces.Close();
-            UnityEngine.Debug.Log("Upload to amazon s3 successful!");
+            //proces.WaitForExit();
+            //proces.Close();
+            //UnityEngine.Debug.Log("Upload to amazon s3 successful!");
         }
+
+
         #endregion
 
     }

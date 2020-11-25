@@ -63,6 +63,25 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         }
     }
 
+    [System.Serializable]
+    public class FilesUpLoadInfo
+    {
+        /// <summary>
+        /// 表数据路径
+        /// </summary>
+        public string dataResAbsolutePath = "";
+
+        /// <summary>
+        /// 需要上传的文件后缀
+        /// </summary>
+        public string uploadFilesPattern = ".x,.zip,.lua";
+
+        /// <summary>
+        /// 远端根目录
+        /// </summary>
+        public string remoteDir = "samples";
+    }
+
 
     public class AppBuildConfig : ScriptableObject
     {
@@ -101,10 +120,8 @@ namespace CenturyGame.AppBuilder.Editor.Builds
 
         public string TargetAssetGraphConfigAssetsPath => $"{targetAssetGraphConfigRelativeToProjectPath}";
 
-        /// <summary>
-        /// 远端拉取下来的数据表路径。
-        /// </summary>
-        public string dataResAbsolutePath = "";
+        [Header("资源上传信息")]
+        public FilesUpLoadInfo upLoadInfo;
 
         [Header("制作Patch版本时自增修订号")]
         public bool incrementRevisionNumberForPatchBuild = true;
