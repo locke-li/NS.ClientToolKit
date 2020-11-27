@@ -14,6 +14,7 @@
 
 ***************************************************************/
 
+using System;
 using System.IO;
 using System.Text;
 using CenturyGame.AppUpdaterLib.Runtime;
@@ -25,6 +26,7 @@ using CenturyGame.AppUpdaterLib.Runtime.Manifests;
 using UnityEditor;
 using CenturyGame.AppBuilder.Editor.Builds.Factories;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
+using Version = CenturyGame.AppUpdaterLib.Runtime.Version;
 #if DEBUG_FILE_CRYPTION
 using File = CenturyGame.Core.IO.File;
 #else
@@ -55,6 +57,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         public MakeVersionMode makeVersionMode = MakeVersionMode.UnKnow;
 
         public readonly string AssetsTitle = "Assets:",
+            ResExt = ".x",
             StreamingAssetsFolder = "Assets/StreamingAssets",
             DependenciesTitle = "Dependencies:",
             DependenciesTitleError = "Dependencies: []",
@@ -62,11 +65,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             PackagePath = "Package",
             PatternManifest = ".manifest",
             VersionFormat = "yyyyMMddHHmmss",
+            LuaProjectFolderName = "LuaProject",
             Temporary = "Temporary",
            
             Rules = "rules",
             DataRes = "Conf",
             BuildReportFolderName = "BuildReporters",
+            UpLoadDirFolderName = "UpLoadRes",
+            GenCodePattern = "/gen/",
             RemoteManifestFolderName = "version_list";
 
 
@@ -400,7 +406,76 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             return outputPath;
         }
 
-#endregion
+
+        public string GetResStoragePath()
+        {
+            string path = string.Concat(System.Environment.CurrentDirectory
+                , Path.DirectorySeparatorChar
+                , this.UpLoadDirFolderName);
+            path = EditorUtils.OptimazePath(path);
+
+            return path;
+        }
+
+        public string GetLuaProjectPath()
+        {
+            //LuaProjectFolderName
+            string path = $"{Application.dataPath}/../{this.LuaProjectFolderName}";
+            path = EditorUtils.OptimazePath(path);
+            return path;
+        }
+
+
+        public string GetPlatformStrForUpload()
+        {
+            var platformName = string.Empty;
+#if UNITY_EDITOR && UNITY_ANDROID
+            platformName = "android";
+#elif UNITY_EDITOR && UNITY_IPHONE
+            platformName = "ios";
+#else
+            throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
+#endif
+            return platformName;
+        }
+
+
+        /// <summary>
+        /// 获取当前游戏版本号
+        /// </summary>
+        /// <returns></returns>
+        public Version GetTargetAppVersion(bool getBaseVersion = false)
+        {
+            var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
+            string versionStr = null;
+            if (getBaseVersion)
+            {
+                versionStr = $"{appVersion.Major}.{appVersion.Minor}.0";
+            }
+            else
+            {
+                if (AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild)
+                {
+                    var lastVersionInfo = this.GetLastBuildInfo();
+                    if (lastVersionInfo != null)
+                    {
+                        var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+                        lastVersion.IncrementOneForPatch();
+                        return lastVersion;
+                    }
+                }
+                else
+                {
+                    versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
+                }
+            }
+            Version result = new Version(versionStr);
+            return result;
+        }
+
+
+
+        #endregion
 
     }
 }

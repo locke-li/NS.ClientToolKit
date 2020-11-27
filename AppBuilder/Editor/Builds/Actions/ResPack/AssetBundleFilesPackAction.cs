@@ -243,7 +243,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             if (abFileInfo.Exists)
             {
                 itemInfo.S = (int)abFileInfo.Length;
-                itemInfo.H = ABBuildCache.GetHash(abFileInfo.FullName, ABBuildCache.HashType.SHA1);
+                itemInfo.H = EditorUtils.GetMD5(abFileInfo.FullName);
             }
             //string abName = abFileInfo.Name.Substring(0, index == -1 ? abFileInfo.Name.Length : index);
             abFileInfo = null;

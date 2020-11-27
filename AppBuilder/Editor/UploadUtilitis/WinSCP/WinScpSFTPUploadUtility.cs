@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using ServerModel.Models;
 using System.IO;
+using CenturyGame.AppBuilder.Editor;
 using Debug = UnityEngine.Debug;
 
 namespace CenturyGame.Editor.UploadUtilitis.WinSCP

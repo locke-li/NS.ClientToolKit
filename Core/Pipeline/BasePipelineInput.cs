@@ -48,7 +48,7 @@ namespace CenturyGame.Core.Pipeline
         #region Methods
         //--------------------------------------------------------------
 
-        public virtual T GetData<T>(string key)
+        public virtual T GetData<T>(string key, T defaultVal)
         {
             System.Object obj;
 
@@ -57,7 +57,7 @@ namespace CenturyGame.Core.Pipeline
                 return (T)obj;
             }
 
-            return default(T);
+            return defaultVal;
         }
 
         public virtual void SetData(string key, object arg)

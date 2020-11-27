@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CenturyGame.Editor
+namespace CenturyGame.AppBuilder.Editor
 {
     public class EnvironmentVariables
     {
@@ -32,6 +32,12 @@ namespace CenturyGame.Editor
         /// 需要上传的文件列表路径
         /// </summary>
         public const string NEEDED_UPLOAD_LIST_NAME_KEY = "NEEDED_UPLOAD_LIST_NAME";
+
+
+        /// <summary>
+        /// 制作基础App
+        /// </summary>
+        public const string MAKE_BASE_APP_VERSION_KEY = "MAKE_BASE_APP_VERSION";
 
     }
 }

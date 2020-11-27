@@ -23,6 +23,8 @@ using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AppBuilder.Editor.Builds.Contexts;
 using UnityEngine;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 {
@@ -92,7 +94,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
                 FileDesc fileDesc = new FileDesc();
                 fileDesc.S = (int)fileInfo.Length;
-                fileDesc.H = ABBuildCache.GetHash(fileInfo.FullName,ABBuildCache.HashType.MD5);
+                fileDesc.H = EditorUtils.GetMD5(fileInfo.FullName);
 
                 string fileFullName = EditorUtils.OptimazePath(fileInfo.FullName);
                 int idx = fileFullName.LastIndexOf(streamFolder, StringComparison.Ordinal);

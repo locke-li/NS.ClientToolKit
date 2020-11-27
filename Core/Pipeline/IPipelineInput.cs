@@ -33,7 +33,7 @@ namespace CenturyGame.Core.Pipeline
 
         void SetData(string key, System.Object arg);
 
-        T GetData<T>(string key);
+        T GetData<T>(string key,T defaultVal);
 
         #endregion
 
