@@ -118,7 +118,15 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var appVersion = AppBuildContext.GetTargetAppVersion(makeBaseVersion);
             var resVersion = appVersion.Patch;
 
-            string commandLineArgs = $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.GetVersionString()} {resVersion}";
+            var noUpload = "false";
+            if (AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.isUploadToRemote)
+                noUpload = "false";
+            else
+                noUpload = "true";
+
+            string commandLineArgs =
+                $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.GetVersionString()} {resVersion} {noUpload}";
+
             
             Debug.Log($"commandline args : {commandLineArgs}");
 

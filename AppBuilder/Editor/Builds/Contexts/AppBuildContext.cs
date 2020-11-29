@@ -71,7 +71,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             Rules = "rules",
             DataRes = "Conf",
             BuildReportFolderName = "BuildReporters",
-            UpLoadDirFolderName = "UpLoadRes",
             GenCodePattern = "/gen/",
             RemoteManifestFolderName = "version_list";
 
@@ -411,7 +410,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         {
             string path = string.Concat(System.Environment.CurrentDirectory
                 , Path.DirectorySeparatorChar
-                , this.UpLoadDirFolderName);
+                , AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.NativeUpLoadDirFolderName);
             path = EditorUtils.OptimazePath(path);
 
             return path;

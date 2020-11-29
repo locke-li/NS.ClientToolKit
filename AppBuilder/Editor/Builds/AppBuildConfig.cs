@@ -72,6 +72,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         public string dataResAbsolutePath = "";
 
         /// <summary>
+        /// 本地上传目录名
+        /// </summary>
+        public string NativeUpLoadDirFolderName = "UpLoadRes";
+
+        /// <summary>
         /// 需要上传的文件后缀
         /// </summary>
         public string uploadFilesPattern = ".x,.zip,.lua";
@@ -80,6 +85,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         /// 远端根目录
         /// </summary>
         public string remoteDir = "samples";
+
+        /// <summary>
+        /// 是否上传到远端服务器
+        /// </summary>
+        public bool isUploadToRemote = true;
     }
 
 
