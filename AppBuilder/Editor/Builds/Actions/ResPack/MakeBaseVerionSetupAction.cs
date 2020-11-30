@@ -7,6 +7,7 @@
  *  版权所有 （C）:   CenturyGames
  **************************************************************/
 
+using System.IO;
 using CenturyGame.AppBuilder.Runtime.Exceptions;
 using CenturyGame.Core.Pipeline;
 using CenturyGame.AppBuilder.Editor;
@@ -79,6 +80,20 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             return true;
         }
 
+
+        private bool CheckGameConfigs()
+        {
+            var configsPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            if (!Directory.Exists(configsPath))
+            {
+                Logger.Error($"The table config git repo that path is \"{configsPath}\" is not exist !" +
+                             $" Pleause specify a valid path!");
+                return false;
+            }
+
+            return true;
+        }
+
         public override bool Test(IFilter filter, IPipelineInput input)
         {
             if (!CheckAppVersionValid())
@@ -86,6 +101,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
                 var versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
                 AppBuildContext.AppendErrorLog($"Invalid target version : {versionStr}.");
+                return false;
+            }
+
+            if (!CheckGameConfigs())
+            {
                 return false;
             }
 

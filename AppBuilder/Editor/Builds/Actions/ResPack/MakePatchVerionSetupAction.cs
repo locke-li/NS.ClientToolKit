@@ -8,6 +8,7 @@
  **************************************************************/
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,6 +90,18 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             return true;
         }
 
+        private bool CheckGameConfigs()
+        {
+            var configsPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            if (!Directory.Exists(configsPath))
+            {
+                Logger.Error($"The table config git repo that path is \"{configsPath}\" is not exist !" +
+                             $" Pleause specify a valid path!");
+                return false;
+            }
+
+            return true;
+        }
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
@@ -100,6 +113,12 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
                 return false;
             }
+
+            if (!CheckGameConfigs())
+            {
+                return false;
+            }
+
             return true;
         }
 
