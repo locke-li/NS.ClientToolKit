@@ -29,6 +29,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public string H;
 
+        public string RD;//服务器目录前缀
+
         public FileDesc() { }
 
         public FileDesc(FileDesc info)

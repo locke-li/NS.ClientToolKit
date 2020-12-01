@@ -46,7 +46,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         private bool CheckAppVersionValid()
         {
             var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
-            Logger.Info($"The target app version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
+            Logger.Info($"The version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
             if (appVersion.Major == "0" && appVersion.Minor == "0" && appVersion.Patch == "0")
             {
                 Logger.Error($"Invalid app base vesion : 0.0.0 .");

@@ -39,6 +39,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public float Progress { set; get; }
 
+
+        public float Percentage { set; get; }
+
         /// <summary>
         /// 总共需要下载的文件数目
         /// </summary>

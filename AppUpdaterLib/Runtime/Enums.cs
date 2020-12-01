@@ -47,9 +47,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         ParseLocalAppInfoFailure,//解析本地appinfo失败
 
-        RequestLighthouseFailure,
+        DownloadLighthouseFailure,//下载lighthouse配置失败
 
-        ParseLighthouseConfigError,
+        ParseLighthouseConfigError,//解析lighthouse配置失败
+
+        LighthouseConfigCheckInvalid,//无效的lighthouse配置
 
         RequestGetVersionFailure,//EntryPointRequest请求返回失败
 

@@ -49,13 +49,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             /// <summary>
             /// 加载app的版本失败
             /// </summary>
-            LoadAppVerisonInfoFailure,
+            //LoadAppVerisonInfoFailure,
 
             //解析版本信息失败
-            ParseBuiltinAppInfoFailure,
+            //ParseBuiltinAppInfoFailure,
 
             //解析本地信息失败
-            ParseLocalAppInfoFailure,
+            //ParseLocalAppInfoFailure,
 
             /// <summary>
             /// 正在加载app版本信息
@@ -185,15 +185,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 case LogicState.LoadAppVerisonInfo:
                     LoadAppVersion();
                     break;
-                case LogicState.LoadAppVerisonInfoFailure:
-                    OnFail(AppUpdaterErrorType.LoadBuiltinAppInfoFailure);
-                    break;
-                case LogicState.ParseBuiltinAppInfoFailure:
-                     OnFail(AppUpdaterErrorType.ParseBuiltinAppInfoFailure);
-                    break;
-                case LogicState.ParseLocalAppInfoFailure:
-                     OnFail(AppUpdaterErrorType.ParseLocalAppInfoFailure);
-                    break;
                 case LogicState.CheckLocalResManifest:
                     this.StartCheckResourceManifest();
                     break;
@@ -210,16 +201,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     Target.ChangeState<AppVersionCheckState>();
                     break;
                 case LogicState.ReqLighthouseConfigFailure:
-                    OnFail(AppUpdaterErrorType.RequestLighthouseFailure);
+                    OnFail();
                     break;
             }
         }
 
 
-        private void OnFail(AppUpdaterErrorType errorType)
+        private void OnFail()
         {
-            Context.ErrorType = errorType;
-            
             Target.ChangeState<AppUpdateFailureState>();
         }
 
@@ -244,6 +233,26 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 , lighthouseId);
         }
 
+
+        private bool CheckoutConfigValid(LighthouseConfig config)
+        {
+            var servers = config.ServersData.Servers;
+            bool valid = false;
+            var curVersion = AppVersionManager.AppInfo.version;
+            for (int i = 0; i < servers.Count; i++)
+            {
+                var serverData = servers[i];
+
+                if (serverData.CanBeUseForVersion(curVersion))
+                {
+                    valid = true;
+                    break;
+                }
+            }
+
+            return valid;
+        }
+
         private void OnGetLighthouseConfigFromRemoteCallback(bool success, string contents)
         {
             if (success)
@@ -256,7 +265,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                         try
                         {
-                            //Logger.Debug($"Lighthouse content : \r\n {contents}");
+                            Logger.Debug($"Lighthouse content : \r\n {contents}");
                             mCurrentLighthouseConfig = LighthouseConfig.ReadFromJson(contents);
                             mState = LogicState.LoadAppVerisonInfo;
                         }
@@ -264,7 +273,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                         {
                             Logger.Error(
                                 $"Parse lighthouse config that from remote file server failure! StackTrace : {e.StackTrace}");
-                            Context.ErrorType = AppUpdaterErrorType.RequestLighthouseFailure;
+                            Context.ErrorType = AppUpdaterErrorType.ParseLighthouseConfigError;
                             mState = LogicState.ReqLighthouseConfigFailure;
                         }
 
@@ -280,7 +289,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else //下载lighthouse失败
             {
-                Context.ErrorType = AppUpdaterErrorType.RequestLighthouseFailure;
+                Context.ErrorType = AppUpdaterErrorType.DownloadLighthouseFailure;
                 Logger.Error($"Download lighthouse config failure ! Current state : {mState}");
                 mState = LogicState.ReqLighthouseConfigFailure;
             }
@@ -308,7 +317,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             if (bytes == null || bytes.Length == 0)
             {
                 Logger.Error($"Load built app info file failure , file name is \"{AssetsFileSystem.AppInfoFileName}\" !");
-                this.mState = LogicState.LoadAppVerisonInfoFailure;
+                Context.ErrorType = AppUpdaterErrorType.LoadBuiltinAppInfoFailure;
+                this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
             }
             
@@ -320,7 +330,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             catch(Exception ex)
             {
                 Logger.Error($"Parse built app info failure , error stackTrace : {ex.StackTrace}");
-                this.mState = LogicState.ParseBuiltinAppInfoFailure;
+                Context.ErrorType = AppUpdaterErrorType.ParseBuiltinAppInfoFailure;
+                this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
             }
             
@@ -332,7 +343,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             catch(Exception ex)
             {
                 Logger.Error($"Parse local app info failure , error stackTrace : {ex.StackTrace}");
-                this.mState = LogicState.ParseLocalAppInfoFailure;
+                Context.ErrorType = AppUpdaterErrorType.ParseLocalAppInfoFailure;
+                this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
             } 
             
@@ -371,7 +383,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
             }
 
-            this.mState = LogicState.CheckLocalResManifest;
+            if (!CheckoutConfigValid(mCurrentLighthouseConfig))
+            {
+                Context.ErrorType = AppUpdaterErrorType.LighthouseConfigCheckInvalid;
+                this.mState = LogicState.ReqLighthouseConfigFailure;
+            }
+            else
+            {
+                this.mState = LogicState.CheckLocalResManifest;
+            }
         }
 
         #endregion

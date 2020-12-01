@@ -46,7 +46,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 
         public override VersionManifest Parse(string manifestContent)
         {
-            var manifest = VersionManifestParser.Parse(manifestContent);
+            var manifest = VersionManifestParser.Parse(manifestContent, "gen");
 
             return manifest;
         }

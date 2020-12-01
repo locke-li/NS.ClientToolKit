@@ -105,7 +105,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             Logger.Info("Start check app force update !");
             this.mState = InnerState.CheckingAppForceUpdate;
 
-            if (Context.GetVersionResponseInfo.forceUpdate)//执行强更操作
+            //是否强更目前通过讨论由服务器返回的字段来决定
+            if (Context.GetVersionResponseInfo.forceUpdate)
             {
                 Logger.Info(" The current app client is too old , call app update function!");
                 this.Target.AufuCallback?.Invoke(AppVersionManager.LHConfig.UpdateData);

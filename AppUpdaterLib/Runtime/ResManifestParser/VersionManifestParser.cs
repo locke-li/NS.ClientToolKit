@@ -44,7 +44,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             s_mPools = new ResourcePool<FileDesc>(()=>new FileDesc(),null,null);
         }
 
-        public static VersionManifest Parse(string manifestContent)
+        public static VersionManifest Parse(string manifestContent,string gen = "")
         {
             List<FileDesc> list = new List<FileDesc>();
 
@@ -54,16 +54,28 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             var keys = doc.keys;
             foreach (var key in keys)
             {
+                string name = string.Empty;
+                if (string.IsNullOrEmpty(gen))
+                {
+                    name = key.Trim();
+                }
+                else
+                {
+                    name = $"lua/{gen}/{key.Trim()}";
+                }
+
                 var val = doc[key].str;
                 var splitStrs = val.Split(wellNumChar);
-                var name = key.Trim();
-                var hash = splitStrs[0];
-                var size = Convert.ToInt32(splitStrs[1]);
 
+                var remoteName = splitStrs[0];
+                var size = Convert.ToInt32(splitStrs[1]);
+                var hash = splitStrs[2];
+                
                 FileDesc desc = Pools.Obtain();
                 desc.N = name;
                 desc.H = hash;
                 desc.S = size;
+                desc.RD = remoteName;
                 list.Add(desc);
             }
 

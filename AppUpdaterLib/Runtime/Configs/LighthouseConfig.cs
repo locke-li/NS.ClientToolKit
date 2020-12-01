@@ -102,10 +102,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
 
             public void Parse(JSONObject jsonObject)
             {
-                var isOpen = jsonObject["open"];
-                IsOpen = Convert.ToBoolean(isOpen.str);
+                var maintenance = jsonObject["maintenance"];
+                IsOpen = Convert.ToBoolean(maintenance.str);
 
-                var urlPattern = jsonObject["url_pattern"];
+                var urlPattern = jsonObject["maintenance_url_pattern"];
                 UrlPattern = urlPattern.str;
             }
         }
@@ -147,8 +147,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
                     }
                 }
 
-                var maintenance = jsonObject["maintenance"];
-                this.MaintenanceInfo.Parse(maintenance);
+                this.MaintenanceInfo.Parse(jsonObject);
             }
 
 
@@ -160,7 +159,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
 
                 bool result = compareResult <= Runtime.Version.VersionCompareResult.Equal;
 
-                if (!string.IsNullOrEmpty(this.VersionMax))
+                if (result && !string.IsNullOrEmpty(this.VersionMax))
                 {
                     var maxVersion = new Runtime.Version(this.VersionMax);
                     compareResult = maxVersion.CompareTo(version);

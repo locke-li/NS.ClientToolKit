@@ -355,10 +355,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
             return JsonUtility.ToJson(obj,prettyPrint);
         }
 
-        public VersionManifest JsonToVersionManifest(string contents)
-        {
-            return VersionManifestParser.Parse(contents);
-        }
+        //public VersionManifest JsonToVersionManifest(string contents)
+        //{
+        //    return VersionManifestParser.Parse(contents);
+        //}
 
         public string VersionManifestToJson(VersionManifest manifest)
         {

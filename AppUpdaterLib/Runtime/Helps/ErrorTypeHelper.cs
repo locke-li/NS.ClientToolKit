@@ -28,8 +28,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "Parse builtin appinfo.x failure !";
                 case AppUpdaterErrorType.ParseLocalAppInfoFailure:
                     return "Parse local appinfo.x failure !";
-                case AppUpdaterErrorType.RequestLighthouseFailure:
-                    return "Request lighthouse config failure!";
+                case AppUpdaterErrorType.DownloadLighthouseFailure:
+                    return "Download lighthouse config failure!";
                 case AppUpdaterErrorType.ParseLighthouseConfigError:
                     return "Parser lighthouse config error!";
                 case AppUpdaterErrorType.RequestGetVersionFailure:
@@ -48,6 +48,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "Request unity resource data version failure!";
                 case AppUpdaterErrorType.DiskIsNotEnoughToDownPatchFiles:
                     return "The disk available space is not enough to download path files !";
+                case AppUpdaterErrorType.LighthouseConfigCheckInvalid:
+                    return "The lighthouse config data that receive is invalid!";
                 default:
                     return "Error ! Unknow appupdater error! ";
             } 
