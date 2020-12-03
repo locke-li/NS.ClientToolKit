@@ -48,6 +48,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
         public string channel = "";
 
         /// <summary>
+        /// 远端根目录
+        /// </summary>
+        public string remoteRoot = "";
+
+        /// <summary>
         /// 跳过热更新
         /// </summary>
         public bool skipAppUpdater = false;

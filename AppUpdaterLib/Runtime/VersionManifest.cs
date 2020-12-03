@@ -29,7 +29,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public string H;
 
-        public string RD;//服务器目录前缀
+        public string RN;//服务器目录前缀
 
         public FileDesc() { }
 
@@ -54,6 +54,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             other.N = this.N;
             other.S = this.S;
             other.H = this.H;
+        }
+
+        public string GetRNUTF8()
+        {
+            return this.RN.Replace("#", CommonConst.WellNumUtf8);
         }
     }
 

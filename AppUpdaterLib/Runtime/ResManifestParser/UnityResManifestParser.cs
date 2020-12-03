@@ -59,7 +59,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 
         public override string GetRemotePath(FileDesc desc)
         {
-            return $"{AssetsFileSystem.AppUnityResRemoteRoot}/{desc.N}";
+            return desc.GetRNUTF8();
         }
 
         public override string GetLocalRoot()

@@ -32,5 +32,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public const int MIN_DISK_AVAILABLE_SPACE = 10 ;
 
+        public const string WellNumUtf8 = "%23";
+
     }
 }

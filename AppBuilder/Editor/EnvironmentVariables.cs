@@ -39,5 +39,11 @@ namespace CenturyGame.AppBuilder.Editor
         /// </summary>
         public const string MAKE_BASE_APP_VERSION_KEY = "MAKE_BASE_APP_VERSION";
 
+        /// <summary>
+        /// Lua assetbundle 路径
+        /// </summary>
+        public const string LUA_AB_PATH_KEY = "LUA_AB_PATH";
+
+
     }
 }

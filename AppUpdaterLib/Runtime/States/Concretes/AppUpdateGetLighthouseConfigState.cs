@@ -491,6 +491,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             Context.Requester.ReqGetVersion(sersveData, AppVersionManager.AppInfo.version,
                 mCurrentLighthouseConfig.MetaData.lighthouseId,
+                Context.Config.channel,
                 mCurLighthouseFromTo,
                 info =>
                 {

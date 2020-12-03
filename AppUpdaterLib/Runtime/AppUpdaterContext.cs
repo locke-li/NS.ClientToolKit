@@ -17,7 +17,9 @@
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Utilities;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
 {
@@ -72,6 +74,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return mTempSb.ToString();
         }
 
+        public string GetRemoteRootUrl(FileServerType fileServerType)
+        {
+            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
+
+            return string.IsNullOrWhiteSpace(Config.remoteRoot) ? serverUrl : $"{serverUrl}/{Config.remoteRoot}";
+        }
+
         /// <summary>
         /// 获取Lighthouse 配置的url
         /// </summary>
@@ -86,12 +95,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
             string url;
 
-            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
-
             if (!string.IsNullOrEmpty(lightHouseId))
-                url = $"{serverUrl}/lighthouse-{this.Config.channel}-{language}-{lightHouseId}.json?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/lighthouse-{this.Config.channel}-{language}-{lightHouseId}.json?v={curTime}&t={curTime}";
             else
-                url = $"{serverUrl}/lighthouse-{this.Config.channel}-{language}.json?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/lighthouse-{this.Config.channel}-{language}.json?v={curTime}&t={curTime}";
 
             return url;
         }
@@ -107,8 +114,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 throw new InvalidOperationException($"Get current version file url error ! CurrentResVersionIdx ：{CurrentResVersionIdx}");
             }
 
-            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
-            string url = $"{serverUrl}/version_list/{this.ResVersions[CurrentResVersionIdx]}";
+            string url = $"{GetRemoteRootUrl(fileServerType)}/version_list/{this.ResVersions[CurrentResVersionIdx]}";
 
             return url;
         }
@@ -132,29 +138,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
             return this.LocalResFiles[CurrentResVersionIdx];
         }
-
         public string GetCurUnityResManifestName(string version)
         {
-            string manifestName = string.Empty;
-
-#if UNITY_EDITOR
-            manifestName = $"res_android-{version}.json";
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            manifestName = $"res_android-{version}.json";
-#elif UNITY_IPHONE && !UNITY_EDITOR
-            manifestName = $"res_ios-{version}.json";
-#else
-            manifestName = $"res_ios-{version}.json";
-#endif
+            string manifestName = $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}";
 
             return manifestName;
         }
 
         public string GetCurDataResManifestName(string version)
         {
-            var platform = Application.platform;
-
-            string manifestName = $"res_data-{version}.json";
+            
+            string manifestName = $"res_data.json{CommonConst.WellNumUtf8}{version}";
             return manifestName;
         }
 
@@ -165,21 +159,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return language;
         }
 
-        public string GetRemoteResFileUrl(string fileName , FileServerType fileServerType = FileServerType.CDN)
+        public string GetRemoteResFileUrl(string fileName, FileServerType fileServerType = FileServerType.CDN)
         {
-            string url = null;
-            switch (fileServerType)
-            {
-                case FileServerType.CDN:
-                    url = $"{this.Config.cdnUrl}/{fileName}";
-                    break;
-                case FileServerType.OSS:
-                    url = $"{this.Config.ossUrl}/{fileName}";
-                    break;
-                default:
-                    break;
-            }
-
+            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
+            string url = $"{serverUrl}/{fileName}";
             return url;
         }
 

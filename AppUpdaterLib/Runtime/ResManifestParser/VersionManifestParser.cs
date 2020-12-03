@@ -75,7 +75,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
                 desc.N = name;
                 desc.H = hash;
                 desc.S = size;
-                desc.RD = remoteName;
+                desc.RN = val;
                 list.Add(desc);
             }
 
@@ -93,7 +93,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             for (int i = 0; i < manifest.Datas.Count; i++)
             {
                 var desc = manifest.Datas[i];
-                doc.AddField(desc.N, $"{desc.H}#{desc.S}");
+                doc.AddField(desc.N, desc.RN);
             }
 
             return doc.ToString();

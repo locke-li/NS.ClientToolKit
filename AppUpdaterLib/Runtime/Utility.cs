@@ -80,7 +80,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 		}
 #endif
 
-					private static string GetPlatformForAssetBundles(RuntimePlatform platform)
+		private static string GetPlatformForAssetBundles(RuntimePlatform platform)
 		{
 			switch (platform)
 			{

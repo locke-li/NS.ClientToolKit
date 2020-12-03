@@ -24,7 +24,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Interfaces
     public interface IAppUpdaterRequester
     {
         void Update();
-        void ReqGetVersion(LighthouseConfig.Server serverData, string appVersion, string lighthouseId,
+        void ReqGetVersion(LighthouseConfig.Server serverData,
+            string appVersion,
+            string lighthouseId,
+            string channel,
             FileServerType fromTo, Action<GetVersionResponseInfo> getVersionResponseInfoAction);
 
     }

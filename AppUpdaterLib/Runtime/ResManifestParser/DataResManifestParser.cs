@@ -60,8 +60,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 
         public override string GetRemotePath(FileDesc desc)
         {
-            const string WellNumUtf8 = "%23";
-            return $"{AssetsFileSystem.AppDataResRemoteRoot}/{desc.N}{WellNumUtf8}{desc.H}{WellNumUtf8}{desc.S}";
+            return desc.GetRNUTF8();
         }
 
         public override string GetLocalRoot()

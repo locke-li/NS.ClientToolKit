@@ -15,6 +15,7 @@
 ***************************************************************/
 
 using System;
+using System.Security;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.Manifests
 {
@@ -39,6 +40,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Manifests
         /// unity资源版本
         /// </summary>
         public string unityDataResVersion;
+
+        /// <summary>
+        /// 渠道
+        /// </summary>
+        public string channel;
 
         /// <summary>
         /// 目标平台
