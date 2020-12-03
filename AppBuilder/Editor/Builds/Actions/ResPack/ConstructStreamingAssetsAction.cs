@@ -53,13 +53,15 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            //var resStorage = GetUploadDir();
+            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
 
-            //if (!Directory.Exists(resStorage))
-            //{
-            //    AppBuildContext.AppendErrorLog($"The target resource storage that path is \"{resStorage}\" is not exist.");
-            //    return false;
-            //}
+            var dataResListPath = $"{configRepoPath}/gen/rawdata/version_list/res_data.json";
+
+            if (!File.Exists(dataResListPath))
+            {
+                AppBuildContext.AppendErrorLog($"The res_data.json that path is \"{dataResListPath}\" is not exist.");
+                return false;
+            }
 
             return true;
         }
