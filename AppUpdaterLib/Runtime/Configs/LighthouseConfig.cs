@@ -129,7 +129,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
 
             public void Parse(JSONObject jsonObject)
             {
-                this.Name = jsonObject["name"].str;
+                this.Name = jsonObject["branch"].str;
                 this.Url = jsonObject["url"].str;
                 this.VersionMin = jsonObject["version_min"].str;
 

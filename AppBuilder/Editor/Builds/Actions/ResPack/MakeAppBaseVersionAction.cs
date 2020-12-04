@@ -70,8 +70,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         private bool Save(IFilter filter, IPipelineInput input)
         {
             var appBuildContext = AppBuildContext;
-
-            //保存AppInfo文件
             appBuildContext.AppInfoManifest.version = AppBuildContext.GetTargetAppVersion(true).GetVersionString();
             var streamingPath = AppBuildContext.GetAssetsOutputPath();
             

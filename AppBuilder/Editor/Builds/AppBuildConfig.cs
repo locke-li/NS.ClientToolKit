@@ -136,13 +136,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         [Header("制作Patch版本时自增修订号")]
         public bool incrementRevisionNumberForPatchBuild = true;
 
-        [Header("负责亚马逊S3上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
-        public string AmazonS3UpLoadEngineRelativeToAssetsPath = "";
-
-        [Header("负责腾讯云上传的可执行文件路径，相对于Assets目录，举例：/../UploadTools/xxx.bat")]
-        public string TencentCloudUpLoadEngineRelativeToAssetsPath = "";
-
-
         public static AppBuildConfig GetAppBuildConfigInst()
         {
             var config = AssetDatabase.LoadAssetAtPath<AppBuildConfig>(GetConfigRelativeToProjectPath());

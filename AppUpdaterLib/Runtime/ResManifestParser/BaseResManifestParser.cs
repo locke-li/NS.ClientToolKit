@@ -25,7 +25,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 
         public abstract string GetRemotePath(FileDesc desc);
 
-        public abstract string GetLocalRoot();
+        public abstract string GetLocalRoot(FileDesc desc);
 
         public abstract void WriteToAppInfo(string resVersion);
 

@@ -53,15 +53,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
 
-            var dataResListPath = $"{configRepoPath}/gen/rawdata/version_list/res_data.json";
-
-            if (!File.Exists(dataResListPath))
-            {
-                AppBuildContext.AppendErrorLog($"The res_data.json that path is \"{dataResListPath}\" is not exist.");
-                return false;
-            }
 
             return true;
         }
@@ -108,6 +100,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 }
 
                 if (sourcePath.Contains("protokitgo.yaml"))
+                {
+                    continue;
+                }
+
+                if (sourcePath.Contains("resource_versions.release"))
                 {
                     continue;
                 }

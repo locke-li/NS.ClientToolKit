@@ -371,7 +371,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             Context.ProgressData.CurrentDownloadFileCount++;
             Context.ProgressData.Progress = Context.ProgressData.CurrentDownloadSize / ((float)Context.ProgressData.TotalDownloadSize);
 
-            string path = AssetsFileSystem.GetWritePath($"{this.mCurManifestParser.GetLocalRoot()}/{this.mCurDownloadTasks[this.mCurrentDownloadIndex].N}", true);
+            string path = AssetsFileSystem.GetWritePath($"{this.mCurManifestParser.GetLocalRoot(this.mCurDownloadTasks[this.mCurrentDownloadIndex])}", true);
             File.WriteAllBytes(path, data);
             this.mLocalManifest.UpdateInnerFile(this.mCurDownloadTasks[this.mCurrentDownloadIndex]);
 

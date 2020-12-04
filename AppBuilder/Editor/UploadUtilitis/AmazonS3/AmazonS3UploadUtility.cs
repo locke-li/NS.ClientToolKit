@@ -33,8 +33,8 @@ namespace CenturyGame.AppBuilder.Editor.UploadUtilitis.AmazonS3
         #region Fields
         //--------------------------------------------------------------
 
-        public static string TARGET_UPLOAD_ENGINE_PATH =>
-            EditorUtils.OptimazePath(Application.dataPath + AppBuildConfig.GetAppBuildConfigInst().AmazonS3UpLoadEngineRelativeToAssetsPath);
+        //public static string TARGET_UPLOAD_ENGINE_PATH =>
+        //    EditorUtils.OptimazePath(Application.dataPath + AppBuildConfig.GetAppBuildConfigInst().AmazonS3UpLoadEngineRelativeToAssetsPath);
 
         #endregion
 

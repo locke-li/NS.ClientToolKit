@@ -62,10 +62,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             return desc.GetRNUTF8();
         }
 
-        public override string GetLocalRoot()
+        public override string GetLocalRoot(FileDesc desc)
         {
             //return AssetsFileSystem.AppUnityResLocalRoot;
-            return string.Empty;
+            return desc.N;
         }
 
         public override void WriteToAppInfo(string resVersion)

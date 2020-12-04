@@ -112,10 +112,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 #endif
             var uploadFilesPattern = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.uploadFilesPattern;
 
-            var remoteDir = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.remoteDir;
-
             var makeBaseVersion = input.GetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
             var appVersion = AppBuildContext.GetTargetAppVersion(makeBaseVersion);
+            
             var resVersion = appVersion.Patch;
 
             var noUpload = "false";
@@ -124,8 +123,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             else
                 noUpload = "true";
 
+            string remoteDir = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.remoteDir; 
+            if (string.IsNullOrEmpty(remoteDir) || string.IsNullOrWhiteSpace(remoteDir))
+            {
+                remoteDir = "**NOROOT**";
+            }
+
             string commandLineArgs =
-                $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.GetVersionString()} {resVersion} {noUpload}";
+                $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
 
             
             Debug.Log($"commandline args : {commandLineArgs}");

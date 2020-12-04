@@ -17,9 +17,7 @@
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Utilities;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
 {
@@ -70,6 +68,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mTempSb.Append(Application.streamingAssetsPath);
             mTempSb.Append("/");
 #endif
+
+#if APPEND_PLATFORM_NAME
+            mTempSb.Append(Utility.GetPlatformName());
+            mTempSb.Append("/");
+#endif
+
             mTempSb.Append(path);
             return mTempSb.ToString();
         }
@@ -96,9 +100,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             string url;
 
             if (!string.IsNullOrEmpty(lightHouseId))
-                url = $"{GetRemoteRootUrl(fileServerType)}/lighthouse-{this.Config.channel}-{language}-{lightHouseId}.json?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/{this.Config.channel}-lighthouse.json_{lightHouseId}?v={curTime}&t={curTime}";
             else
-                url = $"{GetRemoteRootUrl(fileServerType)}/lighthouse-{this.Config.channel}-{language}.json?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/{this.Config.channel}-lighthouse.json?v={curTime}&t={curTime}";
 
             return url;
         }
