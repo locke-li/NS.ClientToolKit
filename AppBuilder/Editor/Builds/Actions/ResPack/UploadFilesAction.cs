@@ -91,15 +91,17 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
             
             pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
-            Debug.Log($"Lua projecet root path : {pythonScripPath} .");
+            Logger.Info($"Lua projecet root path : {pythonScripPath} .");
 
-            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            var appBuildConfig = AppBuildConfig.GetAppBuildConfigInst();
+            var configRepoPath = appBuildConfig.upLoadInfo.dataResAbsolutePath;
             if (!Directory.Exists(configRepoPath))
             {
                 throw new DirectoryNotFoundException(configRepoPath);
             }
 
-            //var versionInfoFilePath = $"{configRepoPath}/gen/rawdata/server/resource_versions.release";
+            var protokitgoConfigName = appBuildConfig.upLoadInfo.protokitgoConfigName;
+
             var uploadFolder = sourceFolder;
 
             string platformName = string.Empty;
@@ -130,7 +132,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             }
 
             string commandLineArgs =
-                $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
+                $"{pythonScripPath} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
 
             
             Debug.Log($"commandline args : {commandLineArgs}");

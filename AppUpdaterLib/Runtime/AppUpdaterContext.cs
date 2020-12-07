@@ -64,7 +64,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mTempSb.Append("file://");
             mTempSb.Append(Application.streamingAssetsPath);
             mTempSb.Append("/");
-#elif UNITY_STANDLONE_WIN || UNITY_EDITOR
+#elif UNITY_EDITOR
+            mTempSb.Append("file://");
             mTempSb.Append(Application.streamingAssetsPath);
             mTempSb.Append("/");
 #endif

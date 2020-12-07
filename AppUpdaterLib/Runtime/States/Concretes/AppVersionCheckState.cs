@@ -134,32 +134,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 return;
             }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR_WIN || (UNITY_ANDROID && !UNITY_EDITOR)
             if (string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.AndroidVersion))
-            {
-                Context.ErrorType = AppUpdaterErrorType.RequestUnityResVersionFailure;
-                this.mState = InnerState.CheckResVersionUpdateFailure;
-                return;
-            }
-
-
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            if (string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.AndroidVersion))
-            {
-                Context.ErrorType = AppUpdaterErrorType.RequestUnityResVersionFailure;
-                this.mState = InnerState.CheckResVersionUpdateFailure;
-                return;
-            }
-
-#elif UNITY_IPHONE && !UNITY_EDITOR
+#elif UNITY_EDITOR_OSX || (UNITY_IPHONE && !UNITY_EDITOR)
             if (string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.IOSVersion))
+#endif
             {
                 Context.ErrorType = AppUpdaterErrorType.RequestUnityResVersionFailure;
                 this.mState = InnerState.CheckResVersionUpdateFailure;
                 return;
             }
-#endif
-
+            
             List<string> resList = new List<string>();
             List<string> resVersionList = new List<string>();
             List<string> localResVersionList = new List<string>();
@@ -175,7 +160,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 localResFileNameList.Add(AssetsFileSystem.AppDataResManifestName);
                 parsers.Add(new DataResManifestParser());
             }
-#if UNITY_EDITOR
+#if UNITY_EDITOR_WIN || (UNITY_ANDROID && !UNITY_EDITOR)
             if (AppVersionManager.AppInfo.unityDataResVersion !=
                 Context.GetVersionResponseInfo.update_detail.AndroidVersion)
             {
@@ -187,18 +172,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 parsers.Add(new UnityResManifestParser());
             }
 
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            if (AppVersionManager.AppInfo.unityDataResVersion !=
-                    Context.GetVersionResponseInfo.update_detail.AndroidVersion)
-                {
-                    resList.Add(Context.GetCurUnityResManifestName(
-                        Context.GetVersionResponseInfo.update_detail.AndroidVersion));
-                    resVersionList.Add(Context.GetVersionResponseInfo.update_detail.AndroidVersion);
-                    localResVersionList.Add(AppVersionManager.AppInfo.unityDataResVersion);
-                    localResFileNameList.Add(AssetsFileSystem.UnityResManifestName);
-                    parsers.Add(new UnityResManifestParser());
-                }
-#elif UNITY_IPHONE && !UNITY_EDITOR
+#elif UNITY_EDITOR_OSX || (UNITY_IPHONE && !UNITY_EDITOR)
             if (AppVersionManager.AppInfo.unityDataResVersion !=
                     Context.GetVersionResponseInfo.update_detail.IOSVersion)
                 {

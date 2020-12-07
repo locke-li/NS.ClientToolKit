@@ -29,64 +29,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
            
         }
 
-        /*
-        private void ReadFileList()
-        {
-            string path = AssetsFileSystem.GetWritePath(AssetsFileSystem.AbConfigName);
-            if (File.Exists(path))//编辑器下有可能不会有这个文件
-            {
-                Debug.Log(string.Concat("load rw path:", path));
-
-#if UNITY_EDITOR
-                this.mLogSb.AppendLine(string.Concat("load rw path:", path));
-                this.mLogSb.AppendLine("Start read local ab config!");
-#endif
-
-                var bytes = File.ReadAllBytes(path);
-                this.ReadAbConfigCompleted(bytes);
-            }
-            else
-            {
-                path = AssetsFileSystem.GetStreamingAssetsPath(AssetsFileSystem.AbConfigName, null, false);
-                Debug.Log(string.Concat("load buildin path :", path));
-
-#if UNITY_EDITOR
-                this.mLogSb.AppendLine(string.Concat("load buildin path :", path));
-                this.mLogSb.AppendLine("Start read buildin config!");
-#endif
-
-                this.Target.Request.Load(path, readConfigCallback);
-            }
-        }
-
-        private void readConfigCallback(byte[] data)
-        {
-            if (data == null || data.Length == 0)
-            {
-#if UNITY_EDITOR
-                this.mLogSb.AppendLine(string.Concat("readConfigCallback failure !"));
-#endif
-                Context.ErrorCode = ErrorCodeConst.READ_ASSETBUNDLE_CONFIG;
-
-                this.Target.ChangeState<HotFixFailureState>();
-            }
-            else
-            {
-                this.ReadAbConfigCompleted(data);
-            }
-        }
-
-        private void ReadAbConfigCompleted(byte[] bytes)
-        {
-#if UNITY_EDITOR
-            this.mLogSb.AppendLine(string.Concat("ReadAbConfigCompleted completed !"));
-#endif
-            AssetsFileSystem.AbConfig = JsonUtility.FromJson<ResManifest>(System.Text.Encoding.UTF8.GetString(bytes));
-            this.Target.ChangeState<HotFixFinalState>();
-        }
-        */
-
-
         public override void Execute(AppUpdaterFsmOwner entity)
         {
             base.Execute(entity);

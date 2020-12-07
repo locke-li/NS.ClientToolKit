@@ -87,6 +87,11 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         public string remoteDir = "samples";
 
         /// <summary>
+        /// 配置仓库的yaml文件名(带后缀)
+        /// </summary>
+        public string protokitgoConfigName = "protokitgo.yaml";
+
+        /// <summary>
         /// 是否上传到远端服务器
         /// </summary>
         public bool isUploadToRemote = true;
