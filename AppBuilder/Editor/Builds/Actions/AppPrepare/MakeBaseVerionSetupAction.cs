@@ -13,7 +13,7 @@ using CenturyGame.Core.Pipeline;
 using CenturyGame.AppBuilder.Editor;
 using Version = CenturyGame.AppUpdaterLib.Runtime.Version;
 
-namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
+namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
 {
     class MakeBaseVerionSetupAction : BaseBuildFilterAction
     {

@@ -115,12 +115,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private static string GetStreamingAssetsPathInternal(string path, string ext, bool loadAB)
         {
-            if (loadAB && configList.ContainsKey(path))
-            {
-                ABTableItemInfoClient item = configList[path];
-                if (item.R)
-                    return GetWritePath(path, true, ext);
-            }
+            //if (loadAB && configList.ContainsKey(path))
+            //{
+            //    ABTableItemInfoClient item = configList[path];
+            //    if (item.R)
+            //        return GetWritePath(path, true, ext);
+            //}
             TmpSB.Length = 0;
 
 #if UNITY_ANDROID && !UNITY_EDITOR

@@ -1,6 +1,0 @@
-{
-    "cdnUrl": "https://zhongtai.s3.amazonaws.com",
-    "ossUrl": "https://zhongtai.s3.amazonaws.com",
-    "channel": "test.global.android",
-    "skipAppUpdater":false
-}

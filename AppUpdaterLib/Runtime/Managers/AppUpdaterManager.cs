@@ -191,6 +191,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
                 throw new NullReferenceException($"Your want to use \"AppUpdaterManager\" that not initialized ! Call method :  \"{methodName}\" .");
         }
 
+        public static void DisposeAppUpdaterService()
+        {
+            if (s_mService != null)
+            {
+                Object.Destroy(s_mService.gameObject);
+            }
+
+            s_mInitialized = false;
+        }
 
         #endregion
 

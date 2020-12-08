@@ -65,8 +65,8 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Filters.Concrete
 
         public override void OnAutoAddActions()
         {
-            this.pSequence.Enqueue(new AssetBundleFilesPackAction());
-            this.pSequence.Enqueue(new FileVersionManifestGenerateAction());
+            //this.pSequence.Enqueue(new AssetBundleFilesPackAction());
+            //this.pSequence.Enqueue(new FileVersionManifestGenerateAction());
         }
 
 

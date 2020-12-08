@@ -49,40 +49,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            //var manifesetPath = GetAssetbundleManifestFilePath();
-            //if (!File.Exists(manifesetPath))
-            //{
-            //    AppBuildContext.ErrorSb.AppendLine($"The assetbundle manifest that path is \"{manifesetPath}\" is not exist!");
-            //    return false;
-            //}
-
-            var luaprojectDir = input.GetData<string>("LuaProject", AppBuildContext.GetLuaProjectPath());
-
-            if (string.IsNullOrEmpty(luaprojectDir))
-            {
-                AppBuildContext.ErrorSb.AppendLine($"The LuaProject not set!");
-                return false;
-            }
-
-            //if (!Directory.Exists(luaprojectDir))
-            //{
-            //    AppBuildContext.ErrorSb.AppendLine($"The LuaProject that path is \"{luaprojectDir}\" is not exist!");
-            //    return false;
-            //}
-
-            //var luaAbPath = input.GetData(EnvironmentVariables.LUA_AB_PATH_KEY, "");
-            //if (!string.IsNullOrEmpty(luaAbPath))
-            //{
-            //    AppBuildContext.ErrorSb.AppendLine($"The lua assetbundle that path is null!");
-            //    return false;
-            //}
-
-            //if (!File.Exists(luaAbPath))
-            //{
-            //    AppBuildContext.ErrorSb.AppendLine($"The lua assetbundle that path is \"{luaAbPath}\" is not exist!");
-            //    return false;
-            //}
-
+            
             return true;
         }
 
@@ -121,8 +88,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var resStorage = CreateStorageDir();
 
             CopyAssetBundlesToUploadStorage(resStorage);
-
-            CopyLuaAssetBundleToUploadStorage(filter, input,resStorage);
         }
 
 
@@ -134,6 +99,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 Directory.Delete(resStorage, true);
             }
 
+            AssetDatabase.Refresh();
             Directory.CreateDirectory(resStorage);
             return resStorage;
         }
@@ -189,53 +155,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             AssetDatabase.Refresh();
             Logger.Debug("Copy assetbundles completed!");
         }
-
-
-        private void CopyLuaAssetBundleToUploadStorage(IFilter filter, IPipelineInput input, string resStorage)
-        {
-            var luaAbPath = input.GetData(EnvironmentVariables.LUA_AB_PATH_KEY, "");
-            if (string.IsNullOrEmpty(luaAbPath))
-            {
-                throw new FileNotFoundException("Null path!");
-            }
-
-            if(!File.Exists(luaAbPath))
-            {
-                throw new FileNotFoundException(luaAbPath);
-            }
-
-            var targetPath = $"{resStorage}/lua.x";
-            File.Copy(luaAbPath, targetPath, true);
-        }
-
-        //private void CopyLuaLogicScriptToUploadStorage(IFilter filter, IPipelineInput input,string resStorage)
-        //{
-        //    var luaprojectDir = input.GetData<string>("LuaProject",AppBuildContext.GetLuaProjectPath());
-        //    luaprojectDir = EditorUtils.OptimazePath(luaprojectDir);
-
-        //    DirectoryInfo dirInfo = new DirectoryInfo(luaprojectDir);
-        //    FileInfo[] fileInfos = dirInfo.GetFiles("*.lua", SearchOption.AllDirectories);
-
-        //    foreach (var fileInfo in fileInfos)
-        //    {
-        //        string sourcePath = EditorUtils.OptimazePath(fileInfo.FullName);
-        //        if (sourcePath.Contains(AppBuildContext.GenCodePattern))
-        //        {
-        //            continue;
-        //        }
-
-        //        string targePath = $"{resStorage}/lua{sourcePath.Replace(luaprojectDir, "")}";
-
-        //        string dirName = Path.GetDirectoryName(targePath);
-
-        //        if (!Directory.Exists(dirName))
-        //        {
-        //            Directory.CreateDirectory(dirName);
-        //        }
-        //        File.Copy(sourcePath, targePath, true);
-        //    }
-        //}
-
 
         #endregion
 

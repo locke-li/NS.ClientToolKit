@@ -55,6 +55,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds.BuildInfos
 
         public string dataResVersion;
 
+
+
+        public string ossUrl;
+        public string cdnUrl;
+        public string channel;
+
+        public bool makeBaseVersion;
+
         #endregion
 
         //--------------------------------------------------------------

@@ -85,6 +85,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             {
                 Directory.Delete(streamingPath, true);
             }
+            AssetDatabase.Refresh();
             Directory.CreateDirectory(streamingPath);
 
             var resStorage = AppBuildContext.GetResStoragePath();

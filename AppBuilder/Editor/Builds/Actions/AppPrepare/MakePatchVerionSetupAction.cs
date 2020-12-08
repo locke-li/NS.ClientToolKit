@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using CenturyGame.Core.Pipeline;
 using Version = CenturyGame.AppUpdaterLib.Runtime.Version;
 
-namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
+namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
 {
     class MakePatchVerionSetupAction : BaseBuildFilterAction
     {
