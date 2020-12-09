@@ -121,7 +121,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             foreach (var abName in abNames)
             {
                 var srcAbPath = $"{abDir}/{abName}";
-                var desPath = $"{resStorage}/{abName}";
+                var desPath = $"{resStorage}/{abName}.x";
                 var desDirPath = Path.GetDirectoryName(desPath);
                 if (!Directory.Exists(desDirPath))
                 {
