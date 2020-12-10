@@ -19,6 +19,8 @@ using System;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.LoggerModule.Runtime;
 using System.IO;
+using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using CenturyGame.AppUpdaterLib.Runtime.Manifests;
 using UnityEngine;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 using Object = UnityEngine.Object;
@@ -184,12 +186,45 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             }
         }
 
+        /// <summary>
+        /// 获取当前服务器配置数据
+        /// </summary>
+        /// <returns></returns>
+        public static LighthouseConfig.Server GetServerData()
+        {
+            CheckIsInitialize("GetServerData");
+            if(AppVersionManager.LHConfig == null)
+                throw new InvalidOperationException("Get server config data failure !");
+            return AppVersionManager.LHConfig.GetCurrentServerData();
+        }
+
+        /// <summary>
+        /// 获取当前App信息清单
+        /// </summary>
+        /// <returns></returns>
+        public static AppInfoManifest GetAppInfoManifest()
+        {
+            CheckIsInitialize("GetAppInfoManifest");
+            return AppVersionManager.AppInfo;
+        }
+
+
+        /// <summary>
+        /// 获取LighthouseConfig清单
+        /// </summary>
+        /// <returns></returns>
+        public static LighthouseConfig GetLHConfig()
+        {
+            CheckIsInitialize("GetLHConfig");
+            return AppVersionManager.LHConfig;
+        }
 
         private static void CheckIsInitialize(string methodName)
         {
             if (!s_mInitialized)
                 throw new NullReferenceException($"Your want to use \"AppUpdaterManager\" that not initialized ! Call method :  \"{methodName}\" .");
         }
+
 
         public static void DisposeAppUpdaterService()
         {

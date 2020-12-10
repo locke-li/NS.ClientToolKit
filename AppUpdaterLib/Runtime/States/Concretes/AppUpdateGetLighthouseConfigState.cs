@@ -47,17 +47,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             LoadAppVerisonInfo,
 
             /// <summary>
-            /// 加载app的版本失败
-            /// </summary>
-            //LoadAppVerisonInfoFailure,
-
-            //解析版本信息失败
-            //ParseBuiltinAppInfoFailure,
-
-            //解析本地信息失败
-            //ParseLocalAppInfoFailure,
-
-            /// <summary>
             /// 正在加载app版本信息
             /// </summary>
             LoadingAppVerisonInfo,
@@ -497,27 +486,37 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 {
                     if (info != null)
                     {
-                        if (string.IsNullOrEmpty(info.lighthouseId))
+                        if (info.forceUpdate || info.maintenance)
                         {
-                            Logger.Error("The lighthouse id that was return by server is null or empty!");
-                            Context.ErrorType = AppUpdaterErrorType.RequestGetVersionFailure;
-                            mState = LogicState.ReqLighthouseConfigFailure;
-                            return;
-                        }
-
-                        Context.GetVersionResponseInfo = info;
-
-                        if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
-                        {
-                            Logger.Info("The current lighthouseconfig is latest !");
+                            Logger.Info($"forceUpdate : {info.forceUpdate}  maintenance : {info.maintenance}");
+                            Context.GetVersionResponseInfo = info;
                             AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
-
                             mState = LogicState.GetLighthouseCompleted;
                         }
                         else
                         {
-                            Logger.Info("The current lighthouseconfig is old , try to get a new one !");
-                            mState = LogicState.ReqLighthouseConfigAgain;
+                            if (string.IsNullOrEmpty(info.lighthouseId))
+                            {
+                                Logger.Error("The lighthouse id that was return by server is null or empty!");
+                                Context.ErrorType = AppUpdaterErrorType.RequestGetVersionFailure;
+                                mState = LogicState.ReqLighthouseConfigFailure;
+                                return;
+                            }
+
+                            Context.GetVersionResponseInfo = info;
+
+                            if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
+                            {
+                                Logger.Info("The current lighthouseconfig is latest !");
+                                AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
+
+                                mState = LogicState.GetLighthouseCompleted;
+                            }
+                            else
+                            {
+                                Logger.Info("The current lighthouseconfig is old , try to get a new one !");
+                                mState = LogicState.ReqLighthouseConfigAgain;
+                            }
                         }
                     }
                     else

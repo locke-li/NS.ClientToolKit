@@ -142,10 +142,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         {
             string lighthouseUrl = null;
 
+            lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId, fileServerType);
+
             if (fileServerType == FileServerType.CDN)
             {
-                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId);
-
                 s_mLogger.Info($"Request CDN , lighthouseUrl : {lighthouseUrl}");
 
                 this.CurRequestFileServerType = FileServerType.CDN;
@@ -154,8 +154,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
             else if(fileServerType == FileServerType.OSS)
             {
-                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId);
-
                 s_mLogger.Info($"Request OSS , lighthouseUrl : {lighthouseUrl}");
 
                 this.CurRequestFileServerType = FileServerType.OSS;

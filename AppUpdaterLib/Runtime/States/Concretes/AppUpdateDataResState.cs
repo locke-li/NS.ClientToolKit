@@ -384,7 +384,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Logger.Info($"Load file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
+                Logger.Info($"Download file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
                 this.mCurFileDownLoadState = FileDownLoadState.DownLoadCompleted;
             }
         }
@@ -437,6 +437,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     this.Reset();
                     this.mCurState = InnerState.StartRequestResManifest;
                     return true;
+                case AppUpdaterInnerEventType.OnApplicationFocus:
+                    this.OnApplicationFocus(eventArgs);
+                    return true;
+                case AppUpdaterInnerEventType.OnApplicationQuit:
+                    this.OnApplicationQuit();
+                    return true;
                 default:
                     break;
             }
@@ -454,6 +460,24 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             {
                 this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx]);
             }
+        }
+
+        private void OnApplicationFocus(in IRoutedEventArgs eventArgs)
+        {
+            var hasFocus = ((RoutedEventArgs<bool>)eventArgs).arg;
+            if (!hasFocus)
+                SaveDownloadProgress();
+        }
+
+        private void OnApplicationQuit()
+        {
+            SaveDownloadProgress();
+        }
+
+        private void SaveDownloadProgress()
+        {
+            if (this.mLocalManifest != null)
+                this.SaveCurrentConfig(false);
         }
 
         public override void Exit(AppUpdaterFsmOwner entity)
@@ -484,6 +508,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
 
             recycleList.ForEach(x=>VersionManifestParser.Pools.Recycle(x));
+            this.mLocalManifest = null;
         }
 
         public override void Reset()

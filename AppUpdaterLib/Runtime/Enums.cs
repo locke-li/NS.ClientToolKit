@@ -26,7 +26,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         PerformResUpdateOperation,
 
-        OnApplicationPause,
+        OnApplicationFocus,
+
+        OnApplicationQuit,
     }
 
 

@@ -55,14 +55,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             foreach (var key in keys)
             {
                 string name = string.Empty;
-                if (string.IsNullOrEmpty(gen))
-                {
-                    name = key.Trim();
-                }
-                else
-                {
-                    name = $"lua/{gen}/{key.Trim()}";
-                }
+                name = key.Trim();
+                //if (string.IsNullOrEmpty(gen))
+                //{
+                //    name = key.Trim();
+                //}
+                //else
+                //{
+                //    name = $"lua/{gen}/{key.Trim()}";
+                //}
 
                 var val = doc[key].str;
                 var splitStrs = val.Split(wellNumChar);
