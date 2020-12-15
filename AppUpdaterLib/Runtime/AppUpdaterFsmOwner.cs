@@ -15,6 +15,7 @@
 ***************************************************************/
 
 using System;
+using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.States.Concretes;
 using CenturyGame.Core.FSM;
 using CenturyGame.Core.MessengerSystem;
@@ -24,8 +25,30 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 {
     internal sealed class AppUpdaterFsmOwner : IFSMOwner
     {
+        public enum AppUpdaterState
+        {
+            Idle,
+            Runing,
+            Maintenance,
+            ForceUpdate,
+            Error,
+            Done,
+        }
+
+        internal class AppUpdaterCallBacks
+        {
+            public AppUpdaterErrorCallback ErrorCallback;
+            public AppUpdaterServerMaintenanceCallback ServermaintenanceCallback;
+            public AppUpdaterForceUpdateCallback ForceUpdateCallback;
+            public AppUpdaterPerformCompleted PerformCompletedCallback;
+        }
+
         #region
-        
+
+        public AppUpdaterState State = AppUpdaterState.Idle;
+
+        private AppUpdaterCallBacks mCallBacks = new AppUpdaterCallBacks();
+
         #region Inner FSM
 
         public AppUpdaterContext Context => AppUpdaterContext.Current;
@@ -80,8 +103,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mFSM?.Update();
         }
 
-       
-
         internal void StartUpdateOperationAgain() 
         {
             this.Clear();
@@ -100,34 +121,57 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         #endregion
 
+        #region Set Callbacks
+
+        public void SetErrorCallback(AppUpdaterErrorCallback callback)
+        {
+            mCallBacks.ErrorCallback = callback;
+        }
+
+        public void SetServerMaintenanceCallback(AppUpdaterServerMaintenanceCallback callback)
+        {
+            mCallBacks.ServermaintenanceCallback = callback;
+        }
+
+        public void SetForceUpdateCallback(AppUpdaterForceUpdateCallback callback)
+        {
+            mCallBacks.ForceUpdateCallback = callback;
+        }
+
+        public void SetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        {
+            mCallBacks.PerformCompletedCallback = callback;
+        }
+
+        #endregion
+
         #region Callbacks
 
 
-        public AppUpdaterErrorCallback AuErrorCallback { get; private set; }
-        public void SetErrorCallback(AppUpdaterErrorCallback callback)
+        public void OnErrorCallback(AppUpdaterErrorType errorType, string desc)
         {
-            AuErrorCallback = callback;
+            this.State = AppUpdaterState.Error;
+            this.mCallBacks.ErrorCallback?.Invoke(errorType, desc);
         }
 
-
-        public AppUpdaterServerMaintenanceCallback AusmCallback { private set; get; }
-        public void SetServerMaintenanceCallback(AppUpdaterServerMaintenanceCallback callback)
+        public void OnMaintenanceCallBack(LighthouseConfig.MaintenanceInfo maintenanceInfo)
         {
-            AusmCallback = callback;
+            this.State = AppUpdaterState.Maintenance;
+            this.mCallBacks.ServermaintenanceCallback?.Invoke(maintenanceInfo);
         }
 
-
-        public AppUpdaterForceUpdateCallback AufuCallback { private set; get; }
-        public void SetForceUpdateCallback(AppUpdaterForceUpdateCallback callback)
+        public void OnForceUpdateCallBack(LighthouseConfig.UpdateDataInfo info)
         {
-            AufuCallback = callback;
+            this.State = AppUpdaterState.ForceUpdate;
+            this.mCallBacks.ForceUpdateCallback?.Invoke(info);
         }
 
-        public AppUpdaterPerformCompleted AupcCallback { private set; get; }
-        public void SetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        public void OnCompletedCallback()
         {
-            AupcCallback = callback;
+            this.State = AppUpdaterState.Done;
+            this.mCallBacks.PerformCompletedCallback?.Invoke();
         }
+
 
         #endregion
 

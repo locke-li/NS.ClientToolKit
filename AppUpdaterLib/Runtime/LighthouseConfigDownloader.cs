@@ -143,23 +143,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             string lighthouseUrl = null;
 
             lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId, fileServerType);
+            this.CurRequestFileServerType = fileServerType;
+            s_mLogger.Info($"Request lighthouseUrl : {lighthouseUrl}");
 
-            if (fileServerType == FileServerType.CDN)
-            {
-                s_mLogger.Info($"Request CDN , lighthouseUrl : {lighthouseUrl}");
-
-                this.CurRequestFileServerType = FileServerType.CDN;
-
-                this.mState = InnerState.RequestingCdn;
-            }
-            else if(fileServerType == FileServerType.OSS)
-            {
-                s_mLogger.Info($"Request OSS , lighthouseUrl : {lighthouseUrl}");
-
-                this.CurRequestFileServerType = FileServerType.OSS;
-
-                this.mState = InnerState.RequestingOss;
-            }
+            this.mState = (fileServerType == FileServerType.CDN) ? InnerState.RequestingCdn : InnerState.RequestingOss;
 
             this.mHttpComponnent.Load(lighthouseUrl, OnLighthouseConfigResponseRet);
         }
@@ -176,6 +163,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                     case InnerState.RequestingOss:
                         this.mState = InnerState.ReqLighthouseConfigFailure;
                         this.mReqLighthouseConfigEvent?.Invoke(false,null);
+                        this.Clear();
                         break;
                 }
             }
@@ -184,7 +172,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 string lighthouseContents = m_Encoding.GetString(netData);
                 this.mReqLighthouseConfigEvent?.Invoke(true,lighthouseContents);
             }
-            this.Clear();
         }
 
 

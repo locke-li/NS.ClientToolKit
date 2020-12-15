@@ -26,7 +26,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             base.Enter(entity, args);
 
-            this.Target.AupcCallback?.Invoke();
+            this.Target.OnCompletedCallback();
         }
     }
 }

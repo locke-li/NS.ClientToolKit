@@ -131,6 +131,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.StartUpdateOperationAgain();
         }
 
+        public bool IsSucceed()
+        {
+            return this.mOwner.State == AppUpdaterFsmOwner.AppUpdaterState.Done;
+        }
+
         #region Unity Callbacks
 
         public void Update()

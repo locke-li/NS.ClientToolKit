@@ -65,7 +65,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         public override bool Test(IFilter filter, IPipelineInput input)
         {
             var lastBuildInfo = AppBuildContext.GetLastBuildInfo();
-            if (lastBuildInfo == null) 
+            if (lastBuildInfo == null || lastBuildInfo.GetCurrentBuildInfo() == null) 
             {
                 AppBuildContext.AppendErrorLog("You can't make patch version , because you has no last build info .");
                 return false;
@@ -101,7 +101,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
             //保存编译信息
             var lastBuildInfo = appBuildContext.GetLastBuildInfo();
-            lastBuildInfo.versionInfo = appBuildContext.AppInfoManifest;
+            lastBuildInfo.AddAppInfo(null, appBuildContext.AppInfoManifest);
             appBuildContext.SaveLastBuildInfo(lastBuildInfo);
 
             AssetDatabase.Refresh();

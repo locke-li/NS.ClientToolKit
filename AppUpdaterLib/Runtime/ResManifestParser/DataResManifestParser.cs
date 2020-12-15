@@ -69,7 +69,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             return $"lua/gen/{desc.N}";
         }
 
-        public override void WriteToAppInfo(string resVersion)
+        public override void WriteToAppInfo(string resVersion , string resVersionNum = null)
         {
             AppVersionManager.AppInfo.dataResVersion = resVersion;
             AppVersionManager.SaveCurrentAppInfo();

@@ -27,6 +27,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Protocols
         public string DataVersion;
 
         /// <summary>
+        /// 资源版本号
+        /// </summary>
+        public string ResVersionNum;
+
+        /// <summary>
         /// android资源版本
         /// </summary>
         public string AndroidVersion;

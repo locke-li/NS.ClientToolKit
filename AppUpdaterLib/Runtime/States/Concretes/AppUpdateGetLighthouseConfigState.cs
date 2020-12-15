@@ -184,7 +184,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     RequestHttpServer();
                     break;
                 case LogicState.ReqLighthouseConfigAgain:
-                    StartReqLighthouseConfig(mCurrentLighthouseConfig.MetaData.lighthouseId);
+                    StartReqLighthouseConfig(Context.GetVersionResponseInfo.lighthouseId);
                     break;
                 case LogicState.GetLighthouseCompleted:
                     Target.ChangeState<AppVersionCheckState>();
@@ -213,7 +213,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Logger.Info($"Start request lighthouse config that id is {lighthouseId} !");
+                Logger.Warn($"Start request lighthouse config that id is {lighthouseId} !");
                 mState = LogicState.RequestingLighthouseConfigAgain;
             }
 
@@ -347,7 +347,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (result > Version.VersionCompareResult.Equal)
                 {
-                    var clearPath = new DirectoryInfo(string.Concat(Application.persistentDataPath,
+                    var clearPath = new DirectoryInfo(string.Concat(AssetsFileSystem.PersistentDataPath,
                         Path.DirectorySeparatorChar, AssetsFileSystem.RootFolderName));
                     if (clearPath.Exists)
                     {
@@ -412,7 +412,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             var localUnityDataResName = AssetsFileSystem.UnityResManifestName;
             if (!AppVersionManager.IsLocalResManifestExist(localUnityDataResName))
             {
-                Logger.Info($"The local manifest file that name is \"{localUnityDataResName}\" is not exist!");
+                Logger.Info($"The local manifest file that name is \"{localUnityDataResName}\" is not exist, Start load builtin !");
                 Target.Request.Load(Context.GetStreamingAssetsPath(localUnityDataResName), OnLoadResManifestFileComplted);
             }
             else
@@ -484,14 +484,25 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 mCurLighthouseFromTo,
                 info =>
                 {
-                    if (info != null)
+                    Logger.Debug($"[ info != null : {info != null} ]   [ string.IsNullOrEmpty(info.lighthouseId) : {string.IsNullOrEmpty(info.lighthouseId)} ] ");
+                    if (info != null && !string.IsNullOrEmpty(info.lighthouseId))
                     {
+                        Context.GetVersionResponseInfo = info;
                         if (info.forceUpdate || info.maintenance)
                         {
-                            Logger.Info($"forceUpdate : {info.forceUpdate}  maintenance : {info.maintenance}");
-                            Context.GetVersionResponseInfo = info;
-                            AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
-                            mState = LogicState.GetLighthouseCompleted;
+                            if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
+                            {
+                                Logger.Info($"forceUpdate : {info.forceUpdate}  maintenance : {info.maintenance}");
+                                Context.GetVersionResponseInfo = info;
+                                AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
+                                mState = LogicState.GetLighthouseCompleted;
+                            }
+                            else
+                            {
+                                Logger.Info("The server may be in maintence or you should to download latest app and install it ." +
+                                            "The current lighthouseconfig is old , try to get latest!");
+                                mState = LogicState.ReqLighthouseConfigAgain;
+                            }
                         }
                         else
                         {
@@ -502,9 +513,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                                 mState = LogicState.ReqLighthouseConfigFailure;
                                 return;
                             }
-
-                            Context.GetVersionResponseInfo = info;
-
                             if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
                             {
                                 Logger.Info("The current lighthouseconfig is latest !");

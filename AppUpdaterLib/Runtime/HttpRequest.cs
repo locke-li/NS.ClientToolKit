@@ -21,6 +21,7 @@ public class HttpRequest
         if (loadState != 0) return;
         callBackHandle = callback;
         loadState = 1;
+        retryCount = 0;
         CurrentUrl = url;
         Update();
     }

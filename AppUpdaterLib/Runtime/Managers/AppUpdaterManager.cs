@@ -219,6 +219,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             return AppVersionManager.LHConfig;
         }
 
+
+        /// <summary>
+        /// 是否更新成功
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsSucceed()
+        {
+            return s_mService.IsSucceed();
+        }
+
+
         private static void CheckIsInitialize(string methodName)
         {
             if (!s_mInitialized)

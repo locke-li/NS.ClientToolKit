@@ -23,6 +23,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             base.Execute(entity);
 
+            this.Target.State = AppUpdaterFsmOwner.AppUpdaterState.Runing;
             if (Context.Config.skipAppUpdater)
             {
                 Context.AppendInfo("Skip app updater !");

@@ -64,22 +64,6 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             }
         }
 
-        //[MenuItem("CenturyGame/AppBuilder/Commands/压缩Lua代码到StreamAssets文件夹")]
-        //static void ZipLuaFile()
-        //{
-        //    string configPath = AppBuildConfig.GetAppBuildConfigInst().AppBuildConfigFolder + "/ZipLuaScript.yaml";
-
-        //    var result = RunPipeline(configPath);
-
-        //    if (result.State == ProcessState.Error)
-        //    {
-        //        Debug.LogError($"Build app failure , error message : {result.Message}");
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("Build app completed!");
-        //    }
-        //}
 
         static ProcessResult RunPipeline(string pipelineConfigPath)
         {
@@ -97,35 +81,6 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             return processor.Process(input);
         }
 
-
-        //[MenuItem("Commands/clear data folder")]
-        private static void clearStreamingAssets()
-        {
-            string folder = @"F:\SVNProjects\DianDianClient\TestUtf8";
-            DirectoryInfo disk = new DirectoryInfo(folder);
-            if (disk.Exists)
-            {
-                FileInfo[] files = disk.GetFiles("*.*", SearchOption.AllDirectories);
-                for (int i = 0; i < files.Length; i++)
-                {
-                    FileInfo info = files[i];
-                    if (info.Extension == AbHelp.AbFileExt)
-                    {
-                        info.Delete();
-                    }
-                    else if (info.Extension == ".meta")
-                    {
-                        string sourceFile = info.FullName.Substring(0, info.FullName.Length - info.Extension.Length);
-                        if (Path.GetExtension(sourceFile) == AbHelp.AbFileExt)
-                        {
-                            info.Delete();
-                        }
-                    }
-                }
-            }
-        }
-
-
         [MenuItem("CenturyGame/AppBuilder/Commands/清理编译缓存")]
         static void ClearBuildCacheFolder()
         {
@@ -138,11 +93,5 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             Debug.Log("Clear build cache success !");
         }
 
-
-        static void ForceBuildBaseAppVersion()
-        {
-            ClearBuildCacheFolder();
-            MakeBaseVersionResources();
-        }
     }
 }

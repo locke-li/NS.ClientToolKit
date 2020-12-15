@@ -33,11 +33,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             base.Execute(entity);
 
-            this.OnHotfixCompleted();
+            this.OnAppUpdateCompleted();
         }
 
 
-        private void OnHotfixCompleted()
+        private void OnAppUpdateCompleted()
         {
             this.Target.ChangeState<AppUpdateFinalState>();
 
@@ -49,7 +49,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             {
                 Context.AppendInfo("Resource update failure!");
             }
-
         }
 
         public override void Exit(AppUpdaterFsmOwner entity)

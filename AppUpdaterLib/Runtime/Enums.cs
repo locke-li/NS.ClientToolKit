@@ -61,6 +61,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         RequestUnityResVersionFailure,//返回的Unity资源版本为空
 
+        RequestAppRevisionNumIsSmallToLocal,//返回的修订号小于当前修订号
+
+        RequestAppRevisionNumFailure,//Unity资源修订号不合理
+
         RequestResManifestFailure,
 
         ParseLocalResManifestFailure,

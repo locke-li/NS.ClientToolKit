@@ -458,7 +458,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             if (updateVerisonNum)
             {
-                this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx]);
+                this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx], Context.TargetResVersionNum);
             }
         }
 

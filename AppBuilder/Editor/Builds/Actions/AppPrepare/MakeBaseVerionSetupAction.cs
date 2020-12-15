@@ -47,29 +47,25 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
         {
             var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
             Logger.Info($"The version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
-            if (appVersion.Major == "0" && appVersion.Minor == "0" && appVersion.Patch == "0")
-            {
-                Logger.Error($"Invalid app base vesion : 0.0.0 .");
-                return false;
-            }
-
+            
             var versionStr = $"{appVersion.Major}.{appVersion.Minor}.0";
 
             var targetVersion = new Version(versionStr);
 
             var lastVersionInfo = AppBuildContext.GetLastBuildInfo();
-            if (lastVersionInfo != null)
+            if (lastVersionInfo != null && lastVersionInfo.GetCurrentBuildInfo() != null)
             {
-                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+                var buildInfo = lastVersionInfo.GetCurrentBuildInfo();
+                var lastVersion = new Version(buildInfo.versionInfo.version);
                 Logger.Info($"The last app version :  {lastVersion.GetVersionString()} .");
 
                 var result = targetVersion.CompareTo(lastVersion);
 
                 if (result < Version.VersionCompareResult.HigherForMinor)//次版本（Minor）本次必须一样或更高
                 {
-                    Logger.Error($"The target version that value is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" " +
+                    Logger.Error($"The target version that value is \"{appVersion.Major}.{appVersion.Minor}.0\" " +
                                  $"is lower or equal to last build ,last build verison is \"" +
-                                 $"{lastVersionInfo.versionInfo.version}\" .");
+                                 $"{lastVersion.GetVersionString()}\" .");
                     return false;
                 }
             }

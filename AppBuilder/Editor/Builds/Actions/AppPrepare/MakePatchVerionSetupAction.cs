@@ -58,9 +58,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
             var targetVersion = new Version(versionStr);
 
             var lastVersionInfo = AppBuildContext.GetLastBuildInfo();
-            if (lastVersionInfo != null)
+            if (lastVersionInfo != null && lastVersionInfo.GetCurrentBuildInfo() != null)
             {
-                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+                var buildInfo = lastVersionInfo.GetCurrentBuildInfo();
+                var lastVersion = new Version(buildInfo.versionInfo.version);
                 Logger.Info($"The last app version :  {lastVersion.GetVersionString()} .");
                 var result = targetVersion.CompareTo(lastVersion);
 
