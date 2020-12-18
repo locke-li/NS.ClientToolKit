@@ -117,7 +117,7 @@ namespace CenturyGame.Framework.Editor
 
         private static void WriteLogic(UIWndAssetData data)
         {
-            sb.AppendLine(string.Format("require 'ui/{0}View'", data.UIName));
+            sb.AppendLine(string.Format("require 'ui/{0}view'", data.UIName));
             sb.AppendLine();
             sb.AppendLine(string.Format("local this = {0}", data.UIName));
             sb.AppendLine();
