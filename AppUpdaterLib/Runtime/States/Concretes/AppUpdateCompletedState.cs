@@ -25,8 +25,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             base.Enter(entity, args);
 
+            Context.SaveAppRevision();
+
             Context.ProgressData.Progress = 1;
-           
         }
 
         public override void Execute(AppUpdaterFsmOwner entity)

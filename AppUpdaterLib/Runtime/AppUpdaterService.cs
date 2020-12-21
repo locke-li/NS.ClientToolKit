@@ -104,8 +104,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.SetForceUpdateCallback(callback);
         }
 
+        public void SetOnTargetVersionObtainCallback(AppUpdaterOnTargetVersionObtainCallback callback)
+        {
+            this.mOwner.SetOnTargetVersionObtainCallback(callback);
+        }
 
-        public void SetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        public void SetPerformCompletedCallback(AppUpdaterPerformCompletedCallback callback)
         {
             this.mOwner.SetPerformCompletedCallback(callback);
         }

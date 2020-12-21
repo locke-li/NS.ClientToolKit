@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 {
-    public class UnityResManifestParser : BaseResManifestParser
+    internal class UnityResManifestParser : BaseResManifestParser
     {
         //--------------------------------------------------------------
         #region Fields

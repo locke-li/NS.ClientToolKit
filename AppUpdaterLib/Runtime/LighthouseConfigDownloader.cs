@@ -142,7 +142,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         {
             string lighthouseUrl = null;
 
-            lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId, fileServerType);
+            if (fileServerType == FileServerType.CDN)
+            {
+                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId, fileServerType);
+            }
+            else if(fileServerType == FileServerType.OSS)
+            {
+                /*
+                 * 如果是oss访问，则只访问默认的lighthouse，然后对比lighthouseId
+                 */
+                lighthouseUrl = this.mContext.GetLighthouseUrl(null, fileServerType);
+            }
+            
             this.CurRequestFileServerType = fileServerType;
             s_mLogger.Info($"Request lighthouseUrl : {lighthouseUrl}");
 

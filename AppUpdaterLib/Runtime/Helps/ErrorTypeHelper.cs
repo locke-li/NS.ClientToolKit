@@ -30,6 +30,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "Parse local appinfo.x failure !";
                 case AppUpdaterErrorType.DownloadLighthouseFailure:
                     return "Download lighthouse config failure!";
+                case AppUpdaterErrorType.DownloadLighthouseConfigInvalid:
+                    return "Download lighthouse config is invalid!";
                 case AppUpdaterErrorType.ParseLighthouseConfigError:
                     return "Parser lighthouse config error!";
                 case AppUpdaterErrorType.RequestGetVersionFailure:

@@ -32,19 +32,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
             void Parse(JSONObject jsonObject);
         }
 
-        public class MetaDataInfo : IFillByJsonObject
+        public class MetaAutoGen : IFillByJsonObject
         {
             public string lighthouseId { get; private set; }
 
-            public string product { get; private set; }
-
-            public string language { get; private set; }
-
             public void Parse(JSONObject jsonObject)
             {
-                this.lighthouseId = jsonObject["lighthouse_id"].str;
-                this.product = jsonObject["product"].str;
-                this.language = jsonObject["lang"].str;
+                this.lighthouseId = jsonObject["id"].str;
             }
         }
 
@@ -200,7 +194,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
 
         private static ILogger mLogger = LoggerManager.GetLogger("LighthouseConfig");
         
-        public MetaDataInfo MetaData { get; private set; } = new MetaDataInfo();
+        public MetaAutoGen MetaData { get; private set; } = new MetaAutoGen();
 
         public UpdateDataInfo UpdateData { get; private set; } = new UpdateDataInfo();
 
@@ -247,7 +241,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
             var doc = new JSONObject(json);
 
             //parser _meta_auto_gen_
-            var metaData = doc["_metadata_"];
+            var metaData = doc["_meta_auto_gen_"];
             if (!metaData) {throw new ArgumentException("json");}
 
             var updateInfo = doc["update_info"];

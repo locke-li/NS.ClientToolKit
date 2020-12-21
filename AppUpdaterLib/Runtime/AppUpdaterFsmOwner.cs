@@ -40,7 +40,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             public AppUpdaterErrorCallback ErrorCallback;
             public AppUpdaterServerMaintenanceCallback ServermaintenanceCallback;
             public AppUpdaterForceUpdateCallback ForceUpdateCallback;
-            public AppUpdaterPerformCompleted PerformCompletedCallback;
+            public AppUpdaterOnTargetVersionObtainCallback OnTargetVersionObtainCallback;
+            public AppUpdaterPerformCompletedCallback PerformCompletedCallback;
         }
 
         #region
@@ -138,7 +139,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mCallBacks.ForceUpdateCallback = callback;
         }
 
-        public void SetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        public void SetOnTargetVersionObtainCallback(AppUpdaterOnTargetVersionObtainCallback callback)
+        {
+            mCallBacks.OnTargetVersionObtainCallback = callback;
+        }
+
+        public void SetPerformCompletedCallback(AppUpdaterPerformCompletedCallback callback)
         {
             mCallBacks.PerformCompletedCallback = callback;
         }
@@ -166,12 +172,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mCallBacks.ForceUpdateCallback?.Invoke(info);
         }
 
+
+        public void OnnTargetVersionObtainCallback(string version)
+        {
+            this.mCallBacks.OnTargetVersionObtainCallback?.Invoke(version);
+        }
+
+
         public void OnCompletedCallback()
         {
             this.State = AppUpdaterState.Done;
             this.mCallBacks.PerformCompletedCallback?.Invoke();
         }
-
 
         #endregion
 

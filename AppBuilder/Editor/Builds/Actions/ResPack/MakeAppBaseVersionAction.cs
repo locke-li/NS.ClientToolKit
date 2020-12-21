@@ -89,22 +89,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             if (lastBuildInfo == null) // 
             {
                 lastBuildInfo = new LastBuildInfo();
-                lastBuildInfo.AddAppInfo(appBuildContext.AppInfoManifest,
-                    appBuildContext.AppInfoManifest);
             }
-            else
-            {
-                if (lastBuildInfo.GetCurrentBuildInfo() == null)
-                {
-                    lastBuildInfo.AddAppInfo(appBuildContext.AppInfoManifest,
-                        appBuildContext.AppInfoManifest);
-                }
-                else
-                {
-                    lastBuildInfo.AddAppInfo(null,
-                        appBuildContext.AppInfoManifest);
-                }
-            }
+            lastBuildInfo.AddAppInfo(appBuildContext.AppInfoManifest,
+                appBuildContext.AppInfoManifest);
             appBuildContext.SaveLastBuildInfo(lastBuildInfo);
 
             AssetDatabase.Refresh();

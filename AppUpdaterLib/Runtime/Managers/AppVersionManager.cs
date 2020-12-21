@@ -52,6 +52,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// </summary>
         public static LighthouseConfig LHConfig { private set; get; }
 
+        /// <summary>
+        /// 当前游戏服url（此url是由热更模块校验版本信息时确定的）
+        /// </summary>
+        public static string ServerUrl { private set; get; }
+
+        /// <summary>
+        /// 目标版本号
+        /// </summary>
+        public static AppInfoManifest TargetAppInfo { private set; get; }
 
         #endregion
 
@@ -123,8 +132,19 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 
         public static void MakeCurrentLighthouseConfig(LighthouseConfig config)
         {
-            s_mLogger.Info($"Set current lighthouse config!");
+            s_mLogger.Info("Set current lighthouse config!");
             LHConfig = config;
+        }
+
+        public static void MakeCurrentServerUrl(string url)
+        {
+            s_mLogger.Debug($"Make current server url : {url} .");
+            ServerUrl = url;
+        }
+
+        public static void SetTargetVersion(AppInfoManifest targetAppInfo)
+        {
+            TargetAppInfo = targetAppInfo;
         }
 
         public static VersionManifest LoadLocalResManifest(string manifestName)

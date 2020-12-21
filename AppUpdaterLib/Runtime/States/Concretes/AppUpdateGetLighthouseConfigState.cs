@@ -271,8 +271,19 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                         var targetLighthouseConfig = LighthouseConfig.ReadFromJson(contents);
                         Logger.Info(
                             $"Get target config success , lighthouseId : {targetLighthouseConfig.MetaData.lighthouseId}");
-                        AppVersionManager.MakeCurrentLighthouseConfig(targetLighthouseConfig);
-                        mState = LogicState.GetLighthouseCompleted;
+                        if (targetLighthouseConfig.MetaData.lighthouseId == Context.GetVersionResponseInfo.lighthouseId)
+                        {
+                            AppVersionManager.MakeCurrentLighthouseConfig(targetLighthouseConfig);
+                            mState = LogicState.GetLighthouseCompleted;
+                        }
+                        else
+                        {
+                            Context.ErrorType = AppUpdaterErrorType.DownloadLighthouseConfigInvalid;
+                            Logger.Error($"Download lighthouse config is invalid ! remote id : " +
+                                         $"{targetLighthouseConfig.MetaData.lighthouseId}  , " +
+                                         $" target id : {Context.GetVersionResponseInfo.lighthouseId}");
+                            mState = LogicState.ReqLighthouseConfigFailure;
+                        }
                         break;
                 }
             }
@@ -484,9 +495,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 mCurLighthouseFromTo,
                 info =>
                 {
-                    Logger.Debug($"[ info != null : {info != null} ]   [ string.IsNullOrEmpty(info.lighthouseId) : {string.IsNullOrEmpty(info.lighthouseId)} ] ");
+                    Logger.Debug($"info != null : {info != null} .");
+                    if(info != null)
+                        Logger.Debug($"string.IsNullOrEmpty(info.lighthouseId) : {string.IsNullOrEmpty(info.lighthouseId)}");
                     if (info != null && !string.IsNullOrEmpty(info.lighthouseId))
                     {
+                        AppVersionManager.MakeCurrentServerUrl(info.url);
                         Context.GetVersionResponseInfo = info;
                         if (info.forceUpdate || info.maintenance)
                         {

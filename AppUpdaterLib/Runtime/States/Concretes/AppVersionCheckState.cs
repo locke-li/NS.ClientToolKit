@@ -16,10 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
+using CenturyGame.AppUpdaterLib.Runtime.Manifests;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.Core.FSM;
+using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 {
@@ -221,12 +222,34 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             this.StartUpdateRes();
         }
 
+        private void SetTargetVersionInfo()
+        {
+            var detail = Context.GetVersionResponseInfo.update_detail;
+            var revision = System.Convert.ToInt32(Context.GetVersionResponseInfo.update_detail.ResVersionNum);
+            var version = new Version(AppVersionManager.AppInfo.version);
+            version.Patch = revision.ToString();
+            AppInfoManifest targetAppInfo = new AppInfoManifest();
+            targetAppInfo.version = version.GetVersionString();
+            targetAppInfo.dataResVersion = Context.GetVersionResponseInfo.update_detail.DataVersion;
+            targetAppInfo.TargetPlatform = Utility.GetPlatformName();
+#if UNITY_ANDROID
+            targetAppInfo.unityDataResVersion = Context.GetVersionResponseInfo.update_detail.AndroidVersion;
+#elif UNITY_IPHONE
+            targetAppInfo.unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
+#endif
+            Logger.Debug($"Target app info : \n{JsonUtility.ToJson(targetAppInfo, true)}");
+            AppVersionManager.SetTargetVersion(targetAppInfo);
+            this.Target.OnnTargetVersionObtainCallback(targetAppInfo.version);
+        }
+
         private void StartUpdateRes()
         {
+            this.SetTargetVersionInfo();
             if (Context.ResVersions.Length == 0)
             {
                 Context.AppendInfo("The game resource is not change , enter game direct!");
                 Logger.Info("The game resource is not change , enter game direct!");
+                Context.SaveAppRevision();
                 this.Target.ChangeState<AppUpdateCompletedState>();
             }
             else

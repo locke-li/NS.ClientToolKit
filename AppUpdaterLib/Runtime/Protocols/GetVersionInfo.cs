@@ -45,6 +45,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Protocols
     public class GetVersionResponseInfo
     {
         /// <summary>
+        /// 当前游戏服url
+        /// </summary>
+        public string url;
+
+        /// <summary>
         /// lighthouse 配置id
         /// </summary>
         public string lighthouseId = string.Empty;

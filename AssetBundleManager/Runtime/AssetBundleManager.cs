@@ -157,14 +157,13 @@ namespace CenturyGame.AssetBundleManager.Runtime
             ABMgrHandle.Init(() =>
                 {
                     s_mInitialize = true;
-                    onInitCompleted?.Invoke();
                     s_mLogger.Value.Info($"AssetBundleManager initialize completed !");
-
+                    onInitCompleted?.Invoke();
                 },
                 error =>
                 {
-                    onInitError?.Invoke(error);
                     s_mLogger.Value.Error($"AssetBundleManager initialize fail! Error : {error} .");
+                    onInitError?.Invoke(error);
                 });
         }
 
