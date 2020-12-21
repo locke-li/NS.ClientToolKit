@@ -115,12 +115,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private static string GetStreamingAssetsPathInternal(string path, string ext, bool loadAB)
         {
-            if (loadAB && configList.ContainsKey(path))
-            {
-                ABTableItemInfoClient item = configList[path];
-                if (item.R)
-                    return GetWritePath(path, true, ext);
-            }
+            //if (loadAB && configList.ContainsKey(path))
+            //{
+            //    ABTableItemInfoClient item = configList[path];
+            //    if (item.R)
+            //        return GetWritePath(path, true, ext);
+            //}
             TmpSB.Length = 0;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -282,78 +282,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 #endif
         }
 
-        public static FileDesc GetTask(FileDesc item, ref bool add)
-        {
-            add = false;
-            FileDesc result = null;
-            if (configList.ContainsKey(item.N))
-            {
-                result = configList[item.N];
-                if (result.H.CompareTo(item.H) != 0)
-                {
-                    add = true;
-                    result = item;
-                }
-            }
-            else
-            {
-                add = true;
-                result = item;
-            }
-            return result;
-        }
-
-
-        public static void UpdateTask(FileDesc task)
-        {
-            if (configList.ContainsKey(task.N))
-            {
-                ABTableItemInfoClient item = configList[task.N];
-                item.H = task.H;
-                item.S = task.S;
-                item.R = true;
-            }
-            else
-            {
-                ABTableItemInfoClient item = new ABTableItemInfoClient();
-                item.N = task.N;
-                item.H = task.H;
-                item.S = task.S;
-                item.R = true;
-                configList[task.N] = item;
-            }
-        }
-
-
-        /// <summary>
-        /// 保存本地热更的配置到手机
-        /// </summary>
-        /// <param name="saveVer"></param>
-        public static void SaveConfigInfoClient(bool saveVer)
-        {
-            List<ABTableItemInfoClient> tmpList = new List<ABTableItemInfoClient>();
-            foreach (KeyValuePair<string, ABTableItemInfoClient> kv in configList)
-            {
-                tmpList.Add(kv.Value);
-            }
-            if (ConfigInfoClient != null)
-            {
-                if (saveVer)
-                {
-                    ConfigInfoClient.Ver = RemoteConfigInfoVer.GetVersionString();
-                }
-                ConfigInfoClient.List = tmpList.ToArray();
-                string json = JsonUtility.ToJson(ConfigInfoClient);
-                File.WriteAllBytes(string.Concat(GetWritePath(AbConfigInfoClientName)), System.Text.Encoding.UTF8.GetBytes(json));
-                ConfigInfoClient = null;
-            }
-            else
-            {
-                Debug.Log("Save ConfigInfoClient fail!");
-            }
-        }
-
-
+        
         public static string GetPlatformStringForConfig()
         {
 #if UNITY_EDITOR

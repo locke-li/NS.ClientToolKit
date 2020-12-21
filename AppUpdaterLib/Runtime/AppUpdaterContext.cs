@@ -16,6 +16,7 @@
 
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.AppUpdaterLib.Runtime.Utilities;
 using UnityEngine;
 
@@ -64,7 +65,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mTempSb.Append("file://");
             mTempSb.Append(Application.streamingAssetsPath);
             mTempSb.Append("/");
-#elif UNITY_STANDLONE_WIN || UNITY_EDITOR
+#elif UNITY_EDITOR
+            mTempSb.Append("file://");
             mTempSb.Append(Application.streamingAssetsPath);
             mTempSb.Append("/");
 #endif
@@ -184,6 +186,21 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 this.DiskInfo.IsGetReady = true;
             }
         }
+
+        /// <summary>
+        /// 保存当前Revision信息
+        /// </summary>
+        public void SaveAppRevision()
+        {
+            if (!string.IsNullOrEmpty(this.TargetResVersionNum))
+            {
+                Version version = new Version(AppVersionManager.AppInfo.version);
+                version.Patch = this.TargetResVersionNum;
+                AppVersionManager.AppInfo.version = version.GetVersionString();
+            }
+            AppVersionManager.SaveCurrentAppInfo();
+        }
+
 
     }
 

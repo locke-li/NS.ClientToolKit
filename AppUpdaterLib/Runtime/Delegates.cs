@@ -39,7 +39,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     public delegate void AppUpdaterForceUpdateCallback(LighthouseConfig.UpdateDataInfo info);
 
     /// <summary>
+    /// 目标版本获取后的回调
+    /// </summary>
+    public delegate void AppUpdaterOnTargetVersionObtainCallback(string version);
+
+    /// <summary>
     /// 热更新模块执行完成回调
     /// </summary>
-    public delegate void AppUpdaterPerformCompleted();
+    public delegate void AppUpdaterPerformCompletedCallback();
 }

@@ -19,6 +19,9 @@ using System;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.LoggerModule.Runtime;
 using System.IO;
+using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using CenturyGame.AppUpdaterLib.Runtime.Manifests;
+using CenturyGame.ClientToolKit.AppUpdaterLib.Runtime;
 using UnityEngine;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 using Object = UnityEngine.Object;
@@ -121,10 +124,20 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         }
 
         /// <summary>
+        /// 注册目标版本信息回调
+        /// </summary>
+        /// <param name="callback"></param>
+        public static void AppUpdaterSetOnTargetVersionObtainCallback(AppUpdaterOnTargetVersionObtainCallback callback)
+        {
+            CheckIsInitialize("AppUpdaterSetOnTargetVersionObtainCallback");
+            s_mService.SetOnTargetVersionObtainCallback(callback);
+        }
+
+        /// <summary>
         /// 注册更新完成时回调
         /// </summary>
         /// <param name="callback"></param>
-        public static void AppUpdaterSetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        public static void AppUpdaterSetPerformCompletedCallback(AppUpdaterPerformCompletedCallback callback)
         {
             CheckIsInitialize("AppUpdaterSetPerformCompletedCallback");
             s_mService.SetPerformCompletedCallback(callback);
@@ -134,7 +147,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// 设置磁盘信息获取提供者
         /// </summary>
         /// <param name="provider"></param>
-        public static void SetStorageInfoProvider(IStorageInfoProvider provider)
+        public static void AppUpdaterSetStorageInfoProvider(IStorageInfoProvider provider)
         {
             CheckIsInitialize("SetStorageInfoProvider");
             s_mService.SetStorageInfoProvider(provider);
@@ -144,7 +157,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// 获取热更新进度数据
         /// </summary>
         /// <returns></returns>
-        public static AppUpdaterProgressData GetAppUpdaterProgressData()
+        public static AppUpdaterProgressData AppUpdaterGetAppUpdaterProgressData()
         {
             CheckIsInitialize("GetAppUpdaterProgressData");
             return AppUpdaterContext.Current.ProgressData;
@@ -184,6 +197,70 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             }
         }
 
+        /// <summary>
+        /// 获取当前服务器配置数据
+        /// </summary>
+        /// <returns></returns>
+        public static LighthouseConfig.Server AppUpdaterGetServerData()
+        {
+            CheckIsInitialize("GetServerData");
+            if(AppVersionManager.LHConfig == null)
+                throw new InvalidOperationException("Get server config data failure !");
+            return AppVersionManager.LHConfig.GetCurrentServerData();
+        }
+
+        /// <summary>
+        /// 获取当前App信息清单
+        /// </summary>
+        /// <returns></returns>
+        public static AppInfoManifest AppUpdaterGetAppInfoManifest()
+        {
+            CheckIsInitialize("GetAppInfoManifest");
+            return AppVersionManager.AppInfo;
+        }
+
+
+        /// <summary>
+        /// 获取LighthouseConfig清单
+        /// </summary>
+        /// <returns></returns>
+        public static LighthouseConfig AppUpdaterGetLHConfig()
+        {
+            CheckIsInitialize("GetLHConfig");
+            return AppVersionManager.LHConfig;
+        }
+
+
+        /// <summary>
+        /// 是否更新成功
+        /// </summary>
+        /// <returns></returns>
+        public static bool AppUpdaterIsSucceed()
+        {
+            if (s_mService == null)
+                return false;
+            return s_mService.IsSucceed();
+        }
+
+        /// <summary>
+        /// 获取服务器Url
+        /// </summary>
+        /// <returns></returns>
+        public static string AppUpdaterGetServerUrl()
+        {
+            CheckIsInitialize("GetServerUrl");
+            return AppVersionManager.ServerUrl;
+        }
+
+        /// <summary>
+        /// 设置示意，每种类型的示意都有对应的数值范围
+        /// </summary>
+        /// <param name="hintName">示意类型</param>
+        /// <param name="hintVal">值</param>
+        public static void AppUpdaterHint(AppUpdaterHintName hintName , int hitVal)
+        {
+            AppUpdaterHints.Instance.SetHintValue(hintName,hitVal);
+        }
 
         private static void CheckIsInitialize(string methodName)
         {
@@ -191,6 +268,16 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
                 throw new NullReferenceException($"Your want to use \"AppUpdaterManager\" that not initialized ! Call method :  \"{methodName}\" .");
         }
 
+
+        public static void AppUpdaterDisposeAppUpdaterService()
+        {
+            if (s_mService != null)
+            {
+                Object.Destroy(s_mService.gameObject);
+            }
+
+            s_mInitialized = false;
+        }
 
         #endregion
 

@@ -19,6 +19,7 @@ using System.IO;
 using CenturyGame.AppBuilder.Editor.Builds.BuildInfos;
 using CenturyGame.AppBuilder.Editor.Builds.Contexts;
 using CenturyGame.AppUpdaterLib.Runtime;
+using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.Core.Pipeline;
 using UnityEditor;
 using UnityEngine;
@@ -56,11 +57,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override void Execute(IFilter filter, IPipelineInput input)
         {
-            this.WriteBuildReporterFile(filter,input);
+            var buildReporterFolderPath = this.WriteBuildReporterFile(filter,input);
+
+            this.CopyResManifessts(buildReporterFolderPath);
+
             this.State = ActionState.Completed;
         }
 
-        private void WriteBuildReporterFile(IFilter filter, IPipelineInput input)
+        private string WriteBuildReporterFile(IFilter filter, IPipelineInput input)
         {
             var reporter = new BuildReportInfo();
 
@@ -76,17 +80,71 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var appBuildContext = AppBuildContext;
             reporter.unityResVerison = appBuildContext.AppInfoManifest.unityDataResVersion;
             reporter.dataResVersion = appBuildContext.AppInfoManifest.dataResVersion;
+            var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
+            var appUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
+            reporter.channel = appUpdaterConfig.channel;
+            reporter.ossUrl = appUpdaterConfig.ossUrl;
+            reporter.cdnUrl = appUpdaterConfig.cdnUrl;
+            
+            reporter.makeBaseVersion = input.GetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
+
             string json = appBuildContext.ToJson(reporter);
 
             string timeStr2 = now.ToString("yyyyMMddHHmmss");
-            string targetFileName = string.Format(BuildReportInfo.BuildReportFileNamePattern,
-                timeStr2,
-                appBuildContext.AppInfoManifest.version);
-
-            string targetPath = appBuildContext.GetBuildReportsPath(targetFileName);
+            string targetPath = appBuildContext.GetBuildReportsPath($"{timeStr2}/Build.report");
             File.WriteAllText(targetPath,json, appBuildContext.TextEncoding);
+
             AssetDatabase.Refresh();
             Logger.Info("Write build report complted!");
+
+            var result = Path.GetDirectoryName(targetPath);
+            result = EditorUtils.OptimazePath(result);
+            return result;
+        }
+
+
+        private void CopyResManifessts(string targetFolder)
+        {
+            var sourceDataResPath = $"{AppBuildContext.GetAssetsOutputPath()}/res_data.json";
+            var desDataResListPath = $"{targetFolder}/res_data.json";
+
+            if (!File.Exists(sourceDataResPath))
+            {
+                throw new FileNotFoundException($"The file path is \"{sourceDataResPath}\" .");
+            }
+
+            if (File.Exists(desDataResListPath))
+            {
+                File.Delete(desDataResListPath);
+            }
+            File.Copy(sourceDataResPath, desDataResListPath);
+
+            var platformName = string.Empty;
+#if UNITY_EDITOR && UNITY_ANDROID
+            platformName = "android";
+#elif UNITY_EDITOR && UNITY_IPHONE
+            platformName = "ios";
+#else
+            throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
+#endif
+
+            var sourceUnityaResPath = $"{AppBuildContext.GetAssetsOutputPath()}/res_{platformName}.json";
+            var desUnityResListPath = $"{targetFolder}/res_{platformName}.json";
+
+            if (!File.Exists(sourceUnityaResPath))
+            {
+                throw new FileNotFoundException($"The file path is \"{sourceUnityaResPath}\" .");
+            }
+
+            if (File.Exists(desUnityResListPath))
+            {
+                File.Delete(desUnityResListPath);
+            }
+            File.Copy(sourceUnityaResPath, desUnityResListPath);
+
+            AssetDatabase.Refresh();
+
+            Logger.Info("Copy resource manifest files complted!");
         }
 
         #endregion

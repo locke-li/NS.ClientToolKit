@@ -16,10 +16,8 @@
 
 using UnityEngine;
 using System;
-using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Diagnostics;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
-using System.Runtime.CompilerServices;
 using CenturyGame.Core.FSM;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
@@ -106,8 +104,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.SetForceUpdateCallback(callback);
         }
 
+        public void SetOnTargetVersionObtainCallback(AppUpdaterOnTargetVersionObtainCallback callback)
+        {
+            this.mOwner.SetOnTargetVersionObtainCallback(callback);
+        }
 
-        public void SetPerformCompletedCallback(AppUpdaterPerformCompleted callback)
+        public void SetPerformCompletedCallback(AppUpdaterPerformCompletedCallback callback)
         {
             this.mOwner.SetPerformCompletedCallback(callback);
         }
@@ -133,6 +135,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.StartUpdateOperationAgain();
         }
 
+        public bool IsSucceed()
+        {
+            return this.mOwner.State == AppUpdaterFsmOwner.AppUpdaterState.Done;
+        }
+
         #region Unity Callbacks
 
         public void Update()
@@ -140,12 +147,21 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.Update();
         }
 
-        private void OnApplicationPause(bool focus)
+        private void OnApplicationFocus(bool hasFocus)
         {
             IRoutedEventArgs arg = new RoutedEventArgs<bool>()
             {
-                EventType = (int)AppUpdaterInnerEventType.OnApplicationPause,
-                arg = focus
+                EventType = (int)AppUpdaterInnerEventType.OnApplicationFocus,
+                arg = hasFocus
+            };
+            this.mOwner.HandleMessage(in arg);
+        }
+
+        private void OnApplicationQuit()
+        {
+            IRoutedEventArgs arg = new RoutedEventArgs()
+            {
+                EventType = (int)AppUpdaterInnerEventType.OnApplicationQuit,
             };
             this.mOwner.HandleMessage(in arg);
         }

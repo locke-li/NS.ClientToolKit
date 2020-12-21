@@ -456,9 +456,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
                 if (AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild)
                 {
                     var lastVersionInfo = this.GetLastBuildInfo();
-                    if (lastVersionInfo != null)
+                    if (lastVersionInfo != null && lastVersionInfo.GetCurrentBuildInfo() != null)
                     {
-                        var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+                        var curBuildInfo = lastVersionInfo.GetCurrentBuildInfo();
+                        var lastVersion = new Version(curBuildInfo.versionInfo.version);
                         lastVersion.IncrementOneForPatch();
                         return lastVersion;
                     }

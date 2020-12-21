@@ -30,7 +30,7 @@ using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.AppBuilder.Editor.Builds
 {
-    internal class AppBuilderPipelineProcessor : BasePipelineProcessor
+    public sealed class AppBuilderPipelineProcessor : BasePipelineProcessor
     {
         //--------------------------------------------------------------
         #region Fields

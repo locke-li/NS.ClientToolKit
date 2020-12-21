@@ -333,7 +333,7 @@ public sealed class ABItem
     {
         if (canLoadAB)
         {
-            string path = AssetsFileSystem.GetWritePath(Table.Name, true, AbHelp.AbFileExt);;
+            string path = AssetsFileSystem.GetWritePath(Table.Name, false, AbHelp.AbFileExt);;
             if (!System.IO.File.Exists(path))
             {
                 path = AssetsFileSystem.GetStreamingAssetsPath(Table.Name, AbHelp.AbFileExt);

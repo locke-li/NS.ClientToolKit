@@ -19,7 +19,7 @@ using CenturyGame.LoggerModule.Runtime;
 
 namespace CenturyGame.AppBuilder.Editor.Builds.InnerLoggers
 {
-    class AppBuilderLoggerProvider : ILoggerProvider
+    public class AppBuilderLoggerProvider : ILoggerProvider
     {
         //--------------------------------------------------------------
         #region Fields

@@ -40,8 +40,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         public float Progress { set; get; }
 
 
-        public float Percentage { set; get; }
-
         /// <summary>
         /// 总共需要下载的文件数目
         /// </summary>
@@ -183,6 +181,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// 当前更新的资源版本相对于ResVersions的索引
         /// </summary>
         public int CurrentResVersionIdx = DefaultResVerisonIdx;
+
+        /// <summary>
+        /// 资源目标版本号，即目标Patch
+        /// </summary>
+        public string TargetResVersionNum = string.Empty;
 
         public LighthouseConfigDownloader LighthouseConfigDownloader = null;
 

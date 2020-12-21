@@ -78,27 +78,27 @@ namespace CenturyGame.AssetBundleManager.Runtime
         const string kSimulateAssetBundles = "SimulateAssetBundles";
 
 
-        public static bool LuaDevelopmentModeInEditor
-        {
-            get
-            {
-                if (m_LuaDevelopmentMode == -1)
-                    m_LuaDevelopmentMode = EditorPrefs.GetBool(kLuaDevelopmentMode, false) ? 1 : 0;
+        //public static bool LuaDevelopmentModeInEditor
+        //{
+        //    get
+        //    {
+        //        if (m_LuaDevelopmentMode == -1)
+        //            m_LuaDevelopmentMode = EditorPrefs.GetBool(kLuaDevelopmentMode, false) ? 1 : 0;
 
-                return m_LuaDevelopmentMode != 0;
-            }
-            set
-            {
-                int newValue = value ? 1 : 0;
-                if (newValue != m_LuaDevelopmentMode)
-                {
-                    m_LuaDevelopmentMode = newValue;
-                    EditorPrefs.SetBool(kLuaDevelopmentMode, value);
-                }
-            }
-        }
-        static int m_LuaDevelopmentMode = -1;
-        const string kLuaDevelopmentMode = "LuaDevelopmentMode";
+        //        return m_LuaDevelopmentMode != 0;
+        //    }
+        //    set
+        //    {
+        //        int newValue = value ? 1 : 0;
+        //        if (newValue != m_LuaDevelopmentMode)
+        //        {
+        //            m_LuaDevelopmentMode = newValue;
+        //            EditorPrefs.SetBool(kLuaDevelopmentMode, value);
+        //        }
+        //    }
+        //}
+        //static int m_LuaDevelopmentMode = -1;
+        //const string kLuaDevelopmentMode = "LuaDevelopmentMode";
 #endif
 
         #endregion
@@ -157,14 +157,13 @@ namespace CenturyGame.AssetBundleManager.Runtime
             ABMgrHandle.Init(() =>
                 {
                     s_mInitialize = true;
-                    onInitCompleted?.Invoke();
                     s_mLogger.Value.Info($"AssetBundleManager initialize completed !");
-
+                    onInitCompleted?.Invoke();
                 },
                 error =>
                 {
-                    onInitError?.Invoke(error);
                     s_mLogger.Value.Error($"AssetBundleManager initialize fail! Error : {error} .");
+                    onInitError?.Invoke(error);
                 });
         }
 

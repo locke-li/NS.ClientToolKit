@@ -144,24 +144,20 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
             if (fileServerType == FileServerType.CDN)
             {
-                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId);
-
-                s_mLogger.Info($"Request CDN , lighthouseUrl : {lighthouseUrl}");
-
-                this.CurRequestFileServerType = FileServerType.CDN;
-
-                this.mState = InnerState.RequestingCdn;
+                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId, fileServerType);
             }
             else if(fileServerType == FileServerType.OSS)
             {
-                lighthouseUrl = this.mContext.GetLighthouseUrl(this.mTargetLighthouseId);
-
-                s_mLogger.Info($"Request OSS , lighthouseUrl : {lighthouseUrl}");
-
-                this.CurRequestFileServerType = FileServerType.OSS;
-
-                this.mState = InnerState.RequestingOss;
+                /*
+                 * 如果是oss访问，则只访问默认的lighthouse，然后对比lighthouseId
+                 */
+                lighthouseUrl = this.mContext.GetLighthouseUrl(null, fileServerType);
             }
+            
+            this.CurRequestFileServerType = fileServerType;
+            s_mLogger.Info($"Request lighthouseUrl : {lighthouseUrl}");
+
+            this.mState = (fileServerType == FileServerType.CDN) ? InnerState.RequestingCdn : InnerState.RequestingOss;
 
             this.mHttpComponnent.Load(lighthouseUrl, OnLighthouseConfigResponseRet);
         }
@@ -178,6 +174,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                     case InnerState.RequestingOss:
                         this.mState = InnerState.ReqLighthouseConfigFailure;
                         this.mReqLighthouseConfigEvent?.Invoke(false,null);
+                        this.Clear();
                         break;
                 }
             }
@@ -186,7 +183,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 string lighthouseContents = m_Encoding.GetString(netData);
                 this.mReqLighthouseConfigEvent?.Invoke(true,lighthouseContents);
             }
-            this.Clear();
         }
 
 

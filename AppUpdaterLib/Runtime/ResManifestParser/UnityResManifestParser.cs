@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 {
-    public class UnityResManifestParser : BaseResManifestParser
+    internal class UnityResManifestParser : BaseResManifestParser
     {
         //--------------------------------------------------------------
         #region Fields
@@ -68,9 +68,16 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             return desc.N;
         }
 
-        public override void WriteToAppInfo(string resVersion)
+        public override void WriteToAppInfo(string resVersion, string resVersionNum = null)
         {
             AppVersionManager.AppInfo.unityDataResVersion = resVersion;
+
+            if (!string.IsNullOrEmpty(resVersionNum))
+            {
+                Version version = new Version(AppVersionManager.AppInfo.version);
+                version.Patch = resVersionNum;
+                AppVersionManager.AppInfo.version = version.GetVersionString();
+            }
             AppVersionManager.SaveCurrentAppInfo();
         }
 

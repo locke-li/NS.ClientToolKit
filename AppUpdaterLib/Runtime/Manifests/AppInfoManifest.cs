@@ -42,11 +42,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Manifests
         public string unityDataResVersion;
 
         /// <summary>
-        /// 渠道
-        /// </summary>
-        public string channel;
-
-        /// <summary>
         /// 目标平台
         /// </summary>
         public string TargetPlatform;

@@ -85,6 +85,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             {
                 Directory.Delete(streamingPath, true);
             }
+            AssetDatabase.Refresh();
             Directory.CreateDirectory(streamingPath);
 
             var resStorage = AppBuildContext.GetResStoragePath();
@@ -125,8 +126,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         private void CopyUnityResFileList()
         {
             var streamingPath = AppBuildContext.GetAssetsOutputPath();
-            var resStorage = AppBuildContext.GetResStoragePath();
-
+            
             var platformName = string.Empty;
 #if UNITY_EDITOR && UNITY_ANDROID
             platformName = "android";
@@ -135,7 +135,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 #else
             throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
 #endif
-            var resListPath = $"{resStorage}/gen/rawdata/version_list/res_{platformName}.json";
+
+            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+
+            var resListPath = $"{configRepoPath}/gen/rawdata/version_list/res_{platformName}.json";
 
             if (!File.Exists(resListPath))
             {

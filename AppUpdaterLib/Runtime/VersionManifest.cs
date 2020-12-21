@@ -38,6 +38,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.N = info.N;
             this.S = info.S;
             this.H = info.H;
+            this.RN = info.RN;
         }
 
         public FileDesc Clone()
@@ -46,7 +47,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             desc.N = this.N;
             desc.H = this.H;
             desc.S = this.S;
-            return new FileDesc(this);
+            desc.RN = this.RN;
+            return desc;
         }
 
         public void CopyTo(FileDesc other)
@@ -54,6 +56,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             other.N = this.N;
             other.S = this.S;
             other.H = this.H;
+            other.RN = this.RN;
         }
 
         public string GetRNUTF8()

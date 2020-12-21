@@ -47,17 +47,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             LoadAppVerisonInfo,
 
             /// <summary>
-            /// 加载app的版本失败
-            /// </summary>
-            //LoadAppVerisonInfoFailure,
-
-            //解析版本信息失败
-            //ParseBuiltinAppInfoFailure,
-
-            //解析本地信息失败
-            //ParseLocalAppInfoFailure,
-
-            /// <summary>
             /// 正在加载app版本信息
             /// </summary>
             LoadingAppVerisonInfo,
@@ -195,7 +184,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     RequestHttpServer();
                     break;
                 case LogicState.ReqLighthouseConfigAgain:
-                    StartReqLighthouseConfig(mCurrentLighthouseConfig.MetaData.lighthouseId);
+                    StartReqLighthouseConfig(Context.GetVersionResponseInfo.lighthouseId);
                     break;
                 case LogicState.GetLighthouseCompleted:
                     Target.ChangeState<AppVersionCheckState>();
@@ -224,7 +213,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Logger.Info($"Start request lighthouse config that id is {lighthouseId} !");
+                Logger.Warn($"Start request lighthouse config that id is {lighthouseId} !");
                 mState = LogicState.RequestingLighthouseConfigAgain;
             }
 
@@ -282,8 +271,19 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                         var targetLighthouseConfig = LighthouseConfig.ReadFromJson(contents);
                         Logger.Info(
                             $"Get target config success , lighthouseId : {targetLighthouseConfig.MetaData.lighthouseId}");
-                        AppVersionManager.MakeCurrentLighthouseConfig(targetLighthouseConfig);
-                        mState = LogicState.GetLighthouseCompleted;
+                        if (targetLighthouseConfig.MetaData.lighthouseId == Context.GetVersionResponseInfo.lighthouseId)
+                        {
+                            AppVersionManager.MakeCurrentLighthouseConfig(targetLighthouseConfig);
+                            mState = LogicState.GetLighthouseCompleted;
+                        }
+                        else
+                        {
+                            Context.ErrorType = AppUpdaterErrorType.DownloadLighthouseConfigInvalid;
+                            Logger.Error($"Download lighthouse config is invalid ! remote id : " +
+                                         $"{targetLighthouseConfig.MetaData.lighthouseId}  , " +
+                                         $" target id : {Context.GetVersionResponseInfo.lighthouseId}");
+                            mState = LogicState.ReqLighthouseConfigFailure;
+                        }
                         break;
                 }
             }
@@ -358,7 +358,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (result > Version.VersionCompareResult.Equal)
                 {
-                    var clearPath = new DirectoryInfo(string.Concat(Application.persistentDataPath,
+                    var clearPath = new DirectoryInfo(string.Concat(AssetsFileSystem.PersistentDataPath,
                         Path.DirectorySeparatorChar, AssetsFileSystem.RootFolderName));
                     if (clearPath.Exists)
                     {
@@ -423,7 +423,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             var localUnityDataResName = AssetsFileSystem.UnityResManifestName;
             if (!AppVersionManager.IsLocalResManifestExist(localUnityDataResName))
             {
-                Logger.Info($"The local manifest file that name is \"{localUnityDataResName}\" is not exist!");
+                Logger.Info($"The local manifest file that name is \"{localUnityDataResName}\" is not exist, Start load builtin !");
                 Target.Request.Load(Context.GetStreamingAssetsPath(localUnityDataResName), OnLoadResManifestFileComplted);
             }
             else
@@ -495,29 +495,50 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 mCurLighthouseFromTo,
                 info =>
                 {
-                    if (info != null)
+                    Logger.Debug($"info != null : {info != null} .");
+                    if(info != null)
+                        Logger.Debug($"string.IsNullOrEmpty(info.lighthouseId) : {string.IsNullOrEmpty(info.lighthouseId)}");
+                    if (info != null && !string.IsNullOrEmpty(info.lighthouseId))
                     {
-                        if (string.IsNullOrEmpty(info.lighthouseId))
-                        {
-                            Logger.Error("The lighthouse id that was return by server is null or empty!");
-                            Context.ErrorType = AppUpdaterErrorType.RequestGetVersionFailure;
-                            mState = LogicState.ReqLighthouseConfigFailure;
-                            return;
-                        }
-
+                        AppVersionManager.MakeCurrentServerUrl(info.url);
                         Context.GetVersionResponseInfo = info;
-
-                        if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
+                        if (info.forceUpdate || info.maintenance)
                         {
-                            Logger.Info("The current lighthouseconfig is latest !");
-                            AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
-
-                            mState = LogicState.GetLighthouseCompleted;
+                            if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
+                            {
+                                Logger.Info($"forceUpdate : {info.forceUpdate}  maintenance : {info.maintenance}");
+                                Context.GetVersionResponseInfo = info;
+                                AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
+                                mState = LogicState.GetLighthouseCompleted;
+                            }
+                            else
+                            {
+                                Logger.Info("The server may be in maintence or you should to download latest app and install it ." +
+                                            "The current lighthouseconfig is old , try to get latest!");
+                                mState = LogicState.ReqLighthouseConfigAgain;
+                            }
                         }
                         else
                         {
-                            Logger.Info("The current lighthouseconfig is old , try to get a new one !");
-                            mState = LogicState.ReqLighthouseConfigAgain;
+                            if (string.IsNullOrEmpty(info.lighthouseId))
+                            {
+                                Logger.Error("The lighthouse id that was return by server is null or empty!");
+                                Context.ErrorType = AppUpdaterErrorType.RequestGetVersionFailure;
+                                mState = LogicState.ReqLighthouseConfigFailure;
+                                return;
+                            }
+                            if (info.lighthouseId == mCurrentLighthouseConfig.MetaData.lighthouseId)
+                            {
+                                Logger.Info("The current lighthouseconfig is latest !");
+                                AppVersionManager.MakeCurrentLighthouseConfig(mCurrentLighthouseConfig);
+
+                                mState = LogicState.GetLighthouseCompleted;
+                            }
+                            else
+                            {
+                                Logger.Info("The current lighthouseconfig is old , try to get a new one !");
+                                mState = LogicState.ReqLighthouseConfigAgain;
+                            }
                         }
                     }
                     else

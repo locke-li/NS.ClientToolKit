@@ -200,13 +200,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return $"{this.Major}.{this.Minor}.{this.Patch}";
         }
 
-        public string GetVersionFolderString()
-        {
-            if (!this.mIsValid)
-                throw new InvalidOperationForVersionException("GetVersionFolderString");
-            return $"{this.Major}_{this.Minor}_{this.Patch}";
-        }
-
         public void IncrementOneForPatch()
         {
             if (!this.mIsValid)

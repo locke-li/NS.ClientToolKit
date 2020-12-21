@@ -66,8 +66,14 @@ namespace CenturyGame.AppBuilder.Editor.Builds
     [System.Serializable]
     public class FilesUpLoadInfo
     {
+        public enum PythonType
+        {
+            Python,
+            Python3
+        }
+
         /// <summary>
-        /// 表数据路径
+        /// 数据表配置仓库
         /// </summary>
         public string dataResAbsolutePath = "";
 
@@ -85,6 +91,16 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         /// 远端根目录
         /// </summary>
         public string remoteDir = "samples";
+
+        /// <summary>
+        /// 配置仓库的yaml文件名(带后缀)
+        /// </summary>
+        public string protokitgoConfigName = "protokitgo.yaml";
+
+        /// <summary>
+        /// Python版本
+        /// </summary>
+        public PythonType pythonType = PythonType.Python;
 
         /// <summary>
         /// 是否上传到远端服务器

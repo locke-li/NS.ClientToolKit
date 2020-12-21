@@ -34,9 +34,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 case AppUpdaterInnerEventType.StartPerformResUpdateOperation:
                     this.CheckResUpdateWasDone();
                     return true;
-                case AppUpdaterInnerEventType.OnApplicationPause:
-                    this.OnAppPauseHandleCallback(in eventArgs);
-                    return true;
+                //case AppUpdaterInnerEventType.OnApplicationFocus:
+                //    return this.AppFocusHandleCallback(in eventArgs);
             }
             return base.OnMessage(entity, in eventArgs);
         }
@@ -65,18 +64,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             this.Target.HandleMessage(in arg);
         }
 
-        private void OnAppPauseHandleCallback(in IRoutedEventArgs arg)
-        {
-            //var concreteArgs = (RoutedEventArgs<bool>)arg;
-
-            //if (concreteArgs.arg)//退回到主屏幕
-            //{
-
-            //}
-            //else
-            //{
-
-            //}
-        }
+        //private bool AppFocusHandleCallback(in IRoutedEventArgs arg)
+        //{
+        //    return false;
+        //}
     }
 }

@@ -91,15 +91,17 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
             
             pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
-            Debug.Log($"Lua projecet root path : {pythonScripPath} .");
+            Logger.Info($"Lua projecet root path : {pythonScripPath} .");
 
-            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            var appBuildConfig = AppBuildConfig.GetAppBuildConfigInst();
+            var configRepoPath = appBuildConfig.upLoadInfo.dataResAbsolutePath;
             if (!Directory.Exists(configRepoPath))
             {
                 throw new DirectoryNotFoundException(configRepoPath);
             }
 
-            //var versionInfoFilePath = $"{configRepoPath}/gen/rawdata/server/resource_versions.release";
+            var protokitgoConfigName = appBuildConfig.upLoadInfo.protokitgoConfigName;
+
             var uploadFolder = sourceFolder;
 
             string platformName = string.Empty;
@@ -110,7 +112,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 #else
             throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
 #endif
-            var uploadFilesPattern = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.uploadFilesPattern;
+
+            var uploadInfo = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo;
+            var uploadFilesPattern = uploadInfo.uploadFilesPattern;
 
             var makeBaseVersion = input.GetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
             var appVersion = AppBuildContext.GetTargetAppVersion(makeBaseVersion);
@@ -118,19 +122,19 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var resVersion = appVersion.Patch;
 
             var noUpload = "false";
-            if (AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.isUploadToRemote)
+            if (uploadInfo.isUploadToRemote)
                 noUpload = "false";
             else
                 noUpload = "true";
 
-            string remoteDir = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.remoteDir; 
+            string remoteDir = uploadInfo.remoteDir; 
             if (string.IsNullOrEmpty(remoteDir) || string.IsNullOrWhiteSpace(remoteDir))
             {
                 remoteDir = "**NOROOT**";
             }
 
             string commandLineArgs =
-                $"{pythonScripPath} {configRepoPath} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
+                $"{pythonScripPath} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
 
             
             Debug.Log($"commandline args : {commandLineArgs}");
@@ -138,9 +142,23 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             var pStartInfo = new ProcessStartInfo();
 
 #if UNITY_EDITOR_WIN
-            pStartInfo.FileName = @"python.exe";
+            if (uploadInfo.pythonType == FilesUpLoadInfo.PythonType.Python)
+            {
+                pStartInfo.FileName = @"python.exe";
+            }
+            else
+            {
+                pStartInfo.FileName = @"python3.exe";
+            }
 #elif UNITY_EDITOR_OSX
-            pStartInfo.FileName = @"python";
+            if (uploadInfo.pythonType == FilesUpLoadInfo.PythonType.Python)
+            {
+                pStartInfo.FileName = @"python";
+            }
+            else
+            {
+                pStartInfo.FileName = @"python3";
+            }
 #else
         throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
 #endif

@@ -1,21 +1,23 @@
 ﻿/**************************************************************
- *  类名称：          MakeBaseVerionSetupAction
+ *  类名称：          MakePitchVerionSetupAction
  *  描述：
  *  作者：            Chico(wuyuanbing)
- *  创建时间：        2020/11/27 14:32:31
+ *  创建时间：        2020/11/27 15:00:03
  *  最后修改人：
  *  版权所有 （C）:   CenturyGames
  **************************************************************/
 
+using System.Collections.Generic;
 using System.IO;
-using CenturyGame.AppBuilder.Runtime.Exceptions;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using CenturyGame.Core.Pipeline;
-using CenturyGame.AppBuilder.Editor;
 using Version = CenturyGame.AppUpdaterLib.Runtime.Version;
 
-namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
+namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
 {
-    class MakeBaseVerionSetupAction : BaseBuildFilterAction
+    class MakePatchVerionSetupAction : BaseBuildFilterAction
     {
         //--------------------------------------------------------------
         #region Fields
@@ -42,44 +44,52 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         #region Methods
         //--------------------------------------------------------------
 
-
         private bool CheckAppVersionValid()
         {
             var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
-            Logger.Info($"The version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
+            Logger.Info($"The target app version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
             if (appVersion.Major == "0" && appVersion.Minor == "0" && appVersion.Patch == "0")
             {
                 Logger.Error($"Invalid app base vesion : 0.0.0 .");
                 return false;
             }
 
-            var versionStr = $"{appVersion.Major}.{appVersion.Minor}.0";
-
+            var versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
             var targetVersion = new Version(versionStr);
 
             var lastVersionInfo = AppBuildContext.GetLastBuildInfo();
-            if (lastVersionInfo != null)
+            if (lastVersionInfo != null && lastVersionInfo.GetCurrentBuildInfo() != null)
             {
-                var lastVersion = new Version(lastVersionInfo.versionInfo.version);
+                var buildInfo = lastVersionInfo.GetCurrentBuildInfo();
+                var lastVersion = new Version(buildInfo.versionInfo.version);
                 Logger.Info($"The last app version :  {lastVersion.GetVersionString()} .");
-
                 var result = targetVersion.CompareTo(lastVersion);
 
-                if (result < Version.VersionCompareResult.HigherForMinor)//次版本（Minor）本次必须一样或更高
+                //首先，目标版本必须和上一次build的版本处在同一个大版本上
+                if (result > Version.VersionCompareResult.LowerForMinor && result < Version.VersionCompareResult.HigherForMinor)
                 {
-                    Logger.Error($"The target version that value is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" " +
-                                 $"is lower or equal to last build ,last build verison is \"" +
-                                 $"{lastVersionInfo.versionInfo.version}\" .");
+                    //如果不是自增Patch的build，那么目标版本的Patch必须大于上一次build的Patch
+                    if (!AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild &&
+                        result < Version.VersionCompareResult.HigherForPatch)
+                    {
+                        Logger.Error($"Version is invalid , targetVersion : {targetVersion.GetVersionString()} " +
+                                     $"lastBuildVersion : {lastVersion.GetVersionString()} .");
+                        return false;
+                    }
+                }
+                else
+                {
                     return false;
                 }
             }
             else
             {
-                Logger.Info($"The last build info is not exist .");
+                Logger.Error($"No last build info , You can't make app patch build !");
+                return false;
             }
+            
             return true;
         }
-
 
         private bool CheckGameConfigs()
         {
@@ -101,6 +111,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
                 var versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
                 AppBuildContext.AppendErrorLog($"Invalid target version : {versionStr}.");
+
                 return false;
             }
 
@@ -112,17 +123,18 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             return true;
         }
 
+
         public override void Execute(IFilter filter, IPipelineInput input)
         {
-            this.Setup(filter,input);
+            this.Setup(filter, input);
             this.State = ActionState.Completed;
         }
 
-
         private void Setup(IFilter filter, IPipelineInput input)
         {
-            input.SetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, true);
+            input.SetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
         }
+
 
         #endregion
 

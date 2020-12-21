@@ -17,10 +17,11 @@
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using System;
 using System.Collections.Generic;
+using CenturyGame.ClientToolKit.AppUpdaterLib.Runtime;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 {
-    public class DataResManifestParser : BaseResManifestParser
+    internal class DataResManifestParser : BaseResManifestParser
     {
         //--------------------------------------------------------------
         #region Fields
@@ -65,11 +66,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 
         public override string GetLocalRoot(FileDesc desc)
         {
-            //return AssetsFileSystem.AppDataResLocalRoot;
-            return $"lua/gen/{desc.N}";
+            if (AppUpdaterHints.Instance.LowerLuaName)
+            {
+                return $"lua/gen/{desc.N.ToLower()}";
+            }
+            else
+            {
+                return $"lua/gen/{desc.N}";
+            }
         }
 
-        public override void WriteToAppInfo(string resVersion)
+        public override void WriteToAppInfo(string resVersion , string resVersionNum = null)
         {
             AppVersionManager.AppInfo.dataResVersion = resVersion;
             AppVersionManager.SaveCurrentAppInfo();

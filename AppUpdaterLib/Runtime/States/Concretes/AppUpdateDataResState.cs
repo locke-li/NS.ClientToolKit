@@ -33,30 +33,21 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             Idle,
 
-            //Get remote resManifest
             StartRequestResManifest,
+
             RequestingManifest,
+
             RequestManifestCompleted,
-            RequestManifestFailured,
 
-            ParseLocalResManifestFailure,//解析本地配置失败
-
-            ParseRemoteResManifestFailure,//解析远程配置失败
-
-            DiskSpaceNotEnough,//磁盘空间不足以支撑下载更新文件
-
-            //Get res difference
             StartCalculateResDiff,
+
             CalculatingResDiff,
             
-            //Download difference and apply patch
             DownloadAndApplyDiff,
 
-            //Download|ApplyPatch error
-            DownloadAndApplyPatchFailure,
+            ResUpdateCompleted,
 
-            //Resource update completd
-            ResUpdateCompleted
+            ResUpdateFailed,
         }
 
         public enum FileDownLoadState
@@ -133,9 +124,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 case InnerState.StartRequestResManifest:
                     this.RequestResManifest(FileServerType.CDN);
                     break;
-                case InnerState.RequestManifestFailured:
-                    this.OnResUpdateFailure(AppUpdaterErrorType.RequestResManifestFailure);
-                    break;
                 case InnerState.RequestManifestCompleted:
                     this.ProcessRequestResManifestCompleted();
                     break;
@@ -148,17 +136,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 case InnerState.ResUpdateCompleted://更新完成
                     this.ProcessResUpdateCompleted();
                     break;
-                case InnerState.DownloadAndApplyPatchFailure:
-                    this.OnResUpdateFailure(AppUpdaterErrorType.DownloadFileFailure);
-                    break;
-                case InnerState.ParseLocalResManifestFailure:
-                    this.OnResUpdateFailure(AppUpdaterErrorType.ParseLocalResManifestFailure);
-                    break;
-                case InnerState.ParseRemoteResManifestFailure:
-                    this.OnResUpdateFailure(AppUpdaterErrorType.ParseRemoteResManifestFailure);
-                    break;
-                case InnerState.DiskSpaceNotEnough:
-                    this.OnResUpdateFailure(AppUpdaterErrorType.DiskIsNotEnoughToDownPatchFiles);
+                case InnerState.ResUpdateFailed:
+                    this.OnResUpdateFailure();
                     break;
 
             }
@@ -188,7 +167,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 }
                 else
                 {
-                    this.mCurState = InnerState.RequestManifestFailured;
+                    Context.ErrorType = AppUpdaterErrorType.RequestResManifestFailure;
+                    this.mCurState = InnerState.ResUpdateFailed;
                 }
             }
             else
@@ -209,7 +189,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 {
                     Context.ErrorType = AppUpdaterErrorType.ParseRemoteResManifestFailure;
 
-                    this.mCurState = InnerState.ParseRemoteResManifestFailure;
+                    this.mCurState = InnerState.ResUpdateFailed;
 
                     Logger.Error($"Error stackTrace : {ex.StackTrace}");
 
@@ -221,10 +201,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         }
 
 
-        private void OnResUpdateFailure(AppUpdaterErrorType failureType)
+        private void OnResUpdateFailure()
         {
-            Logger.Error($"Resource update failure , failure type : {failureType}! ");
-            Context.ErrorType = failureType;
             this.Target.ChangeState<AppUpdateFailureState>();
         }
 
@@ -261,7 +239,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             {
                 Context.ErrorType = AppUpdaterErrorType.ParseLocalResManifestFailure;
 
-                this.mCurState = InnerState.ParseLocalResManifestFailure;
+                this.mCurState = InnerState.ResUpdateFailed;
 
                 Logger.Error($"Error stackTrace : {ex.StackTrace}");
 
@@ -283,7 +261,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (Context.DiskInfo.IsGetReady && Context.DiskInfo.BusySpace + CommonConst.MIN_DISK_AVAILABLE_SPACE > Context.DiskInfo.TotalSpace)
                 {
-                    this.mCurState = InnerState.DiskSpaceNotEnough;
+                    Context.ErrorType = AppUpdaterErrorType.DiskIsNotEnoughToDownPatchFiles;
+                    this.mCurState = InnerState.ResUpdateFailed;
                 }
                 else
                 {
@@ -352,7 +331,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             if (!success)
             {
-                this.mCurState = InnerState.DownloadAndApplyPatchFailure;
+                Context.ErrorType = AppUpdaterErrorType.DownloadFileFailure;
+                this.mCurState = InnerState.ResUpdateFailed;
                 this.mCurFileDownLoadState = FileDownLoadState.DownloadFail;
 
                 Logger.Error($"Download file that name is \"{this.mCurDownloadTasks[this.mCurrentDownloadIndex].N}\" failure! ");
@@ -384,7 +364,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Logger.Info($"Load file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
+                Logger.Info($"Download file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
                 this.mCurFileDownLoadState = FileDownLoadState.DownLoadCompleted;
             }
         }
@@ -437,6 +417,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     this.Reset();
                     this.mCurState = InnerState.StartRequestResManifest;
                     return true;
+                case AppUpdaterInnerEventType.OnApplicationFocus:
+                    this.OnApplicationFocus(eventArgs);
+                    return true;
+                case AppUpdaterInnerEventType.OnApplicationQuit:
+                    this.OnApplicationQuit();
+                    return true;
                 default:
                     break;
             }
@@ -452,8 +438,26 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             if (updateVerisonNum)
             {
-                this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx]);
+                this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx], Context.TargetResVersionNum);
             }
+        }
+
+        private void OnApplicationFocus(in IRoutedEventArgs eventArgs)
+        {
+            var hasFocus = ((RoutedEventArgs<bool>)eventArgs).arg;
+            if (!hasFocus)
+                SaveDownloadProgress();
+        }
+
+        private void OnApplicationQuit()
+        {
+            SaveDownloadProgress();
+        }
+
+        private void SaveDownloadProgress()
+        {
+            if (this.mLocalManifest != null)
+                this.SaveCurrentConfig(false);
         }
 
         public override void Exit(AppUpdaterFsmOwner entity)
@@ -484,6 +488,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
 
             recycleList.ForEach(x=>VersionManifestParser.Pools.Recycle(x));
+            this.mLocalManifest = null;
         }
 
         public override void Reset()

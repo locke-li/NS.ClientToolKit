@@ -48,6 +48,8 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             {
                 Directory.Delete(scriptFolder, true);
             }
+
+            AssetDatabase.Refresh();
         }
 
         private void CopyScripts(IFilter filter, IPipelineInput input, string srcPath, string dstPath)

@@ -29,7 +29,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             if (errorType == AppUpdaterErrorType.None)
                 throw new InvalidOperationException(errorType.ToString());
-            this.Target.AuErrorCallback?.Invoke(errorType,ErrorTypeHelper.GetErrorString(errorType));
+            this.Target.OnErrorCallback(errorType, ErrorTypeHelper.GetErrorString(errorType));
             Context.AppendInfo("App updater failure");
         }
     }
