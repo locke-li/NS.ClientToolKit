@@ -12,8 +12,6 @@ namespace CenturyGame.Framework.Lua
 
         internal override void Init()
         {
-            luaPlugin = LuaPluginCreateFactory.Create("CenturyGame.LuaModule.XLuaSpecialized.XLuaPlugin");
-            LuaAccessManager.Environment.DoString("require 'main'");
         }
 
         internal override void Update(float elapseTime, float realElapseTime)
@@ -35,6 +33,11 @@ namespace CenturyGame.Framework.Lua
 
         internal override void Shutdown()
         {
+        }
+
+        public void SetLuaPlugin(ILuaPlugin plugin)
+        {
+            luaPlugin = plugin;
         }
     }
 }
