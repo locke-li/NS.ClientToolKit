@@ -7,7 +7,7 @@ namespace CenturyGame.Framework.Lua
     {
         internal ILuaPlugin luaPlugin;
 
-        static readonly float GCInterval = 10.0f;
+        static float GCInterval = 10.0f;
         float gcTime;
 
         internal override void Init()
@@ -38,6 +38,11 @@ namespace CenturyGame.Framework.Lua
         public void SetLuaPlugin(ILuaPlugin plugin)
         {
             luaPlugin = plugin;
+        }
+
+        public void SetGCInterval(float interval)
+        {
+            GCInterval = interval;
         }
     }
 }
