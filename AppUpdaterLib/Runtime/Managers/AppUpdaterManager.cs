@@ -21,7 +21,6 @@ using CenturyGame.LoggerModule.Runtime;
 using System.IO;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Manifests;
-using CenturyGame.ClientToolKit.AppUpdaterLib.Runtime;
 using UnityEngine;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 using Object = UnityEngine.Object;

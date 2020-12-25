@@ -13,7 +13,7 @@ using CenturyGame.AppBuilder.Editor.Builds;
 using UnityEditor;
 using UnityEngine;
 
-namespace CenturyGame.ClientToolKit.AppBuilder.Editor.Menus
+namespace CenturyGame.AppBuilder.Editor.Menus
 {
     public static class MenuItems
     {

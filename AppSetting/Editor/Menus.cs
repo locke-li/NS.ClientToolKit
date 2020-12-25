@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-namespace CenturyGame.ClientToolKit.AppSetting.Editor
+namespace CenturyGame.AppSetting.Editor
 {
     class Menus
     {

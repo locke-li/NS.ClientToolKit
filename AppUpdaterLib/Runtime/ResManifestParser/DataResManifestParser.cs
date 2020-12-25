@@ -15,9 +15,6 @@
 ***************************************************************/
 
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
-using System;
-using System.Collections.Generic;
-using CenturyGame.ClientToolKit.AppUpdaterLib.Runtime;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
 {

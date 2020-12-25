@@ -9,7 +9,7 @@
 
 using UnityEngine;
 
-namespace CenturyGame.ClientToolKit.AppSetting.Runtime
+namespace CenturyGame.AppSetting.Runtime
 {
 
     public class AppSetting : ScriptableObject

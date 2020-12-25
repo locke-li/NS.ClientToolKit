@@ -196,6 +196,23 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             File.WriteAllBytes(externalAppInfoPath, bytes);
         }
 
+
+        //public static bool LoadDeferredDownloadManifestToLocal()
+        //{
+        //    var path = AssetsFileSystem.GetWritePath(AssetsFileSystem.DeferredDownloadManifestName, true);
+        //    if (File.Exists(path))
+        //    {
+        //        var contents = File.ReadAllText(path, m_Encoding);
+
+        //    }
+        //}
+
+        public static void SaveDeferredDownloadManifestToLocal()
+        {
+            
+        }
+
+
 #if DEBUG_APP_UPDATER
         public static string GetAppVersionDesc()
         {

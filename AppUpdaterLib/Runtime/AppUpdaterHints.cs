@@ -8,9 +8,8 @@
  **************************************************************/
 
 using System;
-using CenturyGame.AppUpdaterLib.Runtime;
 
-namespace CenturyGame.ClientToolKit.AppUpdaterLib.Runtime
+namespace CenturyGame.AppUpdaterLib.Runtime
 {
     internal class AppUpdaterHints
     {

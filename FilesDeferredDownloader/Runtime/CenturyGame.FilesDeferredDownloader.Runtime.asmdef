@@ -1,0 +1,17 @@
+{
+    "name": "CenturyGame.FilesDeferredDownloader.Runtime",
+    "references": [
+        "CenturyGame.AppUpdater.Runtime",
+        "CenturyGame.LoggerModule.Runtime",
+        "CenturyGame.Log4NetForUnity.Runtime",
+        "CenturyGame.Core"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

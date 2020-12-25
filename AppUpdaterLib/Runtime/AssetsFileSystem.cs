@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using CenturyGame.ClientToolKit.AppSetting.Runtime;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,23 +36,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private static readonly Dictionary<string, ABTableItemInfoClient> configList = new Dictionary<string, ABTableItemInfoClient>(StringComparer.OrdinalIgnoreCase);
 
-        public const string AppInfoFileName = "appInfo.x";
-
-        public const string AppDataResLocalRoot = "Conf";
-        public const string AppDataResRemoteRoot = "data";
-
-        public const string AppUnityResLocalRoot = "resource";
-        public const string AppUnityResRemoteRoot = "resource";
+        public const string AppInfoFileName = "app_info.x";
 
         public const string AppDataResManifestName = "res_data.json";
 
-        public const string UnityABFileName = "FileList.x";
+        public const string UnityABFileName = "file_list.x";
         public const string RemoteUnityResManifestPattern = "res_{0}-{1}.json";
 
         public const string UnityResManifestNamePattern = "res_{0}.json";
         public static string UnityResManifestName => string.Format(UnityResManifestNamePattern, GetPlatformStringForConfig());
 
-        public static readonly string RootFolderName = "Assets";
+        public static readonly string RootFolderName = "assets";
         private static string s_mRootFolder = string.Empty;
         public static string RootFolder
         {
@@ -65,12 +58,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
         }
 
-        public static readonly string AbConfigInfoName = "FileListInfo.x";
-        public static readonly string AbConfigInfoClientName = "FileListClientInfo.x";
-
         public static ABConfigInfoClient ConfigInfoClient = null;
-
-        public static Version RemoteConfigInfoVer = null;
 
         #endregion
 
@@ -86,7 +74,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 if (string.IsNullOrEmpty(mPersistentDataPath))
                 {
 #if UNITY_EDITOR
-                    mPersistentDataPath = System.IO.Path.GetFullPath(Application.dataPath + "/../SandBox");
+                    mPersistentDataPath = System.IO.Path.GetFullPath(Application.dataPath + "/../sandbox");
                     mPersistentDataPath = mPersistentDataPath.Replace(@"\", @"/");
 #else
                 mPersistentDataPath = Application.persistentDataPath;

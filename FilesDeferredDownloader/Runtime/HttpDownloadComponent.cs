@@ -1,0 +1,327 @@
+/***************************************************************
+
+ *  类名称：        HttpDownloadComponent
+
+ *  描述：				
+
+ *  作者：          Chico(wuyuanbing)
+
+ *  创建时间：      2020/12/24 17:49:21
+
+ *  最后修改人：
+
+ *  版权所有 （C）:   CenturyGames
+
+***************************************************************/
+
+using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Networking;
+using System.IO;
+using CenturyGame.AppUpdaterLib.Runtime;
+using CenturyGame.Core.Utilities;
+using CenturyGame.LoggerModule.Runtime;
+using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
+
+namespace CenturyGame.FilesDeferredDownloader.Runtime
+{
+    public class HttpDownloadComponent : MonoBehaviour
+    {
+        //--------------------------------------------------------------
+        #region Inner Class & Enum ...
+        //--------------------------------------------------------------
+
+        public enum DownloadState
+        {
+            Idle,
+
+            StartDownload,
+
+            DownloadAgain,
+
+            Downloading,
+
+            DownloadSuccess,
+
+            DownloadFailure,
+        }
+
+        #endregion
+
+        //--------------------------------------------------------------
+        #region Fields
+        //--------------------------------------------------------------
+        private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
+            LoggerManager.GetLogger("HttpDownloadComponent"));
+
+        public const int MAX_RETRY_COUNT = 3;
+
+        #endregion
+
+        //--------------------------------------------------------------
+        #region Properties & Events
+        //--------------------------------------------------------------
+
+        public float Progress => this.mProgress;
+
+        #endregion
+
+        //--------------------------------------------------------------
+        #region Creation & Cleanup
+        //--------------------------------------------------------------
+
+        #endregion
+
+        //--------------------------------------------------------------
+        #region Methods
+        //--------------------------------------------------------------
+
+        private void Update()
+        {
+            this.UpdateState();
+            this.UpdateDownload();
+        }
+
+        private void UpdateState()
+        {
+            switch (this.mState)
+            {
+                case DownloadState.StartDownload:
+                    this.OnStartDownload();
+                    break;
+                case DownloadState.DownloadAgain:
+                    this.OnDownloadAgain();
+                    break;
+                case DownloadState.DownloadFailure:
+                    this.OnDownloadFailure();
+                    break;
+                case DownloadState.DownloadSuccess:
+                    this.OnDownloadSuccess();
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
+        private void UpdateDownload()
+        {
+        }
+
+        private void OnStartDownload()
+        {
+            this.StartDownload();
+        }
+
+        private void OnDownloadAgain()
+        {
+            if (this.mRetryCount >= MAX_RETRY_COUNT)
+            {
+                this.mState = DownloadState.DownloadFailure;
+            }
+            else
+            {
+                this.mRetryCount++;
+                s_mLogger.Value?.Debug($"Retry download file , retry time : {this.mRetryCount} .");
+                this.StartDownload();
+            }
+        }
+
+        private void OnDownloadFailure()
+        {
+            this.mDownloadCompletedCallBack?.Invoke(false);
+            this.mState = DownloadState.Idle;
+        }
+
+        private void OnDownloadSuccess()
+        {
+            this.mDownloadCompletedCallBack?.Invoke(true);
+            this.mState = DownloadState.Idle;
+        }
+
+        private void StartDownload()
+        {
+            this.mState = DownloadState.Downloading;
+            this.StartCoroutine(DownloadInternal());
+        }
+
+        private IEnumerator DownloadInternal()
+        {
+            s_mLogger.Value?.Debug($"Downloading {this.mUrl}");
+            var headRequest = UnityWebRequest.Head(this.mUrl);
+
+            yield return headRequest.SendWebRequest();
+
+            if (headRequest.isNetworkError || headRequest.isHttpError)
+            {
+                s_mLogger.Value?.Error($"Network error, error message : {headRequest.error} . ResponseCode : {headRequest.responseCode}");
+                this.mState = DownloadState.DownloadAgain;
+            }
+            else
+            {
+                var totalLength = long.Parse(headRequest.GetResponseHeader("Content-Length"));
+               
+                using (var fs = new FileStream(this.mTemporyPath, FileMode.OpenOrCreate, FileAccess.Write))
+                {
+                    var request = UnityWebRequest.Get(this.mUrl);
+                    var fileLength = fs.Length;
+                    if (fileLength > 0)
+                    {
+                        s_mLogger.Value?.Debug($"Resume an interrupted file download , original file path is \"{this.mFilePath}\".");
+                        request.SetRequestHeader("Range", "bytes=" + fileLength + "-" + totalLength);
+                        fs.Seek(fileLength, SeekOrigin.Begin);
+                    }
+
+                    if (fileLength < totalLength)
+                    {   
+                        request.SendWebRequest();
+
+                        var index = 0;
+                        while (true)
+                        {
+                            yield return null;
+                            var buff = request.downloadHandler.data;
+                            if (buff != null)
+                            {
+                                var length = buff.Length - index;
+                                if (length > 0)
+                                {
+                                    fs.Write(buff, index, length);
+                                    index += length;
+                                    fileLength += length;
+                                }
+                                
+                                if (fileLength == totalLength)
+                                {
+                                    this.mProgress = 1f;
+                                }
+                                else
+                                {
+                                    this.mProgress = fileLength / (float)totalLength;
+                                }
+                            }
+
+                            bool networkError = request.isNetworkError || request.isHttpError;
+                            if (networkError)
+                            {
+                                break;
+                            }
+
+                            if (request.isDone && (fileLength == totalLength))
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    fs.Close();
+                    fs.Dispose();
+
+                    if (request.isNetworkError || request.isHttpError)
+                    {
+                        s_mLogger.Value?.Fatal($"Network error , error message : {request.error} . ResponseCode : {request.responseCode}");
+                        this.mState = DownloadState.DownloadAgain;
+                    }
+                    else if(fileLength != totalLength)
+                    {
+                        s_mLogger.Value?.Fatal($"The size of file that downloaded is not equal to the target file ,  " +
+                                               $"the downloaded file size is {fileLength}  , taget size is {totalLength} .");
+                        File.Delete(this.mTemporyPath);
+                        this.mState = DownloadState.DownloadAgain;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(this.mMd5))//Need check file md5
+                        {
+                            var tempFileMd5 = CryptoUtility.GetHash(this.mTemporyPath);
+                            s_mLogger.Value?.Debug($"Target file md5 : {this.mMd5} , downloaded file md5 : {tempFileMd5} .");
+                            if (string.Equals(this.mMd5,tempFileMd5,StringComparison.OrdinalIgnoreCase))
+                            {
+                                s_mLogger.Value?.Debug($"Check md5 success !");
+                                if (File.Exists(this.mFilePath))
+                                {
+                                    File.Delete(this.mFilePath);
+                                }
+                                File.Move(this.mTemporyPath,this.mFilePath);
+                                this.mProgress = 1f;
+                                this.mState = DownloadState.DownloadSuccess;
+                                s_mLogger.Value?.Debug($"Save file to local. Path is \"{this.mFilePath}\" .");
+                            }
+                            else
+                            {
+                                File.Delete(this.mTemporyPath);
+                                this.mState = DownloadState.DownloadAgain;
+                                s_mLogger.Value?.Debug($"Check md5 failure , delete it and retry download. Original file path is \"{this.mFilePath}\" .");
+                            }
+                        }
+                        else
+                        {
+                            this.mProgress = 1f;
+                            this.mState = DownloadState.DownloadSuccess;
+                            s_mLogger.Value?.Debug("Download file success.");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public bool IsCanWorking()
+        {
+            return this.mState == DownloadState.Idle;
+        }
+
+        public void Download(string url , string filePath ,string md5 = null, Action<bool> downloadCompleted = null)
+        {
+            if (!IsCanWorking())
+            {
+                return;
+            }
+           
+            this.Clear();
+
+            this.Collect(url,filePath,md5, downloadCompleted);
+
+            this.StartDownload();
+        }
+
+        private void Collect(string url, string filePath , string md5 , Action<bool> downloadCompleted)
+        {
+            this.mUrl = url;
+            this.mFilePath = filePath;
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            this.mTemporyPath = AssetsFileSystem.GetWritePath($"GCaches/{fileName}_tmp");
+            var dirPath = Path.GetDirectoryName(this.mTemporyPath);
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath ?? throw new InvalidOperationException());
+            }
+
+            this.mMd5 = md5;
+            this.mDownloadCompletedCallBack = downloadCompleted;
+        }
+
+        private DownloadState mState = DownloadState.Idle;
+        private string mUrl;
+        private string mFilePath;
+        private string mTemporyPath;
+        private int mRetryCount;
+        private string mMd5;
+        private Action<bool> mDownloadCompletedCallBack;
+        private float mProgress;
+        private void Clear()
+        {
+            this.mProgress = 0;
+            this.mRetryCount = 0;
+            this.mState = DownloadState.Idle;
+            this.mFilePath = null;
+            this.mTemporyPath = null;
+            this.mUrl = null;
+            this.mMd5 = null;
+            this.mDownloadCompletedCallBack = null;
+        }
+        #endregion
+
+    }
+}

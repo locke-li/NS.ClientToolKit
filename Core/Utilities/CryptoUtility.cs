@@ -15,7 +15,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CenturyGame.ClientToolKit.Core.Utilities
+namespace CenturyGame.Core.Utilities
 {
     public enum HashType
     {
