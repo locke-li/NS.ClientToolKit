@@ -18,6 +18,7 @@ using UnityEngine;
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Diagnostics;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
+using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.Core.FSM;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
@@ -79,6 +80,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private void InitOthers()
         {
+            AppVersionManager.SetChannel(Context.Config.channel);
 #if DEBUG_APP_UPDATER
             this.gameObject.AddComponent<AppUpdaterDebugView>();
             Context.FetchDeviceStorageInfo();

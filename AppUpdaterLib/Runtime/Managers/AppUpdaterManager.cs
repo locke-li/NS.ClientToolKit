@@ -229,6 +229,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             return AppVersionManager.LHConfig;
         }
 
+        /// <summary>
+        /// 获取渠道名
+        /// </summary>
+        /// <returns>返回渠道</returns>
+        public static string AppUpdaterGetChannel()
+        {
+            CheckIsInitialize("AppUpdaterGetChannel");
+            return AppVersionManager.Channel;
+        }
 
         /// <summary>
         /// 是否更新成功
