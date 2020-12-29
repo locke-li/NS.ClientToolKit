@@ -149,7 +149,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             string url = Context.GetCurrentVerisonFileUrl(this.mCurFileServerType);
             Logger.Info($"Start request remote resource manifest {url} .");
 
-
             Context.AppendInfo($"Res current version : {Context.LocalResVersionNums[Context.CurrentResVersionIdx]} target version : {Context.ResVersionNums[Context.CurrentResVersionIdx]}");
             Context.AppendInfo($"Current resource group name is {Context.GetCurrentLocalVersionFileName()} .");
 

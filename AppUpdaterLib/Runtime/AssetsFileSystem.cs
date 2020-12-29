@@ -84,6 +84,38 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
         }
 
+        private static string mStreamingAssetsUrl = string.Empty;
+        public static string StreamingAssetsUrl
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mStreamingAssetsUrl))
+                {
+                    var mTempSb = new StringBuilder();
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+                    mTempSb.Append(Application.streamingAssetsPath);
+                    mTempSb.Append("/");
+#elif UNITY_IPHONE && !UNITY_EDITOR
+                    mTempSb.Append("file://");
+                    mTempSb.Append(Application.streamingAssetsPath);
+                    mTempSb.Append("/");
+#elif UNITY_EDITOR
+                    mTempSb.Append("file://");
+                    mTempSb.Append(Application.streamingAssetsPath);
+                    mTempSb.Append("/");
+#endif
+
+#if APPEND_PLATFORM_NAME
+                    mTempSb.Append(Utility.GetPlatformName());
+                    mTempSb.Append("/");
+#endif
+                    mStreamingAssetsUrl = mTempSb.ToString();
+                }
+                return mStreamingAssetsUrl;
+            }
+        }
+
         #endregion
 
         //--------------------------------------------------------------
@@ -206,40 +238,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return result;
         }
 
-        /*
-        public static void ABConfigInfoClientCopyFrom(VersionManifest config, string clientPath)
-        {
-            configList.Clear();
-            ABConfigInfoClient clientInfo = new ABConfigInfoClient();
-            //clientInfo.Ver = config.Ver;
-            clientInfo.List = new ABTableItemInfoClient[config.Datas.Count];
-            for (int i = 0; i < config.Datas.Count; i++)
-            {
-                ABTableItemInfoClient infoClient = new ABTableItemInfoClient();
-                var info = config.Datas[i];
-                infoClient.N = info.N;
-                infoClient.H = info.H;
-                infoClient.S = info.S;
-                infoClient.R = false;//因为使用的是内置的清单，所以当前默认文件都需要读内置的文件
-                clientInfo.List[i] = infoClient;
-                configList[infoClient.N] = infoClient;
-            }
-            ConfigInfoClient = null;
-            ConfigInfoClient = clientInfo;
-            string json = JsonUtility.ToJson(ConfigInfoClient);
-            File.WriteAllBytes(clientPath, System.Text.Encoding.UTF8.GetBytes(json));
-        }
-        
-        public static void ABConfigInfoClientCopyFrom(ABConfigInfoClient config)
-        {
-            configList.Clear();
-            for (int i = 0; i < config.List.Length; i++)
-            {
-                ABTableItemInfoClient info = config.List[i];
-                configList[info.N] = info;
-            }
-        }
-        */
         public static string GetPlatformStr()
         {
 #if UNITY_EDITOR
@@ -301,7 +299,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 #endif
         }
 
-#endregion
+        #endregion
 
     }
 }

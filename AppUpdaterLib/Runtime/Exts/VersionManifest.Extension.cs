@@ -30,6 +30,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private bool mDicIsInitialized = false;
 
+        public int Count => this.Datas.Count;
+
         public void InitDic()
         {
             if (this.mDicIsInitialized)
@@ -88,6 +90,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 this.mFileDscsDic.Add(desc.N,desc);
                 this.Datas.Add(desc);
             }
+        }
+
+        public ulong GetTotalSize()
+        {
+            ulong totalSize = 0;
+            this.Datas.ForCall((x, index) =>
+            {
+                totalSize += (ulong)x.S;
+            });
+
+            return totalSize;
         }
 
     }

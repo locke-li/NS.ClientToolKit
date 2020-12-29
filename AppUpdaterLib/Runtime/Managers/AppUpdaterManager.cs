@@ -45,6 +45,22 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         #region Properties & Events
         //--------------------------------------------------------------
 
+        private static AppUpdaterConfig mAppUpdaterConfig;
+
+        public static AppUpdaterConfig AppUpdaterConfig
+        {
+            get
+            {
+                if (mAppUpdaterConfig == null)
+                {
+                    var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
+                    mAppUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
+                }
+
+                return mAppUpdaterConfig;
+            }   
+        }
+
         #endregion
 
         //--------------------------------------------------------------
@@ -62,7 +78,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             if (!s_mInitialized)
             {
                 CreateService();
-
                 s_mInitialized = true;
             }
         }

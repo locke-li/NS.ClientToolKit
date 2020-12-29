@@ -1,7 +1,7 @@
 {
-    "name": "CenturyGame.ClientToolKit.AppSetting.Editor",
+    "name": "CenturyGame.AppSetting.Editor",
     "references": [
-        "CenturyGame.ClientToolKit.AppSetting.Runtime"
+        "CenturyGame.AppSetting.Runtime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

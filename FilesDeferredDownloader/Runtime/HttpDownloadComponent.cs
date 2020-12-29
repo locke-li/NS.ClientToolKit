@@ -243,6 +243,11 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                                 {
                                     File.Delete(this.mFilePath);
                                 }
+                                var dirName = Path.GetDirectoryName(this.mFilePath);
+                                if (!Directory.Exists(dirName))
+                                {
+                                    Directory.CreateDirectory(dirName);
+                                }
                                 File.Move(this.mTemporyPath,this.mFilePath);
                                 this.mProgress = 1f;
                                 this.mState = DownloadState.DownloadSuccess;

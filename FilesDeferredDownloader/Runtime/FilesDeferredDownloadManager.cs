@@ -15,40 +15,51 @@
 ***************************************************************/
 
 using System;
-using System.IO;
-using System.Text;
 using UnityEngine;
-using CenturyGame.AppUpdaterLib.Runtime;
-using CenturyGame.FilesDeferredDownloader.Runtime.Configs;
 using CenturyGame.LoggerModule.Runtime;
-using Object = UnityEngine.Object;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
+using Object = UnityEngine.Object;
 
 namespace CenturyGame.FilesDeferredDownloader.Runtime
 {
     public static class FilesDeferredDownloadManager
     {
         //--------------------------------------------------------------
+        #region Inner Class & Enum ...
+        //--------------------------------------------------------------
+        internal enum InnerState
+        {
+            UnInitialize,
+
+            Initializing,
+
+            InitializeError,
+
+            Initialized,
+        }
+
+        #endregion
+
+
+        //--------------------------------------------------------------
         #region Fields
         //--------------------------------------------------------------
 
-        public const string DeferredDownloadManifestPattern = "res_deferred_{0}.json";
-
-        public static string DeferredDownloadManifestName => string.Format(DeferredDownloadManifestPattern, AssetsFileSystem.GetPlatformStringForConfig());
-
         private static ILogger s_mLogger = LoggerManager.GetLogger("AppUpdaterManager");
 
-        private static bool s_mInitialized = false;
-
-        private static DeferredDownloadFileListConfig s_mConfig = null;
+        private static InnerState s_mState = InnerState.UnInitialize;
 
         private static FilesDeferredDownloadService s_mService = null;
+
+        private static Action<bool> mInitCallBack;
 
         #endregion
 
         //--------------------------------------------------------------
         #region Properties & Events
         //--------------------------------------------------------------
+
+        public static bool Initialized => s_mState == InnerState.Initialized;
 
         #endregion
 
@@ -65,20 +76,12 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         /// <summary>
         /// 初始化
         /// </summary>
-        public static void Init()
+        public static void Init(Action<bool> callBack)
         {
-            if (s_mInitialized)
+            if (s_mState == InnerState.Initialized)
                 return;
+            mInitCallBack = callBack;
             CreateService();
-            var configPath= AssetsFileSystem.GetWritePath(DeferredDownloadManifestName);
-            if (File.Exists(configPath))
-            {
-                var contents = File.ReadAllText(configPath, new UTF8Encoding(false, true));
-
-                s_mConfig = JsonUtility.FromJson<DeferredDownloadFileListConfig>(contents);
-            }
-
-            s_mInitialized = true;
         }
 
         private static void CreateService()
@@ -86,31 +89,95 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             const string serviceName = "FilesDeferredDownloader";
             var serviceGo = new GameObject();
             serviceGo.name = serviceName;
-            s_mService = serviceGo.GetComponent<FilesDeferredDownloadService>();
+            Object.DontDestroyOnLoad(serviceGo);
+            s_mService = serviceGo.AddComponent<FilesDeferredDownloadService>();
+            s_mService.SetOnInitCompletedCallBack(result =>
+            {
+                s_mState = result ? InnerState.Initialized : InnerState.InitializeError;
+                try
+                {
+                    mInitCallBack?.Invoke(result);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    mInitCallBack = null;
+                }
+            });
         }
 
         /// <summary>
-        /// 指定文件集是否已下载
+        /// 指定文件集是否已存在
         /// </summary>
         /// <param name="fileSetName">文件集名</param>
         /// <returns></returns>
-        public static bool FileSetExist(string fileSetName)
+        public static bool IsFileSetExist(string fileSetName)
         {
-            if (s_mConfig == null)
-            {
-                return false;
-            }
-
-            return s_mConfig.Exist(fileSetName);
+            CheckIsInitialize("IsFileSetExist");
+            return s_mService.IsFileSetExist(fileSetName);
         }
 
         /// <summary>
-        /// 
+        /// 同步指定文件集的文件到本地
         /// </summary>
         /// <param name="fileSetName"></param>
         public static void SyncFiles(string fileSetName)
         {
+            CheckIsInitialize("SyncFiles");
+            if (string.IsNullOrEmpty(fileSetName))
+            {
+                throw new NullReferenceException($"The file set that name is \"{nameof(fileSetName)}\" is null!");
+            }
             s_mService.SyncFiles(fileSetName);
+        }
+
+        /// <summary>
+        /// 获取下载进度数据
+        /// </summary>
+        /// <returns></returns>
+        public static ProgressData GetProgressData()
+        {
+            CheckIsInitialize("GetProgressData");
+            return s_mService.ProgressData;
+        }
+
+        /// <summary>
+        /// 设置文件下载完成回调
+        /// </summary>
+        /// <param name="callback"></param>
+        public static void SetOnFileDownloadCallBack(Action<bool, string, long, string> callback)
+        {
+            CheckIsInitialize("SetOnFileDownloadCallBack");
+            s_mService.SetOnFileDownloadCallBack(callback);
+        }
+
+        /// <summary>
+        /// 设置下载完成回调
+        /// </summary>
+        /// <param name="completed"></param>
+        public static void SetDownloadCompletedCallBack(Action completed)
+        {
+            CheckIsInitialize("SetDownloadCompletedCallBack");
+            s_mService.SetDownloadCompletedCallBack(completed);
+        }
+
+        /// <summary>
+        /// 设置下载出错回调
+        /// </summary>
+        /// <param name="callback"></param>
+        public static void SetDownloadErrorCallBack(Action<DeferredDownloadErrorType> callback)
+        {
+            CheckIsInitialize("SetDownloadErrorCallBack");
+            s_mService.SetDownloadErrorCallBack(callback);
+        }
+
+        private static void CheckIsInitialize(string methodName)
+        {
+            if (!Initialized)
+                throw new NullReferenceException($"Your want to use \"FilesDeferredDownloadManager\" that not initialized ! Call method :  \"{methodName}\" .");
         }
 
         #endregion
