@@ -80,6 +80,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         {
             if (s_mState == InnerState.Initialized)
                 return;
+            s_mState = InnerState.Initializing;
             mInitCallBack = callBack;
             CreateService();
         }
@@ -110,14 +111,14 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         }
 
         /// <summary>
-        /// 指定文件集是否已存在
+        /// 指定文件集是否准备好
         /// </summary>
         /// <param name="fileSetName">文件集名</param>
         /// <returns></returns>
-        public static bool IsFileSetExist(string fileSetName)
+        public static bool IsFileSetPrepared(string fileSetName)
         {
-            CheckIsInitialize("IsFileSetExist");
-            return s_mService.IsFileSetExist(fileSetName);
+            CheckIsInitialize("IsFileSetPrepared");
+            return s_mService.IsFileSetPrepared(fileSetName);
         }
 
         /// <summary>

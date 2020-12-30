@@ -15,8 +15,10 @@
 ***************************************************************/
 
 using System;
+using System.IO;
 using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
+using CenturyGame.Core.Utilities;
 using CenturyGame.LoggerModule.Runtime;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
@@ -133,10 +135,15 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             return url;
         }
 
+        private string GetLocalFilePath()
+        {
+            return AssetsFileSystem.GetWritePath(this.mCurDownloadInfo.N);
+        }
+
         private void StartDownloadInternal(FileServerType serverType)
         {
             var url = GetRemoteResFileUrl(this.mCurDownloadInfo.GetRNUTF8(), serverType);
-            string filePath = AssetsFileSystem.GetWritePath(this.mCurDownloadInfo.N);
+            string filePath = GetLocalFilePath();
             this.mDownloadCore.Download(url,filePath,this.mCurDownloadInfo.H,this.OnDownloadCompleted);
         }
 
@@ -171,7 +178,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                 return;
             }
             this.Collect(fileDesc);
-            this.mState = InnerState.StartDownloadFromCDN;
+            this.DownloadInternal();
         }
 
         public float GetProgress()
@@ -184,6 +191,22 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         {
             this.mCurDownloadInfo = fileDesc;
         }
+
+        private void DownloadInternal()
+        {
+            string filePath = GetLocalFilePath();
+            if (File.Exists(filePath))
+            {
+                var localMd5 = CryptoUtility.GetHash(filePath);
+                if (string.Equals(localMd5,this.mCurDownloadInfo.H))
+                {
+                    this.mState = InnerState.DownloadSuccess;
+                    return;
+                }
+            }
+            this.mState = InnerState.StartDownloadFromCDN;
+        }
+
 
         private InnerState mState = InnerState.Idle;
         private FileDesc mCurDownloadInfo;
