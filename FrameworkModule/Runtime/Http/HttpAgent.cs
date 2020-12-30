@@ -11,6 +11,14 @@ namespace CenturyGame.Framework.Http
         private HttpClient httpClient = new HttpClient();
         private StringBuilder getUrlBuilder = new StringBuilder();
 
+        public void SetTimeOutSecond(float t)
+        {
+            if (t > 15)
+                httpClient.Timeout = TimeSpan.FromSeconds(t);
+            else
+                httpClient.Timeout = TimeSpan.FromSeconds(15);
+        }
+
         internal void Post(string url, byte[] postData, IDictionary<string, string> header, Action<byte[]> callback)
         {
             PostBytes(url, postData, header, callback);
