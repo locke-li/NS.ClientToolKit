@@ -47,18 +47,16 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
         private bool CheckAppVersionValid()
         {
             var appVersion = AppBuildConfig.GetAppBuildConfigInst().targetAppVersion;
-            Logger.Info($"The target app version from build config is \"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}\" .");
-            if (appVersion.Major == "0" && appVersion.Minor == "0" && appVersion.Patch == "0")
+            var versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
+            var targetVersion = new Version(versionStr);
+            if (!AppBuildConfig.GetAppBuildConfigInst().incrementRevisionNumberForPatchBuild && (targetVersion.PatchNum== 0))
             {
-                Logger.Error($"Invalid app base vesion : 0.0.0 .");
+                Logger.Error($"In patch build mode and not be auto increment revision number , the patch value can not be zero , target version is \"{targetVersion.GetVersionString()}\".");
                 return false;
             }
 
-            var versionStr = $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Patch}";
-            var targetVersion = new Version(versionStr);
-
             var lastVersionInfo = AppBuildContext.GetLastBuildInfo();
-            if (lastVersionInfo != null && lastVersionInfo.GetCurrentBuildInfo() != null)
+            if (lastVersionInfo?.GetCurrentBuildInfo() != null)
             {
                 var buildInfo = lastVersionInfo.GetCurrentBuildInfo();
                 var lastVersion = new Version(buildInfo.versionInfo.version);
