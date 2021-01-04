@@ -129,7 +129,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         private string GetRemoteResFileUrl(string fileName, FileServerType fileServerType = FileServerType.CDN)
         {
-            var config = AppUpdaterManager.AppUpdaterConfig;
+            var config = FilesDeferredDownloadManager.DeferredDownloadConfig;
             string serverUrl = (fileServerType == FileServerType.CDN) ? config.cdnUrl : config.ossUrl;
             string url = $"{serverUrl}/{fileName}";
             return url;

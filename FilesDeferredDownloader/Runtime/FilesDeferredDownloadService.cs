@@ -442,6 +442,26 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             return string.Equals(localMD5,targetMD5);
         }
 
+        public bool IsFileSetNameValid(string fileSetName)
+        {
+            if (string.IsNullOrEmpty(fileSetName))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(fileSetName))
+            {
+                return false;
+            }
+
+            if (!this.mTargetFileSetConfig.Exist(fileSetName))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
     }

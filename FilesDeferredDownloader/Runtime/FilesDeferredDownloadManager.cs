@@ -15,6 +15,8 @@
 ***************************************************************/
 
 using System;
+using System.IO;
+using CenturyGame.FilesDeferredDownloader.Runtime.Configs;
 using UnityEngine;
 using CenturyGame.LoggerModule.Runtime;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
@@ -61,6 +63,26 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         public static bool Initialized => s_mState == InnerState.Initialized;
 
+
+        private static DeferredDownloadConfig s_mDeferredDownloadConfig = null;
+
+        public static DeferredDownloadConfig DeferredDownloadConfig
+        {
+            get
+            {
+                if (s_mDeferredDownloadConfig == null)
+                {
+                    var text = Resources.Load<TextAsset>("deferreddownload");
+                    if (text == null)
+                    {
+                        throw new FileNotFoundException("deferreddownload");
+                    }
+
+                    s_mDeferredDownloadConfig = JsonUtility.FromJson<DeferredDownloadConfig>(text.text);
+                }
+                return s_mDeferredDownloadConfig;
+            }
+        }
         #endregion
 
         //--------------------------------------------------------------
@@ -119,6 +141,17 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         {
             CheckIsInitialize("IsFileSetPrepared");
             return s_mService.IsFileSetPrepared(fileSetName);
+        }
+
+        /// <summary>
+        /// 文件集名是否合理
+        /// </summary>
+        /// <param name="fileSetName">文件集名</param>
+        /// <returns></returns>
+        public static bool IsFileSetNameValid(string fileSetName)
+        {
+            CheckIsInitialize("IsFileSetNameValid");
+            return s_mService.IsFileSetNameValid(fileSetName);
         }
 
         /// <summary>
