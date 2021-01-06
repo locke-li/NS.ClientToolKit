@@ -33,6 +33,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             if (errorType == AppUpdaterErrorType.LighthouseConfigServersIsUnReachable)
             {
                 this.Target.OnForceUpdateCallBack(AppVersionManager.LHConfig.UpdateData);
+                Context.AppendInfo("App Need update to latest , current has no server to reachable !");
             }
             else
             {
