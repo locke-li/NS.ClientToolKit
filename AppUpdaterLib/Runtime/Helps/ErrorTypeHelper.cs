@@ -54,8 +54,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "Request app revision number failure!";
                 case AppUpdaterErrorType.DiskIsNotEnoughToDownPatchFiles:
                     return "The disk available space is not enough to download path files !";
-                case AppUpdaterErrorType.LighthouseConfigCheckInvalid:
-                    return "The lighthouse config data that receive is invalid!";
+                case AppUpdaterErrorType.LighthouseConfigServersIsUnReachable:
+                    return "The servers data from lighthouse config is not reachable!";
                 default:
                     return "Error ! Unknow appupdater error! ";
             } 

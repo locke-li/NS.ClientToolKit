@@ -39,7 +39,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         public int TotalDownloadFileCount { set; get; }
 
         /// <summary>
-        /// 当前正在下载的文件数量
+        /// 当前正在下载的文件大小
         /// </summary>
         public ulong CurrentDownloadingFileSize { set; get; }
 

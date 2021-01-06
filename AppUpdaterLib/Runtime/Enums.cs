@@ -53,7 +53,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         ParseLighthouseConfigError,//解析lighthouse配置失败
 
-        LighthouseConfigCheckInvalid,//无效的lighthouse配置
+        LighthouseConfigServersIsUnReachable,//无效的lighthouse配置,当前没有服务器可以连接
 
         DownloadLighthouseConfigInvalid,//下载lighthouse配置无效
 

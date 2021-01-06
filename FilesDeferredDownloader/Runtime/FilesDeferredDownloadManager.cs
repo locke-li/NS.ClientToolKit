@@ -181,7 +181,9 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         /// <summary>
         /// 设置文件下载完成回调
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">
+        /// 参数含义分别为：是否成功，文件名，大小，md5
+        /// </param>
         public static void SetOnFileDownloadCallBack(Action<bool, string, long, string> callback)
         {
             CheckIsInitialize("SetOnFileDownloadCallBack");

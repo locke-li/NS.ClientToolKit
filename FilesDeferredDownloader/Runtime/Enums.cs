@@ -25,7 +25,6 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
     public enum DeferredDownloadErrorType
     {
         None,
-        InitializeError,
         FileSetNotFound,
         FileDownloadFailure
     }

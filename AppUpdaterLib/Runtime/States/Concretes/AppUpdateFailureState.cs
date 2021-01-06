@@ -16,6 +16,7 @@
 
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Helps;
+using CenturyGame.AppUpdaterLib.Runtime.Managers;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 {
@@ -29,8 +30,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             if (errorType == AppUpdaterErrorType.None)
                 throw new InvalidOperationException(errorType.ToString());
-            this.Target.OnErrorCallback(errorType, ErrorTypeHelper.GetErrorString(errorType));
-            Context.AppendInfo("App updater failure");
+            if (errorType == AppUpdaterErrorType.LighthouseConfigServersIsUnReachable)
+            {
+                this.Target.OnForceUpdateCallBack(AppVersionManager.LHConfig.UpdateData);
+            }
+            else
+            {
+                this.Target.OnErrorCallback(errorType, ErrorTypeHelper.GetErrorString(errorType));
+                Context.AppendInfo("App updater failure");
+            }
         }
     }
 }

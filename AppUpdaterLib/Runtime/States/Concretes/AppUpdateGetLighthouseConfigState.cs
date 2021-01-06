@@ -19,7 +19,6 @@ using System.IO;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.AppUpdaterLib.Runtime.Manifests;
-using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 {
@@ -223,7 +222,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         }
 
 
-        private bool CheckoutConfigValid(LighthouseConfig config)
+        private bool IsServersConfigValid(LighthouseConfig config)
         {
             var servers = config.ServersData.Servers;
             bool valid = false;
@@ -383,9 +382,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
             }
 
-            if (!CheckoutConfigValid(mCurrentLighthouseConfig))
+            if (!IsServersConfigValid(mCurrentLighthouseConfig))
             {
-                Context.ErrorType = AppUpdaterErrorType.LighthouseConfigCheckInvalid;
+                AppVersionManager.MakeCurrentLighthouseConfig(this.mCurrentLighthouseConfig);
+                Context.ErrorType = AppUpdaterErrorType.LighthouseConfigServersIsUnReachable;
                 this.mState = LogicState.ReqLighthouseConfigFailure;
             }
             else
