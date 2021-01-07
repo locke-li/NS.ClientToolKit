@@ -223,6 +223,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                 else
                 {
                     File.Delete(configPath);
+                    s_mLogger?.Value.Info($"Delete local config that path is \"{configPath}\", because it is too old.");
                 }
             }
 
@@ -282,17 +283,17 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             this.mCurSetName = this.mCurFileSetQueue.Dequeue();
             this.ProgressData.FileSetName = this.mCurSetName;
             this.mState = DownloadState.InitializingFileSetList;
-            string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
-            if (File.Exists(fileExternalPath))
-            {
-                this.LoadLocalFileSetManifest(fileExternalPath);
-                this.mState = DownloadState.StartDownloadFiles;
-            }
-            else
-            {
+            //string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
+            //if (File.Exists(fileExternalPath))
+            //{
+            //    this.LoadLocalFileSetManifest(fileExternalPath);
+            //    this.mState = DownloadState.StartDownloadFiles;
+            //}
+            //else
+            //{
                 var url = $"{AssetsFileSystem.StreamingAssetsUrl}{this.mCurSetName}";
                 this.mHttpRequest.Load(url, this.OnLoadFileSetManifestCallBack);
-            }
+            //}
         }
 
         private void OnLoadFileSetManifestCallBack(byte[] bytes)
@@ -303,20 +304,26 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             }
             else
             {
-                string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
-                File.WriteAllBytes(fileExternalPath, bytes);
-                this.LoadLocalFileSetManifest(fileExternalPath);
+                //string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
+                //File.WriteAllBytes(fileExternalPath, bytes);
+                //this.LoadLocalFileSetManifest(fileExternalPath);
+                //this.mState = DownloadState.StartDownloadFiles;
+
+                var manifestContent = mEncoding.GetString(bytes);
+                this.mFileSetManifest = VersionManifestParser.Parse(manifestContent);
+                this.ProgressData.TotalDownloadFileCount = this.mFileSetManifest.Count;
+                this.ProgressData.TotalDownloadSize = this.mFileSetManifest.GetTotalSize();
                 this.mState = DownloadState.StartDownloadFiles;
             }
         }
 
-        private void LoadLocalFileSetManifest(string path)
-        {
-            var manifestContent = File.ReadAllText(path, mEncoding);
-            this.mFileSetManifest = VersionManifestParser.Parse(manifestContent);
-            this.ProgressData.TotalDownloadFileCount = this.mFileSetManifest.Count;
-            this.ProgressData.TotalDownloadSize = this.mFileSetManifest.GetTotalSize();
-        }
+        //private void LoadLocalFileSetManifest(string path)
+        //{
+        //    var manifestContent = File.ReadAllText(path, mEncoding);
+        //    this.mFileSetManifest = VersionManifestParser.Parse(manifestContent);
+        //    this.ProgressData.TotalDownloadFileCount = this.mFileSetManifest.Count;
+        //    this.ProgressData.TotalDownloadSize = this.mFileSetManifest.GetTotalSize();
+        //}
 
         private void OnInitFileSetListFailure()
         {
