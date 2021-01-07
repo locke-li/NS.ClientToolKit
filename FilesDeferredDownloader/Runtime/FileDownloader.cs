@@ -200,6 +200,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                 var localMd5 = CryptoUtility.GetHash(filePath);
                 if (string.Equals(localMd5,this.mCurDownloadInfo.H))
                 {
+                    s_mLogger.Value?.Info($"The file that path is \"{filePath}\" is already downloaded.");
                     this.mState = InnerState.DownloadSuccess;
                     return;
                 }

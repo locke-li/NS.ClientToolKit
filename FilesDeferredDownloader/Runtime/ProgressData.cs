@@ -29,6 +29,11 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         //--------------------------------------------------------------
 
         /// <summary>
+        /// 文件集名
+        /// </summary>
+        public string FileSetName { set; get; }
+
+        /// <summary>
         /// 当前已下载的文件数量
         /// </summary>
         public int CurrentDownloadedFileCount { set; get; }
@@ -91,6 +96,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         public void Clear()
         {
+            this.FileSetName = string.Empty;
             this.CurrentDownloadedFileCount = 0;
             this.TotalDownloadFileCount = 0;
             this.CurrentDownloadingFileSize = 0;

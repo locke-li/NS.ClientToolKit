@@ -26,6 +26,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
     {
         None,
         FileSetNotFound,
-        FileDownloadFailure
+        FileDownloadFailure,
+        FileSetDownloadFailure,
     }
 }

@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.FilesDeferredDownloader.Runtime.Configs;
@@ -52,6 +53,8 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
             DownloadingFiles,
 
+            DownloadFileSetSuccess,
+
             DownloadFailed,
 
             DownloadSuccess,
@@ -61,6 +64,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         {
             public Action<bool> initialize;
             public Action<bool, string, long, string> fileDownload;
+            public Action<bool, string, string> fileSetDownload;
             public Action completed;
             public Action<DeferredDownloadErrorType> error;
 
@@ -69,6 +73,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                 initialize = null;
                 completed = null;
                 fileDownload = null;
+                fileSetDownload = null;
                 error = null;
             }
         }
@@ -157,6 +162,9 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                     break;
                 case DownloadState.DownloadingFiles:
                     this.OnDownloadingFiles();
+                    break;
+                case DownloadState.DownloadFileSetSuccess:
+                    this.OnDownloadFileSetSuccess();
                     break;
                 case DownloadState.DownloadFailed:
                     this.OnDownloadFailure();
@@ -261,8 +269,11 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         private void OnStartInitFileSetList()
         {
+            this.ProgressData.Clear();
+            this.mCurSetName = this.mCurFileSetQueue.Dequeue();
+            this.ProgressData.FileSetName = this.mCurSetName;
             this.mState = DownloadState.InitializingFileSetList;
-            string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurFileSetName);
+            string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
             if (File.Exists(fileExternalPath))
             {
                 this.LoadLocalFileSetManifest(fileExternalPath);
@@ -270,7 +281,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             }
             else
             {
-                var url = $"{AssetsFileSystem.StreamingAssetsUrl}{this.mCurFileSetName}";
+                var url = $"{AssetsFileSystem.StreamingAssetsUrl}{this.mCurSetName}";
                 this.mHttpRequest.Load(url, this.OnLoadFileSetManifestCallBack);
             }
         }
@@ -283,7 +294,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             }
             else
             {
-                string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurFileSetName);
+                string fileExternalPath = AssetsFileSystem.GetWritePath(this.mCurSetName);
                 File.WriteAllBytes(fileExternalPath, bytes);
                 this.LoadLocalFileSetManifest(fileExternalPath);
                 this.mState = DownloadState.StartDownloadFiles;
@@ -316,6 +327,21 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             this.ProgressData.CurrentDownloadingFileProgress = this.mDownloader.GetProgress();
         }
 
+        private void OnDownloadFileSetSuccess()
+        {
+            this.SaveLocalFileSetConfig();
+            this.mCallbacks.fileSetDownload?.Invoke(true, 
+                this.mCurSetName,this.mTargetFileSetConfig.GetFileSetMD5(this.mCurSetName));
+            if (this.mCurFileSetQueue.Count == 0)
+            {
+                this.mState = DownloadState.DownloadSuccess;
+            }
+            else
+            {
+                this.mState = DownloadState.StartInitFileSetList;
+            }
+        }
+
         private void OnDownloadFailure()
         {
             this.Clear();
@@ -324,15 +350,14 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         private void OnDownloadSuccess()
         {
-            this.SaveLocalFileSetConfig();
             this.Clear();
             this.mCallbacks.completed?.Invoke();
         }
 
         private void SaveLocalFileSetConfig()
         {
-            var md5 = this.mTargetFileSetConfig.GetFileSetMD5(this.mCurFileSetName);
-            this.mLocalFileSetConfig.AddOrUpdate(this.mCurFileSetName,md5);
+            var md5 = this.mTargetFileSetConfig.GetFileSetMD5(this.mCurSetName);
+            this.mLocalFileSetConfig.AddOrUpdate(this.mCurSetName, md5);
             this.SerializeLocalFileSetConfig();
         }
 
@@ -355,7 +380,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
                 if (this.mDownloadIdx >= this.mFileSetManifest.Datas.Count)
                 {
-                    this.mState = DownloadState.DownloadSuccess;
+                    this.mState = DownloadState.DownloadFileSetSuccess;
                 }
                 else
                 {
@@ -364,39 +389,74 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             }
             else
             {
+                this.mCallbacks.fileSetDownload?.Invoke(false,this.mCurSetName,this.mTargetFileSetConfig.GetFileSetMD5(this.mCurSetName));
                 this.mState = DownloadState.DownloadFailed;
             }
         }
 
 
         private DownloadState mState = DownloadState.StartInit;
-        private string mCurFileSetName = string.Empty;
+        private Queue<string> mCurFileSetQueue = new Queue<string>();
+        private string mCurSetName = string.Empty;
         private VersionManifest mFileSetManifest = null;
         private int mDownloadIdx = -1;
         private void Clear()
         {
             this.mState = DownloadState.Idle;
-            this.mCurFileSetName = string.Empty;
+            this.mCurFileSetQueue.Clear();
             this.mFileSetManifest = null;
             this.mDownloadIdx = -1;
         }
 
         #endregion
 
-        public void SyncFiles(string fileSetName)
+        public void SyncFiles(out bool addedResult, params string[] fileSetNames)
         {
             if (this.mState != DownloadState.Idle)
             {
+                s_mLogger.Value?.Warn("Downloader is working , Pleause try later!");
+                addedResult = false;
                 return;
             }
 
-            if (IsFileSetPrepared(fileSetName))
+            if (fileSetNames == null || fileSetNames.Length == 0)
             {
+                s_mLogger.Value?.Warn("The file Sets that you want to download has no element!");
+                addedResult = false;
                 return;
             }
 
-            this.mCurFileSetName = fileSetName;
-            this.ProgressData.Clear();
+            foreach (var fileSetName in fileSetNames)
+            {
+                if (!IsFileSetNameValid(fileSetName))
+                {
+                    s_mLogger.Value?.Fatal($"The file set that name is \"{fileSetName}\" is invalid .");
+                    addedResult = false;
+                    return;
+                }
+            }
+
+            foreach (var fileSetName in fileSetNames)
+            {
+                if (!IsFileSetPrepared(fileSetName))
+                {
+                    this.mCurFileSetQueue.Enqueue(fileSetName);
+                    s_mLogger.Value?.Debug($"Add file set that name is \"{fileSetName}\" to download queue .");
+                }
+                else
+                {
+                    s_mLogger.Value?.Fatal($"The file set that name is \"{fileSetName}\" is prepared .");
+                }
+            }
+
+            addedResult = true;
+            if (this.mCurFileSetQueue.Count == 0)
+            {
+                s_mLogger.Value?.Info("All off file set in the current download request is prepared!");
+                addedResult = true;
+                return;
+            }
+            
             this.mState = DownloadState.StartInitFileSetList;
         }
 
@@ -408,6 +468,11 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         public void SetOnFileDownloadCallBack(Action<bool, string, long, string> callback)
         {
             this.mCallbacks.fileDownload = callback;
+        }
+
+        public void SetOnFileSetDownloadCallBack(Action<bool, string, string> callback)
+        {
+            this.mCallbacks.fileSetDownload = callback;
         }
 
         public void SetDownloadCompletedCallBack(Action callback)

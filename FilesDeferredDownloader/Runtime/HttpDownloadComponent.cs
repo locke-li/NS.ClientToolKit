@@ -38,9 +38,11 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
             StartDownload,
 
+            Downloading,
+            
             DownloadAgain,
 
-            Downloading,
+            WaitToRetry,
 
             DownloadSuccess,
 
@@ -93,6 +95,9 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
                 case DownloadState.DownloadAgain:
                     this.OnDownloadAgain();
                     break;
+                case DownloadState.WaitToRetry:
+                    this.OnWaitToRetry();
+                    break;
                 case DownloadState.DownloadFailure:
                     this.OnDownloadFailure();
                     break;
@@ -122,22 +127,45 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             }
             else
             {
+                this.mRetryStartTime = Time.realtimeSinceStartup;
                 this.mRetryCount++;
-                s_mLogger.Value?.Debug($"Retry download file , retry time : {this.mRetryCount} .");
+                this.mState = DownloadState.WaitToRetry;
+                s_mLogger.Value?.Debug($"Download the file that url is \"{this.mUrl}\" after {this.mRetryInterval} seconds .");
+            }
+        }
+
+        private void OnWaitToRetry()
+        {
+            if (this.mRetryCount > 0 && (Time.realtimeSinceStartup - this.mRetryStartTime) > this.mRetryInterval)
+            {
+                s_mLogger.Value?.Debug($"Start retry download file , retry time : {this.mRetryCount} .");
+                this.mRetryStartTime = 0;
                 this.StartDownload();
             }
         }
 
         private void OnDownloadFailure()
         {
-            this.mDownloadCompletedCallBack?.Invoke(false);
-            this.mState = DownloadState.Idle;
+            try
+            {
+                this.mDownloadCompletedCallBack?.Invoke(false);
+            }
+            finally
+            {
+                this.Clear();
+            }
         }
 
         private void OnDownloadSuccess()
         {
-            this.mDownloadCompletedCallBack?.Invoke(true);
-            this.mState = DownloadState.Idle;
+            try
+            {
+                this.mDownloadCompletedCallBack?.Invoke(true);
+            }
+            finally
+            {
+                this.Clear();
+            }
         }
 
         private void StartDownload()
@@ -283,7 +311,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             {
                 return;
             }
-           
+
             this.Clear();
 
             this.Collect(url,filePath,md5, downloadCompleted);
@@ -296,7 +324,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             this.mUrl = url;
             this.mFilePath = filePath;
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            this.mTemporyPath = AssetsFileSystem.GetWritePath($"GCaches/{fileName}_tmp");
+            this.mTemporyPath = AssetsFileSystem.GetWritePath($"g_caches/{fileName}_tmp");
             var dirPath = Path.GetDirectoryName(this.mTemporyPath);
             if (!Directory.Exists(dirPath))
             {
@@ -311,6 +339,9 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         private string mUrl;
         private string mFilePath;
         private string mTemporyPath;
+
+        private float mRetryInterval = 3;
+        private float mRetryStartTime = 0;
         private int mRetryCount;
         private string mMd5;
         private Action<bool> mDownloadCompletedCallBack;
@@ -318,6 +349,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         private void Clear()
         {
             this.mProgress = 0;
+            this.mRetryStartTime = 0;
             this.mRetryCount = 0;
             this.mState = DownloadState.Idle;
             this.mFilePath = null;

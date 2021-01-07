@@ -157,15 +157,12 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         /// <summary>
         /// 同步指定文件集的文件到本地
         /// </summary>
-        /// <param name="fileSetName"></param>
-        public static void SyncFiles(string fileSetName)
+        /// <param name="fileSetNames"></param>
+        /// <param name="addedResult"></param>
+        public static void SyncFiles(out bool addedResult, params string[] fileSetNames)
         {
             CheckIsInitialize("SyncFiles");
-            if (string.IsNullOrEmpty(fileSetName))
-            {
-                throw new NullReferenceException($"The file set that name is \"{nameof(fileSetName)}\" is null!");
-            }
-            s_mService.SyncFiles(fileSetName);
+            s_mService.SyncFiles(out addedResult , fileSetNames);
         }
 
         /// <summary>
@@ -188,6 +185,18 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
         {
             CheckIsInitialize("SetOnFileDownloadCallBack");
             s_mService.SetOnFileDownloadCallBack(callback);
+        }
+
+        /// <summary>
+        /// 设置文件集下载完成回调
+        /// </summary>
+        /// <param name="callback">
+        /// 参数含义分别为：是否成功，文件集名，目标文件集md5
+        /// </param>
+        public static void SetOnFileSetDownloadCallBack(Action<bool, string, string> callback)
+        {
+            CheckIsInitialize("SetOnFileSetDownloadCallBack");
+            s_mService.SetOnFileSetDownloadCallBack(callback);
         }
 
         /// <summary>
