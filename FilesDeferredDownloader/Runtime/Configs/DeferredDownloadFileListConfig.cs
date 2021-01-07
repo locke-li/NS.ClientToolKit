@@ -30,6 +30,8 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime.Configs
     [Serializable]
     public class DeferredDownloadFileListConfig
     {
+        public string md5 = string.Empty;
+
         public List<FileMD5Pair> files = new List<FileMD5Pair>();
 
         public bool Exist(string fileSetName)

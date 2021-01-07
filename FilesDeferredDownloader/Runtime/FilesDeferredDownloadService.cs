@@ -180,23 +180,20 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             this.mDownloader.Update();
         }
 
+        #region 初始化
         private void OnStartInit()
         {
             this.mState = DownloadState.Initializing;
-            var configPath = AssetsFileSystem.GetWritePath(DeferredDownloadManifestName);
-            if (File.Exists(configPath))
-            {
-                var contents = File.ReadAllText(configPath, mEncoding);
-                this.OnFileListConfigLoadCompleted(contents);
-            }
-            else
-            {
-                var url = $"{AssetsFileSystem.StreamingAssetsUrl}{DeferredDownloadManifestName}";
-                this.mHttpRequest.Load(url, this.OnLoadFileListConfigCallBack);
-            }
+            this.LoadTargetFileSetListConfig();
         }
 
-        private void OnLoadFileListConfigCallBack(byte[] bytes)
+        private void LoadTargetFileSetListConfig()
+        {
+            var url = $"{AssetsFileSystem.StreamingAssetsUrl}{DeferredDownloadManifestName}";
+            this.mHttpRequest.Load(url, this.OnTargetFileListConfigLoadedCallBack);
+        }
+
+        private void OnTargetFileListConfigLoadedCallBack(byte[] bytes)
         {
             if (bytes == null || bytes.Length == 0)
             {
@@ -205,23 +202,34 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             else
             {
                 var contents = new UTF8Encoding(false, true).GetString(bytes);
-                this.OnFileListConfigLoadCompleted(contents);
+                mTargetFileSetConfig = JsonUtility.FromJson<DeferredDownloadFileListConfig>(contents);
+                this.LoadLocalFileSetListConfig();
             }
         }
 
-        private void OnFileListConfigLoadCompleted(string contents)
+        private void LoadLocalFileSetListConfig()
         {
-            mTargetFileSetConfig = JsonUtility.FromJson<DeferredDownloadFileListConfig>(contents);
-
             var configPath = AssetsFileSystem.GetWritePath(LocalDownloadManifestName);
+            bool needCreateLocalFileSetConfig = true;
             if (File.Exists(configPath))
             {
                 var localContetns = File.ReadAllText(configPath, mEncoding);
-                this.mLocalFileSetConfig = JsonUtility.FromJson<DeferredDownloadFileListConfig>(localContetns);
+                var fileLocalFileSetConfig = JsonUtility.FromJson<DeferredDownloadFileListConfig>(localContetns);
+                if (string.Equals(fileLocalFileSetConfig.md5, this.mTargetFileSetConfig.md5))
+                {
+                    this.mLocalFileSetConfig = fileLocalFileSetConfig;
+                    needCreateLocalFileSetConfig = false;
+                }
+                else
+                {
+                    File.Delete(configPath);
+                }
             }
-            else
+
+            if (needCreateLocalFileSetConfig)
             {
                 this.mLocalFileSetConfig = new DeferredDownloadFileListConfig();
+                this.mLocalFileSetConfig.md5 = this.mTargetFileSetConfig.md5;
                 this.SerializeLocalFileSetConfig();
             }
             this.mState = DownloadState.Initialized;
@@ -264,8 +272,9 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
             {
                 this.mState = DownloadState.Idle;
             }
-            
         }
+
+        #endregion
 
         private void OnStartInitFileSetList()
         {
