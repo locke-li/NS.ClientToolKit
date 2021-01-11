@@ -101,6 +101,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 			}
 		}
 
+		/// <summary>
+		/// 获取设备唯一ID
+		/// </summary>
+		/// <returns></returns>
+        public static string GetDeviceUniqueID()
+        {
+            return SystemInfo.deviceUniqueIdentifier;
+        }
+
 		#endregion
 
 	}
