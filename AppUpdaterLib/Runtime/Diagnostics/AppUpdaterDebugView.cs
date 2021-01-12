@@ -93,8 +93,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Diagnostics
             GUILayout.BeginVertical();
 
             GUILayout.BeginVertical("Box");
-            GUILayout.Label($"组件版本: {AppUpdaterVersion.GetVersionInfo()}");
-
+            GUILayout.Label($"组件版本 : {AppUpdaterVersion.GetVersionInfo()}");
+            GUILayout.Label($"客户端唯一id : {AppUpdaterManager.ClientUniqueId}");
 #if DEBUG_APP_UPDATER
 
             GUILayout.Label($"版本 : {AppVersionManager.GetAppVersionDesc()}");

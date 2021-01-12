@@ -20,6 +20,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
     public enum AppUpdaterInnerEventType
     {
+        /// <summary>
+        /// 执行App更新操作，默认自动进入app更新操作
+        /// </summary>
+        PerformAppUpdate,
+
         StartPerformResUpdateOperation,
 
         OnCurrentResUpdateCompleted,
@@ -96,6 +101,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     public enum AppUpdaterHintName
     {
         LOWER_LUA_NAME,//lua路径小写，解决针对ios大小写敏感相关问题
+        MANUAL_PERFORM_APP_UPDATE,//手动进入app更新
     }
 
     public enum AppUpdaterBool

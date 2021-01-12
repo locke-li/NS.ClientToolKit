@@ -132,6 +132,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
         }
 
+        public void ManualStartAppUpdate()
+        {
+            IRoutedEventArgs arg = new RoutedEventArgs()
+            {
+                EventType = (int)AppUpdaterInnerEventType.PerformAppUpdate
+            };
+            this.mOwner.HandleMessage(in arg);
+        }
+
         public void StartUpdateAgain()
         {
             this.mOwner.StartUpdateOperationAgain();

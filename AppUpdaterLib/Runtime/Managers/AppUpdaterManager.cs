@@ -61,6 +61,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             }   
         }
 
+        public static string ClientUniqueId { set; get; } = string.Empty;
+
         #endregion
 
         //--------------------------------------------------------------
@@ -283,6 +285,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         public static void AppUpdaterHint(AppUpdaterHintName hintName , int hitVal)
         {
             AppUpdaterHints.Instance.SetHintValue(hintName,hitVal);
+        }
+
+        public static void ManualStartAppUpdate()
+        {
+            CheckIsInitialize("ManualStartAppUpdate");
+            s_mService.ManualStartAppUpdate();
         }
 
         private static void CheckIsInitialize(string methodName)

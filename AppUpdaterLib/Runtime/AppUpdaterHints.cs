@@ -30,24 +30,42 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// 保存lua到本地路径名小写（在可写空间后）
         /// </summary>
         public bool LowerLuaName = false;
-        
 
-        public void SetHintValue(AppUpdaterHintName hintName , int hitVal)
+        /// <summary>
+        /// 手动执行app更新
+        /// </summary>
+        public bool ManualPerformAppUpdate = false;
+
+        public void SetHintValue(AppUpdaterHintName hintName , int hintVal)
         {
             switch (hintName)
             {
                 case AppUpdaterHintName.LOWER_LUA_NAME:
-                    if (hitVal == (int)AppUpdaterBool.FALSE)
+                    if (hintVal == (int)AppUpdaterBool.FALSE)
                     {
                         LowerLuaName = false;
                     }
-                    else if (hitVal == (int)AppUpdaterBool.TRUE)
+                    else if (hintVal == (int)AppUpdaterBool.TRUE)
                     {
                         LowerLuaName = true;
                     }
                     else
                     {
-                        throw new ArgumentException($"hintName : {hintName}  , hitVal : {hitVal} .");
+                        throw new ArgumentException($"hintName : {hintName}  , hintVal : {hintVal} .");
+                    }
+                    break;
+                case AppUpdaterHintName.MANUAL_PERFORM_APP_UPDATE:
+                    if (hintVal == (int)AppUpdaterBool.FALSE)
+                    {
+                        ManualPerformAppUpdate = false;
+                    }
+                    else if (hintVal == (int)AppUpdaterBool.TRUE)
+                    {
+                        ManualPerformAppUpdate = true;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"hintName : {hintName}  , hintVal : {hintVal} .");
                     }
                     break;
                 default:
