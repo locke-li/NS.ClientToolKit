@@ -22,10 +22,12 @@ using UnityEngine;
 
 namespace CenturyGame.Log4NetForUnity.Runtime
 {
-    class UnityDefaultLogFileAppender : AppenderSkeleton
+    public class UnityDefaultLogFileAppender : AppenderSkeleton
     {
         private object mLockObj = new object();
         private StreamWriter mWriter;
+
+        public static string CurrentLogName { get; private set; }
 
         public UnityDefaultLogFileAppender()
         {
@@ -36,7 +38,7 @@ namespace CenturyGame.Log4NetForUnity.Runtime
         private void Init()
         {
             string logFileName = $"{System.DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss")}.log";
-
+            CurrentLogName = logFileName;
             string logFilePath = Path.Combine(Application.persistentDataPath, $"GameLogs/{logFileName}");
             string dirPath = Path.GetDirectoryName(logFilePath);
             dirPath = dirPath.Replace("\\", "/");

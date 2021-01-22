@@ -1,0 +1,16 @@
+{
+    "name": "CenturyGame.LogUpload.Runtime",
+    "references": [
+        "ICsharpCode.SharpZipLib",
+        "CenturyGame.LoggerModule.Runtime",
+        "CenturyGame.Log4NetForUnity.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
