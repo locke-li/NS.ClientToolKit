@@ -10,11 +10,15 @@ using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.LogUpload.Runtime
 {
-    public class LogUploader
+    public static class LogUploader
     {
         private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
             LoggerManager.GetLogger("LogUploader"));
 
+        /// <summary>
+        /// 是否有需要提交的日志文件
+        /// </summary>
+        /// <returns></returns>
         public static bool CheckNeedUpload()
         {
             string LogPath = GetGameLogPath();
@@ -29,16 +33,25 @@ namespace CenturyGame.LogUpload.Runtime
             return false;
         }
 
-        public static void UploadLog(string url)
+        /// <summary>
+        /// 尝试自动提交
+        /// </summary>
+        /// <param name="url"></param>
+        public static void TryAutoUpload(string url)
         {
             if (CheckNeedUpload())
             {
-                ZipLogFile(out string zipFilePath);
-                AsyncHttpUpload(url, zipFilePath);
+                ZipLogFile(out string zipFilePath, out long zipFileSize);
+                ManualUpload(url, zipFilePath);
             }
         }
 
-        public static void ZipLogFile(out string zipFilePath)
+        /// <summary>
+        /// 压缩日志文件
+        /// </summary>
+        /// <param name="zipFilePath"></param>
+        /// <param name="zipFileSize"></param>
+        public static void ZipLogFile(out string zipFilePath, out long zipFileSize)
         {
             try
             {
@@ -78,11 +91,14 @@ namespace CenturyGame.LogUpload.Runtime
                     s.Close();                 
                 }
                 zipFilePath = zipPath;
+                FileInfo fileInfo = new FileInfo(zipFilePath);
+                zipFileSize = fileInfo.Length;
             }
             catch (Exception e)
             {
                 s_mLogger.Value.Error($"Exception during ZipLogFile: {e.Message}");
                 zipFilePath = string.Empty;
+                zipFileSize = 0;
             }
         }
 
@@ -130,6 +146,16 @@ namespace CenturyGame.LogUpload.Runtime
             return s_GameLogPath;
         }
 
+        public static void ManualUpload(string url, string path)
+        {
+            AsyncHttpUpload(url, path);
+        }
+
+        /// <summary>
+        /// 异步HttpPut提交
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="path"></param>
         private async static void AsyncHttpUpload(string url, string path)
         {
             byte[] buffer = new byte[0];
