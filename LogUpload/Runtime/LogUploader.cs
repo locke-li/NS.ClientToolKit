@@ -120,6 +120,9 @@ namespace CenturyGame.LogUpload.Runtime
             var e = logFiles.GetEnumerator();
             while (e.MoveNext())
             {
+                string logFileName = Path.GetFileName(e.Current);
+                if (logFileName.Equals(UnityDefaultLogFileAppender.CurrentLogName))
+                    continue;
                 File.Delete(e.Current);
             }
         }
