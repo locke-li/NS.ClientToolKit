@@ -15,12 +15,16 @@ namespace CenturyGame.LogUpload.Runtime
         private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
             LoggerManager.GetLogger("LogUploader"));
 
+        public static bool EnableUpload { get; set; } = true;
+
         /// <summary>
         /// 是否有需要提交的日志文件
         /// </summary>
         /// <returns></returns>
         public static bool CheckNeedUpload()
         {
+            if (!EnableUpload)
+                return false;
             string LogPath = GetGameLogPath();
             var logFiles = Directory.EnumerateFiles(LogPath, "*.log");
             var e = logFiles.GetEnumerator();
