@@ -2,6 +2,8 @@
 using System.Text;
 using System.Collections.Generic;
 using CenturyGame.LuaModule.Runtime.Interfaces;
+using CenturyGame.LoggerModule.Runtime;
+using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.Framework.Network
 {
@@ -39,6 +41,11 @@ namespace CenturyGame.Framework.Network
 
         public IMsgProcesser MsgProcesser { get; private set; }
 
+        private readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
+            LoggerManager.GetLogger("Network"));
+
+        public bool EnableProtoLog { get; set; } = false;
+
         internal override void Init()
         {
         }
@@ -65,24 +72,29 @@ namespace CenturyGame.Framework.Network
         }
 
         private StringBuilder netLogBuilder = new StringBuilder();
-        private readonly string netLogPath = System.Environment.CurrentDirectory + "\\NetworkTrace.log";
         private void TraceUpdate(DateTime a_dataTime, ETracerLevel a_level, string a_context, string a_file, int a_line)
         {
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
-            netLogBuilder.Length = 0;
-            netLogBuilder.Append(a_dataTime.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            netLogBuilder.Append("[" + a_level.ToString() + "]");
-            netLogBuilder.Append(a_context);
-            netLogBuilder.Append("[" + a_file + "(" + a_line.ToString() + ")]");
-            using (System.IO.StreamWriter sw = System.IO.File.AppendText(netLogPath))
+            if (EnableProtoLog)
             {
-                if (a_level >= ETracerLevel.WARN)
+                netLogBuilder.Length = 0;
+                netLogBuilder.Append(a_dataTime.ToString("[yyyy-MM-dd HH:mm:ss]"));
+                //netLogBuilder.Append("[" + a_level.ToString() + "]");
+                netLogBuilder.Append(a_context);
+                //netLogBuilder.Append("[" + a_file + "(" + a_line.ToString() + ")]");
+                
+                if (a_level >= ETracerLevel.ERROR)
                 {
-                    UnityEngine.Debug.LogWarning(a_context + "[" + a_file + "(" + a_line.ToString() + ")]");
+                    s_mLogger.Value.Error(netLogBuilder.ToString());
                 }
-                sw.WriteLine(netLogBuilder.ToString());
+                else if (a_level >= ETracerLevel.WARN)
+                {
+                    s_mLogger.Value.Warn(netLogBuilder.ToString());
+                }
+                else
+                {
+                    s_mLogger.Value.Debug(netLogBuilder.ToString());
+                }
             }
-#endif
         }
 
         public void SetMsgProcesser(IMsgProcesser processer)
