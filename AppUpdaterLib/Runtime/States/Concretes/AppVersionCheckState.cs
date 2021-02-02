@@ -139,7 +139,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 #elif UNITY_IPHONE
             unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
 #endif
-            if (string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.DataVersion))
+
+            Logger.Info($"EnableTableDataUpdate : {AppUpdaterHints.Instance.EnableTableDataUpdate }.");
+            if (AppUpdaterHints.Instance.EnableTableDataUpdate && string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.DataVersion))
             {
                 Context.ErrorType = AppUpdaterErrorType.RequestUnityResVersionFailure;
 
@@ -204,14 +206,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 parsers.Add(new UnityResManifestParser());
             }
 
-            if (AppVersionManager.AppInfo.dataResVersion !=
-                Context.GetVersionResponseInfo.update_detail.DataVersion)
+            if (AppUpdaterHints.Instance.EnableTableDataUpdate)
             {
-                resList.Add(Context.GetCurDataResManifestName(Context.GetVersionResponseInfo.update_detail.DataVersion));
-                resVersionList.Add(Context.GetVersionResponseInfo.update_detail.DataVersion);
-                localResVersionList.Add(AppVersionManager.AppInfo.dataResVersion);
-                localResFileNameList.Add(AssetsFileSystem.AppDataResManifestName);
-                parsers.Add(new DataResManifestParser());
+                if (AppVersionManager.AppInfo.dataResVersion !=
+                    Context.GetVersionResponseInfo.update_detail.DataVersion)
+                {
+                    resList.Add(Context.GetCurDataResManifestName(Context.GetVersionResponseInfo.update_detail.DataVersion));
+                    resVersionList.Add(Context.GetVersionResponseInfo.update_detail.DataVersion);
+                    localResVersionList.Add(AppVersionManager.AppInfo.dataResVersion);
+                    localResFileNameList.Add(AssetsFileSystem.AppDataResManifestName);
+                    parsers.Add(new DataResManifestParser());
+                }
             }
 
             Context.ResVersions = resList.ToArray();

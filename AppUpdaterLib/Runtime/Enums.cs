@@ -102,6 +102,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     {
         LOWER_LUA_NAME,//lua路径小写，解决针对ios大小写敏感相关问题
         MANUAL_PERFORM_APP_UPDATE,//手动进入app更新
+        ENABLE_TABLE_DATA_UPDATE,//激活数据表更新（默认打开）
     }
 
     public enum AppUpdaterBool

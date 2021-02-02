@@ -36,6 +36,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public bool ManualPerformAppUpdate = false;
 
+        /// <summary>
+        /// 激活表数据更新
+        /// </summary>
+        public bool EnableTableDataUpdate = true;
+
         public void SetHintValue(AppUpdaterHintName hintName , int hintVal)
         {
             switch (hintName)
@@ -62,6 +67,20 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                     else if (hintVal == (int)AppUpdaterBool.TRUE)
                     {
                         ManualPerformAppUpdate = true;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"hintName : {hintName}  , hintVal : {hintVal} .");
+                    }
+                    break;
+                case AppUpdaterHintName.ENABLE_TABLE_DATA_UPDATE:
+                    if (hintVal == (int)AppUpdaterBool.FALSE)
+                    {
+                        EnableTableDataUpdate = false;
+                    }
+                    else if (hintVal == (int)AppUpdaterBool.TRUE)
+                    {
+                        EnableTableDataUpdate = true;
                     }
                     else
                     {
