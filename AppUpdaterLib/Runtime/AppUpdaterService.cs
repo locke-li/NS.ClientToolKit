@@ -144,6 +144,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         public void StartUpdateAgain()
         {
             this.mOwner.StartUpdateOperationAgain();
+
+            if (AppUpdaterHints.Instance.ManualPerformAppUpdate)
+            {
+                this.ManualStartAppUpdate();
+            }
         }
 
         public bool IsSucceed()

@@ -139,6 +139,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
         //--------------------------------------------------------------
 
+        public override void Reset()
+        {
+            this.mState = LogicState.Idle;
+            this.mCheckingResManifestType = CheckingResManifestType.UnKnow;
+            this.mCurrentLighthouseConfig = null;
+            this.mCurLighthouseFromTo = FileServerType.CDN;
+        }
+
         #endregion
 
         //--------------------------------------------------------------

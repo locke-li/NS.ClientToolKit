@@ -179,16 +179,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             return AppUpdaterContext.Current.ProgressData;
         }
 
-#if DEBUG_APP_UPDATER
         /// <summary>
-        /// 
+        /// 重试更新操作
         /// </summary>
         public static void AppUpdaterStartUpdateAgain()
         {
             CheckIsInitialize("AppUpdaterStartUpdateAgain");
             s_mService.StartUpdateAgain();
         }
-#endif
 
         /// <summary>
         /// 打开商店
