@@ -404,7 +404,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             this.mState = LogicState.CheckLocalResManifesting;
             var localDataResName = AssetsFileSystem.AppDataResManifestName;
 
-            if (!AppVersionManager.IsLocalResManifestExist(localDataResName))
+            if (!AppVersionManager.IsLocalResManifestExist(localDataResName) && AppUpdaterHints.Instance.EnableTableDataUpdate)
             {
                 this.mCheckingResManifestType = CheckingResManifestType.DataRes;
                 var localDataResNameInnerAppInfoPath = Context.GetStreamingAssetsPath(localDataResName);
