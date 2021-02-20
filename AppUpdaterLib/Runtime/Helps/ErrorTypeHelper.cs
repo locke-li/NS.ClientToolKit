@@ -56,6 +56,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "The disk available space is not enough to download path files !";
                 case AppUpdaterErrorType.LighthouseConfigServersIsUnReachable:
                     return "The servers data from lighthouse config is not reachable!";
+                case AppUpdaterErrorType.AppBuiltInVersionNumNotCompatibleToExternal:
+                    return "The builtIn version is not compatible to external!";
                 default:
                     return "Error ! Unknow appupdater error! ";
             } 

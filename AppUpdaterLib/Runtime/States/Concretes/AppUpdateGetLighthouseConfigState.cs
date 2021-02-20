@@ -377,6 +377,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     Logger.Info("Make built appinfo as current!");
                     AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
                 }
+                else if (result < Version.VersionCompareResult.LowerForPatch)
+                {
+                    Context.ErrorType = AppUpdaterErrorType.AppBuiltInVersionNumNotCompatibleToExternal;
+                    this.mState = LogicState.ReqLighthouseConfigFailure;
+                    return;
+                }
                 else
                 {
                     Logger.Info("Make local appinfo as current!");

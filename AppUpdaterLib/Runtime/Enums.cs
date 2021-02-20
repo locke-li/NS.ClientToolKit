@@ -82,6 +82,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         DiskIsNotEnoughToDownPatchFiles,//磁盘空间不足
 
+        AppBuiltInVersionNumNotCompatibleToExternal,//app内建版本号与外部不兼容
+
         Unknow,
     }
 
