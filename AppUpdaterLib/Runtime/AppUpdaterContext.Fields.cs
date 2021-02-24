@@ -189,7 +189,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public LighthouseConfigDownloader LighthouseConfigDownloader = null;
 
-        public RemoteFileDownloader RemoteFileDownloader = null;
+        //public RemoteFileDownloader RemoteFileDownloader = null;
 
         public IStorageInfoProvider StorageInfoProvider = null;
 
@@ -217,7 +217,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.CurrentResVersionIdx = DefaultResVerisonIdx;
 
             this.LighthouseConfigDownloader?.Clear();
-            this.RemoteFileDownloader?.Clear();
+            //this.RemoteFileDownloader?.Clear();
             this.DiskInfo.Clear();
         }
 

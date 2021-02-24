@@ -41,6 +41,19 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public bool EnableTableDataUpdate = true;
 
+        /// <summary>
+        /// 允许本地资源号比远端更新
+        /// </summary>
+        public bool AllowResNumLocalNewerToRemote = true;
+
+
+        //private void SetBoolean
+
+        //private bool CheckHintBoolean(AppUpdaterHintName hintName)
+        //{
+
+        //}
+
         public void SetHintValue(AppUpdaterHintName hintName , int hintVal)
         {
             switch (hintName)

@@ -1,0 +1,21 @@
+{
+    "name": "CenturyGame.ServiceLocation.Editor.Test",
+    "references": [
+        "CenturyGame.ServiceLocation.Runtime",
+        "CenturyGame.Log4NetForUnity.Runtime",
+        "CenturyGame.LoggerModule.Runtime",
+        "CommonServiceLocator"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

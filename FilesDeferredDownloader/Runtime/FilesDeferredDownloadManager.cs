@@ -63,26 +63,6 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         public static bool Initialized => s_mState == InnerState.Initialized;
 
-
-        private static DeferredDownloadConfig s_mDeferredDownloadConfig = null;
-
-        public static DeferredDownloadConfig DeferredDownloadConfig
-        {
-            get
-            {
-                if (s_mDeferredDownloadConfig == null)
-                {
-                    var text = Resources.Load<TextAsset>("deferreddownload");
-                    if (text == null)
-                    {
-                        throw new FileNotFoundException("deferreddownload");
-                    }
-
-                    s_mDeferredDownloadConfig = JsonUtility.FromJson<DeferredDownloadConfig>(text.text);
-                }
-                return s_mDeferredDownloadConfig;
-            }
-        }
         #endregion
 
         //--------------------------------------------------------------

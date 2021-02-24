@@ -20,7 +20,10 @@ using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.LoggerModule.Runtime;
 using System.IO;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using CenturyGame.AppUpdaterLib.Runtime.Download;
 using CenturyGame.AppUpdaterLib.Runtime.Manifests;
+using CenturyGame.ServiceLocation.Runtime;
+using CommonServiceLocator;
 using UnityEngine;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 using Object = UnityEngine.Object;
@@ -86,6 +89,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 
         private static void CreateService()
         {
+            var container = new ServiceContainer();
+            ServiceLocator.SetLocatorProvider(() => container);
+
             const string serviceName = "AppUpdater";
             var sersvicePfb = Resources.Load<GameObject>(serviceName);
 
@@ -97,6 +103,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             var serviceGo = Object.Instantiate(sersvicePfb);
             serviceGo.name = serviceName;
             s_mService = serviceGo.GetComponent<AppUpdaterService>();
+
+            var go = new GameObject("RemoteFileDownloadService");
+            Object.DontDestroyOnLoad(go);
+            var service = go.AddComponent<RemoteFileDownloadService>();
+            container.Register<IRemoteFileDownloadService>(null, service);
         }
 
         /// <summary>

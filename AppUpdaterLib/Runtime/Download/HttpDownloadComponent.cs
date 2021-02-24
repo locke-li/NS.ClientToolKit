@@ -19,12 +19,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
-using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.Core.Utilities;
 using CenturyGame.LoggerModule.Runtime;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
-namespace CenturyGame.FilesDeferredDownloader.Runtime
+// ReSharper disable once CheckNamespace
+namespace CenturyGame.AppUpdaterLib.Runtime.Download
 {
     public class HttpDownloadComponent : MonoBehaviour
     {

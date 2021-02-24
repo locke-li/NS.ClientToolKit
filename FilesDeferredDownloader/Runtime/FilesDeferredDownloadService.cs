@@ -19,6 +19,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using CenturyGame.AppUpdaterLib.Runtime;
+using CenturyGame.AppUpdaterLib.Runtime.Download;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.FilesDeferredDownloader.Runtime.Configs;
 using CenturyGame.LoggerModule.Runtime;

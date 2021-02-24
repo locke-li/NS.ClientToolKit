@@ -14,9 +14,8 @@
 
 ***************************************************************/
 
-using CenturyGame.AppUpdaterLib.Runtime;
-
-namespace CenturyGame.FilesDeferredDownloader.Runtime
+// ReSharper disable once CheckNamespace
+namespace CenturyGame.AppUpdaterLib.Runtime.Download
 {
     public delegate void FileDownloadCallBack(bool result);
 }

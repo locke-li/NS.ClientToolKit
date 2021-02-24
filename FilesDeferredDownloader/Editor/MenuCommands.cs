@@ -30,28 +30,28 @@ namespace CenturyGame.FilesDeferredDownloader.Editor
         [MenuItem(CreateDeferredDownloadConfig)]
         static void MakeDefaultConfig()
         {
-            string targetFolderPath = Application.dataPath + "/CenturyGamePackageRes/FilesDeferredDownloader/Resources";
-            if (!Directory.Exists(targetFolderPath))
-            {
-                Directory.CreateDirectory(targetFolderPath);
+            //string targetFolderPath = Application.dataPath + "/CenturyGamePackageRes/FilesDeferredDownloader/Resources";
+            //if (!Directory.Exists(targetFolderPath))
+            //{
+            //    Directory.CreateDirectory(targetFolderPath);
 
-                AssetDatabase.Refresh();
-            }
+            //    AssetDatabase.Refresh();
+            //}
 
-            var path = targetFolderPath + "/deferreddownload.txt";
+            //var path = targetFolderPath + "/deferreddownload.txt";
 
-            if (File.Exists(path))
-            {
-                Debug.LogWarning("The appupdater config that you want to make is exist in current project!");
-                return;
-            }
-            DeferredDownloadConfig config = new DeferredDownloadConfig();
-            string jsonContents = JsonUtility.ToJson(config, true);
-            File.WriteAllText(path, jsonContents, new UTF8Encoding(false, true));
+            //if (File.Exists(path))
+            //{
+            //    Debug.LogWarning("The appupdater config that you want to make is exist in current project!");
+            //    return;
+            //}
+            //DeferredDownloadConfig config = new DeferredDownloadConfig();
+            //string jsonContents = JsonUtility.ToJson(config, true);
+            //File.WriteAllText(path, jsonContents, new UTF8Encoding(false, true));
 
-            Debug.Log("Write default deferred download default config completd!");
+            //Debug.Log("Write default deferred download default config completd!");
 
-            AssetDatabase.Refresh();
+            //AssetDatabase.Refresh();
 
         }
     }

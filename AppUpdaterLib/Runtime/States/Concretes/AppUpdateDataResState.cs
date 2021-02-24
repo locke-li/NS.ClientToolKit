@@ -17,15 +17,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CenturyGame.AppUpdaterLib.Runtime.Download;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.Core.FSM;
 using CenturyGame.Core.Functional;
+using CommonServiceLocator;
 using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 {
-    class AppUpdateDataResState : BaseAppUpdaterFunctionalState
+    internal sealed class AppUpdateDataResState : BaseAppUpdaterFunctionalState
     {
         #region Inner class&enum
 
@@ -103,14 +105,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             base.Enter(entity, args);
 
-            if (Context.RemoteFileDownloader == null)
-            {
-                Context.RemoteFileDownloader = new RemoteFileDownloader(Context,this.Target.Request);
-            }
-            else
-            {
-                Context.RemoteFileDownloader.Clear();
-            }
+            //if (Context.RemoteFileDownloader == null)
+            //{
+            //    Context.RemoteFileDownloader = new RemoteFileDownloader(Context,this.Target.Request);
+            //}
+            //else
+            //{
+            //    Context.RemoteFileDownloader.Clear();
+            //}
         }
 
         
@@ -118,7 +120,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         public override void Execute(AppUpdaterFsmOwner entity)
         {
             base.Execute(entity);
-            Context.RemoteFileDownloader.Update();
+            //Context.RemoteFileDownloader.Update();
             switch (mCurState)
             {
                 case InnerState.StartRequestResManifest:
@@ -269,6 +271,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     this.mCurrentDownloadIndex = 0;
                     this.mCurDownloadTasks = diff;
                     this.mCurFileDownLoadState = FileDownLoadState.StartDownLoad;
+
+                    var service = ServiceLocator.Current.GetInstance<IRemoteFileDownloadService>();
+                    service.SetDownloadCallBack(this.OnFileDownloaded);
                 }
             }
             else
@@ -319,13 +324,51 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             var fileDesc = this.mCurDownloadTasks[this.mCurrentDownloadIndex];
             Context.ProgressData.CurrentDownloadingFileSize = (ulong)fileDesc.S;
-            string fileName = this.mCurManifestParser.GetRemotePath(fileDesc);
+            //string fileName = this.mCurManifestParser.GetRemotePath(fileDesc);
 
-            Context.RemoteFileDownloader.StartLoadResFileFromRemote(OnFileDownloaded , fileName);
+            //Context.RemoteFileDownloader.StartLoadResFileFromRemote(OnFileDownloaded , fileName);
 
             this.mCurFileDownLoadState = FileDownLoadState.DownLoading;
+
+            var service = ServiceLocator.Current.GetInstance<IRemoteFileDownloadService>();
+            service.StartDownload(fileDesc);
         }
 
+        private void OnFileDownloaded(bool result)
+        {
+            if (!result)
+            {
+                Context.ErrorType = AppUpdaterErrorType.DownloadFileFailure;
+                this.mCurState = InnerState.ResUpdateFailed;
+                this.mCurFileDownLoadState = FileDownLoadState.DownloadFail;
+
+                Logger.Error($"Download file that name is \"{this.mCurDownloadTasks[this.mCurrentDownloadIndex].N}\" failure! ");
+
+                this.SaveCurrentConfig(false);
+            }
+            else
+            {
+                Context.ProgressData.CurrentDownloadSize += (ulong)this.mCurDownloadTasks[this.mCurrentDownloadIndex].S;
+                Context.ProgressData.CurrentDownloadFileCount++;
+                Context.ProgressData.Progress = Context.ProgressData.CurrentDownloadSize / ((float)Context.ProgressData.TotalDownloadSize);
+                this.mLocalManifest.UpdateInnerFile(this.mCurDownloadTasks[this.mCurrentDownloadIndex]);
+
+                if (this.CheckDownloadOperationIsCompleted())
+                {
+                    Context.AppendInfo($"Current resource version update to \"{Context.ResVersionNums[Context.CurrentResVersionIdx]}\".");
+                    Logger.Info($"Update manifest that name is {Context.GetCurrentVersionFileName()} is success!");
+                    this.mCurFileDownLoadState = FileDownLoadState.Idle;
+                    this.mCurState = InnerState.ResUpdateCompleted;
+                }
+                else
+                {
+                    Logger.Info($"Download file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
+                    this.mCurFileDownLoadState = FileDownLoadState.DownLoadCompleted;
+                }
+            }
+        }
+
+        /*
         private void OnFileDownloaded(bool success , byte[] data)
         {
             if (!success)
@@ -366,7 +409,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 Logger.Info($"Download file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
                 this.mCurFileDownLoadState = FileDownLoadState.DownLoadCompleted;
             }
-        }
+        }*/
 
         private void ProcessDownLoading()
         {

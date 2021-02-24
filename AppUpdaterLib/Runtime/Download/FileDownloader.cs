@@ -16,13 +16,13 @@
 
 using System;
 using System.IO;
-using CenturyGame.AppUpdaterLib.Runtime;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.Core.Utilities;
 using CenturyGame.LoggerModule.Runtime;
 using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
-namespace CenturyGame.FilesDeferredDownloader.Runtime
+// ReSharper disable once CheckNamespace
+namespace CenturyGame.AppUpdaterLib.Runtime.Download
 {
     public class FileDownloader
     {
@@ -129,7 +129,7 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         private string GetRemoteResFileUrl(string fileName, FileServerType fileServerType = FileServerType.CDN)
         {
-            var config = FilesDeferredDownloadManager.DeferredDownloadConfig;
+            var config = AppUpdaterManager.AppUpdaterConfig;
             string serverUrl = (fileServerType == FileServerType.CDN) ? config.cdnUrl : config.ossUrl;
             string url = $"{serverUrl}/{fileName}";
             return url;
@@ -137,7 +137,26 @@ namespace CenturyGame.FilesDeferredDownloader.Runtime
 
         private string GetLocalFilePath()
         {
-            return AssetsFileSystem.GetWritePath(this.mCurDownloadInfo.N);
+            FileDesc desc = this.mCurDownloadInfo;
+            string relativePath;
+
+            if (desc.RN.StartsWith("resource/"))
+            {
+                relativePath = desc.N;
+            }
+            else
+            {
+                if (AppUpdaterHints.Instance.LowerLuaName)
+                {
+                    relativePath = $"lua/gen/{desc.N.ToLower()}";
+                }
+                else
+                {
+                    relativePath = $"lua/gen/{desc.N}";
+                }
+            }
+           
+            return AssetsFileSystem.GetWritePath(relativePath);
         }
 
         private void StartDownloadInternal(FileServerType serverType)

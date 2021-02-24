@@ -1,9 +1,7 @@
 {
-    "name": "CenturyGame.AppUpdater.Runtime",
+    "name": "CenturyGame.ServiceLocation.Runtime",
     "references": [
-        "CenturyGame.Core",
-        "CenturyGame.LoggerModule.Runtime",
-        "CenturyGame.ServiceLocation.Runtime"
+        "CenturyGame.LoggerModule.Runtime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
