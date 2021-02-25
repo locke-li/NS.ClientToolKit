@@ -157,7 +157,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
                 {
                     var maxVersion = new Runtime.Version(this.VersionMax);
                     compareResult = maxVersion.CompareTo(version);
-                    result = compareResult >= Version.VersionCompareResult.Equal;
+                    result = compareResult > Version.VersionCompareResult.Equal;//前开后闭，
                 }
                 return result;
             }

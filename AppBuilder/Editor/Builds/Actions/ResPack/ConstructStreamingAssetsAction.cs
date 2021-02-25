@@ -152,7 +152,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             //File.WriteAllText($"{streamingPath}/res_{platformName}.json", 
             //    contents,AppBuildContext.TextEncoding);
             File.Copy(resListPath, $"{streamingPath}/res_{platformName}.json");
-            Logger.Info("copC resource list file completed!");
+            Logger.Info("copy resource list file completed!");
             AssetDatabase.Refresh();
         }
 
@@ -170,7 +170,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
             Logger.Info("Start copy data resource list file to streaming assets path !");
             File.Copy(dataResListPath, $"{streamingPath}/res_data.json");
-            Logger.Info("copC data resource list file completed!");
+            Logger.Info("copy data resource list file completed!");
             AssetDatabase.Refresh();
            
         }
