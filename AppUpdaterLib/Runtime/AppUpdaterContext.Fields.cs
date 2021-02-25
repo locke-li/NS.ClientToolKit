@@ -82,18 +82,21 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         }
     }
 
-    //public enum ResSyncMode
-    //{
-    //    FULL,//同步远端所有的资源
+    public enum ResSyncMode
+    {
+        FULL,//同步远端所有的资源
 
-    //    LOCAL,//只同步本地清单资源
+        LOCAL,//只同步本地清单资源
 
-    //    SUB_GROUP,//只同步子组的资源
-    //}
+        SUB_GROUP,//只同步子组的资源
+    }
 
-    //internal class ResUpdateConfig
-    //{
-    //}
+    internal class ResUpdateConfig
+    {
+        public ResSyncMode Mode = ResSyncMode.FULL;
+
+
+    }
 
 
     internal class DiskInfo
@@ -146,7 +149,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private StringBuilder mTempSb = new StringBuilder();
         
-        public bool IsFirstRun = false;
+        public bool IsFirstRun = true;
 
         /// <summary>
         /// GetVersion返回相关

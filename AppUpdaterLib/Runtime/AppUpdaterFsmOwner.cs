@@ -52,8 +52,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         #region Inner FSM
 
-        private AppUpdaterContext mContext;
-        public AppUpdaterContext Context => mContext;
+        private AppUpdaterContext _mContext = new AppUpdaterContext();
+        public AppUpdaterContext Context => _mContext;
 
         private StateMachine<AppUpdaterFsmOwner> mFSM;
         public StateMachine<AppUpdaterFsmOwner> FSM => mFSM;
@@ -66,30 +66,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public void Init()
         {
-            this.InitializeComponent();
-            this.CreateContext();
-            this.InitializeFSM();
-        }
-            
-
-        private void InitializeComponent()
-        {
+            this.CreateFsm();
         }
 
-        private void CreateContext()
-        {
-            mContext = new AppUpdaterContext();
-        }
-
-        private void InitializeFSM()
+        private void CreateFsm()
         {
             this.mFSM = new StateMachine<AppUpdaterFsmOwner>(this);
-            this.mFSM.SetCurrentState<AppUpdateInitState>();
-            this.mFSM.SetGlobalState<AppUpdaterGlobalState>();
-        }
-
-        private void AddListeners()
-        {
         }
 
         public bool HandleMessage(in IRoutedEventArgs msg)
@@ -97,10 +79,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return this.mFSM.HandleMessage(in msg);
         }
 
-
         public void ChangeState<T>() where T : State<AppUpdaterFsmOwner>,new() 
         {
             this.mFSM.ChangeState<T>();
+        }
+
+        private void InitializeFsm()
+        {
+            this.mFSM.SetCurrentState<AppUpdateInitState>();
+            this.mFSM.SetGlobalState<AppUpdaterGlobalState>();
         }
 
         public void Update()
@@ -109,13 +96,40 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mFSM?.Update();
         }
 
-        internal void StartUpdateOperationAgain() 
+        public void StartupFsm()
+        {
+            if (_mContext.IsFirstRun)
+            {
+                this.InitializeFsm();
+                _mContext.IsFirstRun = false;
+            }
+            else
+            {
+                this.mFSM.ChangeState<AppUpdateInitState>();
+            }
+        }
+
+        public void StartUpdateOperationAgain() 
         {
             this.Clear();
             Context.AppendInfo("Start app update operation again !");
-            this.ChangeState<AppUpdateInitState>();
+            this.StartupFsm();
+
+            if (AppUpdaterHints.Instance.ManualPerformAppUpdate)
+            {
+                this.ManualStartAppUpdate();
+            }
         }
-        
+
+        public void ManualStartAppUpdate()
+        {
+            IRoutedEventArgs arg = new RoutedEventArgs()
+            {
+                EventType = (int)AppUpdaterInnerEventType.PerformAppUpdate
+            };
+            this.HandleMessage(in arg);
+        }
+
         internal void Clear()
         {
             Context?.Clear();

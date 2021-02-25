@@ -20,6 +20,8 @@ using CenturyGame.AppUpdaterLib.Runtime.Diagnostics;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.Core.FSM;
+using CenturyGame.LoggerModule.Runtime;
+using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
 {
@@ -27,6 +29,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     {
         #region Fields
 
+        private static readonly Lazy<ILogger> s_mLogger = new Lazy<ILogger>(() =>
+            LoggerManager.GetLogger("AppUpdaterService"));
 
         private AppUpdaterFsmOwner mOwner;
 
@@ -116,21 +120,23 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public void ManualStartAppUpdate()
         {
-            IRoutedEventArgs arg = new RoutedEventArgs()
-            {
-                EventType = (int)AppUpdaterInnerEventType.PerformAppUpdate
-            };
-            this.mOwner.HandleMessage(in arg);
+            this.mOwner.ManualStartAppUpdate();
+        }
+
+        public void StartUpdate()
+        {
+            this.mOwner.StartupFsm();
         }
 
         public void StartUpdateAgain()
         {
-            this.mOwner.StartUpdateOperationAgain();
-
-            if (AppUpdaterHints.Instance.ManualPerformAppUpdate)
+            if (Context.IsFirstRun)
             {
-                this.ManualStartAppUpdate();
+                s_mLogger.Value?.Warn("Please call mathod that name is \"StartUpdate\" , because the appupdater is not running yet!");
+                return;
             }
+
+            this.mOwner.StartUpdateOperationAgain();
         }
 
         public bool IsSucceed()

@@ -15,7 +15,7 @@
 ***************************************************************/
 
 using System;
-using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using System.Diagnostics;
 using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.AppUpdaterLib.Runtime.Utilities;
 using UnityEngine;
@@ -24,12 +24,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 {
     internal partial class AppUpdaterContext
     {
+        [Conditional("DEBUG_APP_UPDATER")]
         public void AppendInfo(string info)
         {
-#if DEBUG_APP_UPDATER
             var Now = DateTime.Now.ToString("HH:mm:ss ");
             this.InfoStringBuilder.AppendLine($"{Now}{info}");
-#endif
         }
 
         public string GetStreamingAssetsPath(string path)
@@ -131,7 +130,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public string GetCurDataResManifestName(string version)
         {
-            
             string manifestName = $"res_data.json{CommonConst.WellNumUtf8}{version}";
             return manifestName;
         }

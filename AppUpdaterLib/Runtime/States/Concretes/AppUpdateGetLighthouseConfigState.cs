@@ -392,7 +392,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             else
             {
                 Logger.Info("Local appinfo file is not exist , make built appinfo file as current!");
-                Context.IsFirstRun = true;
                 AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
             }
 

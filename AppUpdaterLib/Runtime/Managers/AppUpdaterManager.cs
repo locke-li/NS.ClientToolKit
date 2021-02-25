@@ -89,6 +89,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             var serviceGo = Object.Instantiate(servicePfb);
             serviceGo.name = serviceName;
             s_mService = serviceGo.GetComponent<AppUpdaterService>();
+
+            if (!AppUpdaterHints.Instance.ManualPerformAppUpdate)
+            {
+                s_mService.StartUpdate();
+            }
         }
 
         /// <summary>
