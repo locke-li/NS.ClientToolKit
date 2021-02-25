@@ -62,11 +62,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// </summary>
         public static AppInfoManifest TargetAppInfo { private set; get; }
 
-        /// <summary>
-        /// 渠道名
-        /// </summary>
-        public static string Channel { private set; get; }
-
         #endregion
 
         //--------------------------------------------------------------
@@ -145,11 +140,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         {
             s_mLogger.Debug($"Make current server url : {url} .");
             ServerUrl = url;
-        }
-
-        public static void SetChannel(string channel)
-        {
-            Channel = channel;
         }
 
         public static void SetTargetVersion(AppInfoManifest targetAppInfo)

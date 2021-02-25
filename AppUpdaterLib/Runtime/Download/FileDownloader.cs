@@ -129,7 +129,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
 
         private string GetRemoteResFileUrl(string fileName, FileServerType fileServerType = FileServerType.CDN)
         {
-            var config = AppUpdaterManager.AppUpdaterConfig;
+            var config = AppUpdaterConfigManager.AppUpdaterConfig;
             string serverUrl = (fileServerType == FileServerType.CDN) ? config.cdnUrl : config.ossUrl;
             string url = $"{serverUrl}/{fileName}";
             return url;

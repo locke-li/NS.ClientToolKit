@@ -24,28 +24,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 {
     internal partial class AppUpdaterContext
     {
-        private static AppUpdaterContext mCurrent;
-        public static AppUpdaterContext Current
-        {
-            get
-            {
-                if (mCurrent == null)
-                {
-                    var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
-                    var appUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
-                    mCurrent = new AppUpdaterContext(appUpdaterConfig);
-                }
-                    
-                return mCurrent;
-            }
-        }
-
-
-        public AppUpdaterContext(AppUpdaterConfig config)
-        {
-            this.Config = config;
-        }
-
         public void AppendInfo(string info)
         {
 #if DEBUG_APP_UPDATER
@@ -82,9 +60,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public string GetRemoteRootUrl(FileServerType fileServerType)
         {
-            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
-
-            return string.IsNullOrWhiteSpace(Config.remoteRoot) ? serverUrl : $"{serverUrl}/{Config.remoteRoot}";
+            var appUpdaterConfig = AppUpdaterConfigManager.AppUpdaterConfig;
+            var serverUrl = (fileServerType == FileServerType.CDN) ? appUpdaterConfig.cdnUrl : appUpdaterConfig.ossUrl;
+            return string.IsNullOrWhiteSpace(appUpdaterConfig.remoteRoot) ? serverUrl : $"{serverUrl}/{appUpdaterConfig.remoteRoot}";
         }
 
         /// <summary>
@@ -96,15 +74,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         public string GetLighthouseUrl(string lightHouseId, FileServerType fileServerType = FileServerType.CDN)
         {
             var curTime = TimeUtility.GetCurrentTimeSeconds() / 60;
-
-            var language = GetCurrentLanguageName();
+            var appUpdaterConfig = AppUpdaterConfigManager.AppUpdaterConfig;
+            //var language = GetCurrentLanguageName();
 
             string url;
 
             if (!string.IsNullOrEmpty(lightHouseId))
-                url = $"{GetRemoteRootUrl(fileServerType)}/{this.Config.channel}-lighthouse.json_{lightHouseId}?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/{appUpdaterConfig.channel}-lighthouse.json_{lightHouseId}?v={curTime}&t={curTime}";
             else
-                url = $"{GetRemoteRootUrl(fileServerType)}/{this.Config.channel}-lighthouse.json?v={curTime}&t={curTime}";
+                url = $"{GetRemoteRootUrl(fileServerType)}/{appUpdaterConfig.channel}-lighthouse.json?v={curTime}&t={curTime}";
 
             return url;
         }
@@ -163,13 +141,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             var language = PlayerPrefs.GetString(CommonConst.APP_LANGUAGE_KEY, "en");
 
             return language;
-        }
-
-        public string GetRemoteResFileUrl(string fileName, FileServerType fileServerType = FileServerType.CDN)
-        {
-            string serverUrl = (fileServerType == FileServerType.CDN) ? this.Config.cdnUrl : this.Config.ossUrl;
-            string url = $"{serverUrl}/{fileName}";
-            return url;
         }
 
         /// <summary>

@@ -48,22 +48,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         #region Properties & Events
         //--------------------------------------------------------------
 
-        private static AppUpdaterConfig mAppUpdaterConfig;
-
-        public static AppUpdaterConfig AppUpdaterConfig
-        {
-            get
-            {
-                if (mAppUpdaterConfig == null)
-                {
-                    var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
-                    mAppUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
-                }
-
-                return mAppUpdaterConfig;
-            }   
-        }
-
         public static string ClientUniqueId { set; get; } = string.Empty;
 
         #endregion
@@ -91,23 +75,20 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         {
             var container = new ServiceContainer();
             ServiceLocator.SetLocatorProvider(() => container);
-
-            const string serviceName = "AppUpdater";
-            var sersvicePfb = Resources.Load<GameObject>(serviceName);
-
-            if (sersvicePfb == null)
-            {
-                throw new FileNotFoundException("AppUpdater");
-            }
-
-            var serviceGo = Object.Instantiate(sersvicePfb);
-            serviceGo.name = serviceName;
-            s_mService = serviceGo.GetComponent<AppUpdaterService>();
-
             var go = new GameObject("RemoteFileDownloadService");
             Object.DontDestroyOnLoad(go);
             var service = go.AddComponent<RemoteFileDownloadService>();
             container.Register<IRemoteFileDownloadService>(null, service);
+
+            const string serviceName = "AppUpdater";
+            var servicePfb = Resources.Load<GameObject>(serviceName);
+            if (servicePfb == null)
+            {
+                throw new FileNotFoundException("AppUpdater");
+            }
+            var serviceGo = Object.Instantiate(servicePfb);
+            serviceGo.name = serviceName;
+            s_mService = serviceGo.GetComponent<AppUpdaterService>();
         }
 
         /// <summary>
@@ -176,7 +157,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <param name="provider"></param>
         public static void AppUpdaterSetStorageInfoProvider(IStorageInfoProvider provider)
         {
-            CheckIsInitialize("SetStorageInfoProvider");
+            CheckIsInitialize("AppUpdaterSetStorageInfoProvider");
             s_mService.SetStorageInfoProvider(provider);
         }
 
@@ -186,8 +167,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <returns></returns>
         public static AppUpdaterProgressData AppUpdaterGetAppUpdaterProgressData()
         {
-            CheckIsInitialize("GetAppUpdaterProgressData");
-            return AppUpdaterContext.Current.ProgressData;
+            CheckIsInitialize("AppUpdaterGetAppUpdaterProgressData");
+            return s_mService.Context.ProgressData;
         }
 
         /// <summary>
@@ -228,7 +209,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <returns></returns>
         public static LighthouseConfig.Server AppUpdaterGetServerData()
         {
-            CheckIsInitialize("GetServerData");
+            CheckIsInitialize("AppUpdaterGetServerData");
             if(AppVersionManager.LHConfig == null)
                 throw new InvalidOperationException("Get server config data failure !");
             return AppVersionManager.LHConfig.GetCurrentServerData();
@@ -240,7 +221,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <returns></returns>
         public static AppInfoManifest AppUpdaterGetAppInfoManifest()
         {
-            CheckIsInitialize("GetAppInfoManifest");
+            CheckIsInitialize("AppUpdaterGetAppInfoManifest");
             return AppVersionManager.AppInfo;
         }
 
@@ -251,7 +232,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <returns></returns>
         public static LighthouseConfig AppUpdaterGetLHConfig()
         {
-            CheckIsInitialize("GetLHConfig");
+            CheckIsInitialize("AppUpdaterGetLHConfig");
             return AppVersionManager.LHConfig;
         }
 
@@ -262,7 +243,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         public static string AppUpdaterGetChannel()
         {
             CheckIsInitialize("AppUpdaterGetChannel");
-            return AppVersionManager.Channel;
+            return AppUpdaterConfigManager.AppUpdaterConfig.channel;
         }
 
         /// <summary>
@@ -282,7 +263,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <returns></returns>
         public static string AppUpdaterGetServerUrl()
         {
-            CheckIsInitialize("GetServerUrl");
+            CheckIsInitialize("AppUpdaterGetServerUrl");
             return AppVersionManager.ServerUrl;
         }
 

@@ -14,6 +14,7 @@
 
 ***************************************************************/
 
+using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.Core.FSM;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
@@ -47,7 +48,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         private void PerformAppUpdate()
         {
             this.Target.State = AppUpdaterFsmOwner.AppUpdaterState.Runing;
-            if (Context.Config.skipAppUpdater)
+            var appUpdaterConfig = AppUpdaterConfigManager.AppUpdaterConfig;
+            if (appUpdaterConfig.skipAppUpdater)
             {
                 Context.AppendInfo("Skip app updater !");
                 this.Target.ChangeState<AppUpdateFinalState>();

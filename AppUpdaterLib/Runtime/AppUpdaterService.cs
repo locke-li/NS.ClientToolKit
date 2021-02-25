@@ -37,7 +37,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         #region Properties And Events
 
-        public AppUpdaterContext Context { private set; get; }
+        public AppUpdaterContext Context => mOwner?.Context;
 
         #endregion
 
@@ -49,30 +49,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.InitializeComponent();
         }
 
-        private void InitializeComponent()
+        public void InitializeComponent()
         {
-            this.GetAppUpdaterContext();
-            this.AddListeners();
+            this.CreateFSMOwner();
             this.InitOthers();
         }
 
-        private void GetAppUpdaterContext()
-        {
-            try
-            {
-                Context = AppUpdaterContext.Current;
-                if (this.Context != null && this._mStorageInfoProvider != null)
-                {
-                    this.Context.StorageInfoProvider = this._mStorageInfoProvider;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        private void AddListeners()
+        private void CreateFSMOwner()
         {
             this.mOwner = new AppUpdaterFsmOwner();
             this.mOwner.Init();
@@ -80,7 +63,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private void InitOthers()
         {
-            AppVersionManager.SetChannel(Context.Config.channel);
 #if DEBUG_APP_UPDATER
             this.gameObject.AddComponent<AppUpdaterDebugView>();
             Context.FetchDeviceStorageInfo();
@@ -160,12 +142,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public void Update()
         {
-            this.mOwner.Update();
+            this.mOwner?.Update();
         }
 
         private void OnApplicationFocus(bool hasFocus)
         {
-            IRoutedEventArgs arg = new RoutedEventArgs<bool>()
+            IRoutedEventArgs arg = new RoutedEventArgs<bool>
             {
                 EventType = (int)AppUpdaterInnerEventType.OnApplicationFocus,
                 arg = hasFocus
@@ -175,7 +157,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private void OnApplicationQuit()
         {
-            IRoutedEventArgs arg = new RoutedEventArgs()
+            IRoutedEventArgs arg = new RoutedEventArgs
             {
                 EventType = (int)AppUpdaterInnerEventType.OnApplicationQuit,
             };

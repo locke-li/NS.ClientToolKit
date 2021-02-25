@@ -52,7 +52,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         #region Inner FSM
 
-        public AppUpdaterContext Context => AppUpdaterContext.Current;
+        private AppUpdaterContext mContext;
+        public AppUpdaterContext Context => mContext;
 
         private StateMachine<AppUpdaterFsmOwner> mFSM;
         public StateMachine<AppUpdaterFsmOwner> FSM => mFSM;
@@ -66,14 +67,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         public void Init()
         {
             this.InitializeComponent();
+            this.CreateContext();
+            this.InitializeFSM();
         }
             
 
-        private void InitializeComponent() 
+        private void InitializeComponent()
         {
-            this.InitializeFSM();
+        }
 
-            this.AddListeners();
+        private void CreateContext()
+        {
+            mContext = new AppUpdaterContext();
         }
 
         private void InitializeFSM()

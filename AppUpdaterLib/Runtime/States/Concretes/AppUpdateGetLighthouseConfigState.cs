@@ -501,11 +501,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             mState = LogicState.RequestingHttpServer;
 
-            var sersveData = mCurrentLighthouseConfig.GetCurrentServerData();
-
-            Context.Requester.ReqGetVersion(sersveData, AppVersionManager.AppInfo.version,
+            var serverData = mCurrentLighthouseConfig.GetCurrentServerData();
+            var appUpdaterConfig = AppUpdaterConfigManager.AppUpdaterConfig;
+            Context.Requester.ReqGetVersion(serverData, AppVersionManager.AppInfo.version,
                 mCurrentLighthouseConfig.MetaData.lighthouseId,
-                Context.Config.channel,
+                appUpdaterConfig.channel,
                 mCurLighthouseFromTo,
                 info =>
                 {
