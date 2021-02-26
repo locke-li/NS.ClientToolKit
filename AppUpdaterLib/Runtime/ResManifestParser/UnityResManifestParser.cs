@@ -57,17 +57,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             return content;
         }
 
-        public override string GetRemotePath(FileDesc desc)
-        {
-            return desc.GetRNUTF8();
-        }
-
-        public override string GetLocalRoot(FileDesc desc)
-        {
-            //return AssetsFileSystem.AppUnityResLocalRoot;
-            return desc.N;
-        }
-
         public override void WriteToAppInfo(string resVersion, string resVersionNum = null)
         {
             AppVersionManager.AppInfo.unityDataResVersion = resVersion;

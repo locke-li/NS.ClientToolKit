@@ -92,47 +92,37 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// <returns></returns>
         public string GetCurrentVerisonFileUrl(FileServerType fileServerType = FileServerType.CDN)
         {
-            if (CurrentResVersionIdx >= this.ResVersions.Length || CurrentResVersionIdx < 0)
+            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.ResVersions.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
             {
-                throw new InvalidOperationException($"Get current version file url error ! CurrentResVersionIdx ：{CurrentResVersionIdx}");
+                throw new InvalidOperationException($"Get current version file url error ! CurrentResVersionIdx ：" +
+                                                    $"{this.ResUpdateTarget.CurrentResVersionIdx}");
             }
 
-            string url = $"{GetRemoteRootUrl(fileServerType)}/version_list/{this.ResVersions[CurrentResVersionIdx]}";
+            string url = $"{GetRemoteRootUrl(fileServerType)}/version_list/{this.ResUpdateTarget.ResVersions[this.ResUpdateTarget.CurrentResVersionIdx]}";
 
             return url;
         }
 
         public string GetCurrentVersionFileName()
         {
-            if (CurrentResVersionIdx >= this.ResVersions.Length || CurrentResVersionIdx < 0)
+            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.ResVersions.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
             {
                 return null;
             }
 
-            return this.ResVersions[CurrentResVersionIdx];
+            return this.ResUpdateTarget.ResVersions[this.ResUpdateTarget.CurrentResVersionIdx];
         }
 
         public string GetCurrentLocalVersionFileName()
         {
-            if (CurrentResVersionIdx >= this.LocalResFiles.Length || CurrentResVersionIdx < 0)
+            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.LocalResFiles.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
             {
                 return null;
             }
 
-            return this.LocalResFiles[CurrentResVersionIdx];
+            return this.ResUpdateTarget.LocalResFiles[this.ResUpdateTarget.CurrentResVersionIdx];
         }
-        public string GetCurUnityResManifestName(string version)
-        {
-            string manifestName = $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}";
-
-            return manifestName;
-        }
-
-        public string GetCurDataResManifestName(string version)
-        {
-            string manifestName = $"res_data.json{CommonConst.WellNumUtf8}{version}";
-            return manifestName;
-        }
+        
 
         public string GetCurrentLanguageName()
         {
@@ -161,15 +151,49 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public void SaveAppRevision()
         {
-            if (!string.IsNullOrEmpty(this.TargetResVersionNum))
+            if (!string.IsNullOrEmpty(this.ResUpdateTarget.TargetResVersionNum))
             {
                 Version version = new Version(AppVersionManager.AppInfo.version);
-                version.Patch = this.TargetResVersionNum;
+                version.Patch = this.ResUpdateTarget.TargetResVersionNum;
                 AppVersionManager.AppInfo.version = version.GetVersionString();
             }
             AppVersionManager.SaveCurrentAppInfo();
         }
 
+
+        private string GetCurUnityResManifestName(string version)
+        {
+            string manifestName = $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}";
+
+            return manifestName;
+        }
+
+        private string GetCurDataResManifestName(string version)
+        {
+            string manifestName = $"res_data.json{CommonConst.WellNumUtf8}{version}";
+            return manifestName;
+        }
+
+        public string GetResManifestName(UpdateResourceType type , string version)
+        {
+            if (type == UpdateResourceType.UnKnow)
+            {
+                throw new ArgumentException($"Method : AppUpdaterContext.GetResManifestName type : {type} .");
+            }
+            else if(type == UpdateResourceType.TableData)
+            {
+                return this.GetCurDataResManifestName(version);
+            }
+            else
+            {
+                return this.GetCurUnityResManifestName(version);
+            }
+        }
+
+        public bool HasResNeedUpdate()
+        {
+            return this.ResUpdateTarget.ResVersions.Length == 0;
+        }
 
     }
 

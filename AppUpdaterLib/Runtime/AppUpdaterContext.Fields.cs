@@ -16,7 +16,6 @@
 
 using System;
 using System.Text;
-using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.Helps;
 using CenturyGame.AppUpdaterLib.Runtime.Interfaces;
 using CenturyGame.AppUpdaterLib.Runtime.Protocols;
@@ -95,6 +94,70 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     {
         public ResSyncMode Mode = ResSyncMode.FULL;
 
+        public AppUpdaterFileUpdateRuleFilter Filter;
+    }
+
+    internal class VersionDesc
+    {
+        public UpdateResourceType Type = UpdateResourceType.UnKnow;
+
+        public string Md5;
+
+        public bool IsSameVersion(VersionDesc desc)
+        {
+            return this.Md5 == desc.Md5;
+        }
+    }
+
+
+    internal class ResUpdateTarget
+    {
+        /// <summary>
+        ///  目标资源版本号 
+        /// </summary>
+        public static readonly string[] DefaultResVersionNums = new string[0];
+        public string[] ResVersionNums = DefaultResVersionNums;
+
+        /// <summary>
+        /// 本地资源版本号
+        /// </summary>
+        public static readonly string[] DefaultLocalResVersionNums = new string[0];
+        public string[] LocalResVersionNums = DefaultLocalResVersionNums;
+
+
+        public static readonly string[] DefaultResVersions = new string[0];
+        /// <summary>
+        /// 目标版本清单名
+        /// </summary>
+        public string[] ResVersions = DefaultResVersions;
+
+        public static readonly string[] DefaultLocalResFiles = new string[0];
+        /// <summary>
+        /// 本地清单名列表
+        /// </summary>
+        public string[] LocalResFiles = DefaultLocalResFiles;
+
+        public static readonly BaseResManifestParser[] DefaultResVersionParsers = new BaseResManifestParser[0];
+        public BaseResManifestParser[] ResVersionParsers = DefaultResVersionParsers;
+
+        public static readonly int DefaultResVerisonIdx = -1;
+        /// <summary>
+        /// 当前更新的资源版本相对于ResVersions的索引
+        /// </summary>
+        public int CurrentResVersionIdx = DefaultResVerisonIdx;
+
+        /// <summary>
+        /// 资源目标版本号，即目标Patch
+        /// </summary>
+        public string TargetResVersionNum = string.Empty;
+
+        public void Clear()
+        {
+            this.ResVersions = DefaultResVersions;
+            this.LocalResFiles = DefaultLocalResFiles;
+            this.ResVersionParsers = DefaultResVersionParsers;
+            this.CurrentResVersionIdx = DefaultResVerisonIdx;
+        }
 
     }
 
@@ -158,56 +221,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public IAppUpdaterRequester Requester { set; get; }
 
-        #endregion
-
-        #region Resource update
-
-        public static readonly string[] DefaultResVersions = new string[0];
-        /// <summary>
-        /// 目标版本清单名
-        /// </summary>
-        public string[] ResVersions = DefaultResVersions;
-
-        /// <summary>
-        ///  目标资源版本号 
-        /// </summary>
-        public static readonly string[] DefaultResVersionNums = new string[0];
-        public string[] ResVersionNums = DefaultResVersionNums;
-
-        /// <summary>
-        /// 本地资源版本号
-        /// </summary>
-        public static readonly string[] DefaultLocalResVersionNums = new string[0];
-        public string[] LocalResVersionNums = DefaultLocalResVersionNums;
-
-
-        public static readonly string[] DefaultLocalResFiles = new string[0];
-        /// <summary>
-        /// 本地清单名列表
-        /// </summary>
-        public string[] LocalResFiles = DefaultLocalResFiles;
-
-        public static readonly BaseResManifestParser[] DefaultResVersionParsers = new BaseResManifestParser[0];
-        public BaseResManifestParser[] ResVersionParsers = DefaultResVersionParsers;
-
-        public static readonly int DefaultResVerisonIdx = -1;
-        /// <summary>
-        /// 当前更新的资源版本相对于ResVersions的索引
-        /// </summary>
-        public int CurrentResVersionIdx = DefaultResVerisonIdx;
-
-        /// <summary>
-        /// 资源目标版本号，即目标Patch
-        /// </summary>
-        public string TargetResVersionNum = string.Empty;
-
         public LighthouseConfigDownloader LighthouseConfigDownloader = null;
-
-        //public RemoteFileDownloader RemoteFileDownloader = null;
 
         public IStorageInfoProvider StorageInfoProvider = null;
 
         public DiskInfo DiskInfo = new DiskInfo();
+
+        public ResUpdateConfig ResUpdateConfig = new ResUpdateConfig();
+
+        public ResUpdateTarget ResUpdateTarget = new ResUpdateTarget();
+
+        #endregion
+
 
         public void Clear()
         {
@@ -225,18 +250,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.IsFirstRun = false;
             this.GetVersionResponseInfo = null;
 
-            this.ResVersions = DefaultResVersions;
-            this.LocalResFiles = DefaultLocalResFiles;
-            this.ResVersionParsers = DefaultResVersionParsers;
-            this.CurrentResVersionIdx = DefaultResVerisonIdx;
+            this.ResUpdateTarget.Clear();
 
             this.LighthouseConfigDownloader?.Clear();
-            //this.RemoteFileDownloader?.Clear();
             this.DiskInfo.Clear();
         }
 
 #if DEBUG_APP_UPDATER
-      
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -250,7 +271,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             sb.AppendLine($"当前已下载的文件数量 : {this.ProgressData.CurrentDownloadFileCount}");
             sb.AppendLine($"当前已下载的文件大小 : {this.ProgressData.CurrentDownloadSize}");
             sb.AppendLine($"当前下载的总时长 : {this.ProgressData.CurrentDownloadFileTotalTime}");
-            
+
             if (this.DiskInfo.IsGetReady)
             {
                 sb.AppendLine($"Last fetch disk info time : {this.DiskInfo.time:yyyy_MM_dd-HH_mm_ss.fff}");
@@ -279,9 +300,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                     return "未知";
             }
         }
-
 #endif
-#endregion
 
     }
 }

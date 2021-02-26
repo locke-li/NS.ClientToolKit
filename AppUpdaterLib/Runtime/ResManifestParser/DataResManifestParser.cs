@@ -56,23 +56,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
             return content;
         }
 
-        public override string GetRemotePath(FileDesc desc)
-        {
-            return desc.GetRNUTF8();
-        }
-
-        public override string GetLocalRoot(FileDesc desc)
-        {
-            if (AppUpdaterHints.Instance.LowerLuaName)
-            {
-                return $"lua/gen/{desc.N.ToLower()}";
-            }
-            else
-            {
-                return $"lua/gen/{desc.N}";
-            }
-        }
-
         public override void WriteToAppInfo(string resVersion , string resVersionNum = null)
         {
             AppVersionManager.AppInfo.dataResVersion = resVersion;

@@ -144,6 +144,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return this.mOwner.State == AppUpdaterFsmOwner.AppUpdaterState.Done;
         }
 
+        public void SetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        {
+            this.mOwner.SetFileUpdateRuleFilter(filter);
+        }
+
         #region Unity Callbacks
 
         public void Update()

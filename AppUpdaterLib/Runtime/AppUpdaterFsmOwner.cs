@@ -50,6 +50,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         private AppUpdaterCallBacks mCallBacks = new AppUpdaterCallBacks();
 
+        private AppUpdaterFileUpdateRuleFilter _fileUpdateRuleFilter = null;
+
         #region Inner FSM
 
         private AppUpdaterContext _mContext = new AppUpdaterContext();
@@ -119,6 +121,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             {
                 this.ManualStartAppUpdate();
             }
+        }
+
+
+        public void SetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        {
+            this._fileUpdateRuleFilter = filter;
         }
 
         public void ManualStartAppUpdate()

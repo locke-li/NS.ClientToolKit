@@ -183,7 +183,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 return;
             }
             
-            Context.TargetResVersionNum = Context.GetVersionResponseInfo.update_detail.ResVersionNum;
+            Context.ResUpdateTarget.TargetResVersionNum = Context.GetVersionResponseInfo.update_detail.ResVersionNum;
             string unityDataResVersion = null;
 
 #if UNITY_ANDROID
@@ -199,7 +199,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             if (AppVersionManager.AppInfo.unityDataResVersion != unityDataResVersion)
             {
-                resList.Add(Context.GetCurUnityResManifestName(unityDataResVersion));
+                //resList.Add(Context.GetCurUnityResManifestName(unityDataResVersion));
                 resVersionList.Add(unityDataResVersion);
                 localResVersionList.Add(AppVersionManager.AppInfo.unityDataResVersion);
                 localResFileNameList.Add(AssetsFileSystem.UnityResManifestName);
@@ -211,7 +211,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 if (AppVersionManager.AppInfo.dataResVersion !=
                     Context.GetVersionResponseInfo.update_detail.DataVersion)
                 {
-                    resList.Add(Context.GetCurDataResManifestName(Context.GetVersionResponseInfo.update_detail.DataVersion));
+                    //resList.Add(Context.GetCurDataResManifestName(Context.GetVersionResponseInfo.update_detail.DataVersion));
                     resVersionList.Add(Context.GetVersionResponseInfo.update_detail.DataVersion);
                     localResVersionList.Add(AppVersionManager.AppInfo.dataResVersion);
                     localResFileNameList.Add(AssetsFileSystem.AppDataResManifestName);
@@ -219,11 +219,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 }
             }
 
-            Context.ResVersions = resList.ToArray();
-            Context.ResVersionNums = resVersionList.ToArray();
-            Context.LocalResVersionNums = localResVersionList.ToArray(); 
-            Context.ResVersionParsers = parsers.ToArray();
-            Context.LocalResFiles = localResFileNameList.ToArray();
+            Context.ResUpdateTarget.ResVersions = resList.ToArray();
+            Context.ResUpdateTarget.ResVersionNums = resVersionList.ToArray();
+            Context.ResUpdateTarget.LocalResVersionNums = localResVersionList.ToArray(); 
+            Context.ResUpdateTarget.ResVersionParsers = parsers.ToArray();
+            Context.ResUpdateTarget.LocalResFiles = localResFileNameList.ToArray();
             this.StartUpdateRes();
         }
 
@@ -250,7 +250,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         private void StartUpdateRes()
         {
             this.SetTargetVersionInfo();
-            if (Context.ResVersions.Length == 0)
+            if (Context.ResUpdateTarget.ResVersions.Length == 0)
             {
                 Context.AppendInfo("The game resource is not change , enter game direct!");
                 Logger.Info("The game resource is not change , enter game direct!");
@@ -259,7 +259,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Context.AppendInfo($"The resource group that you needed to update has {Context.ResVersions.Length} files to update , startup update the game resource . ");
+                Context.AppendInfo($"The resource group that you needed to update has {Context.ResUpdateTarget.ResVersions.Length} files to update , startup update the game resource . ");
                 IRoutedEventArgs arg = new RoutedEventArgs()
                 {
                     EventType = (int)AppUpdaterInnerEventType.StartPerformResUpdateOperation

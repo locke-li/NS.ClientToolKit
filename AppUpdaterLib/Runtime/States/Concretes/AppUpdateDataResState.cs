@@ -151,7 +151,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             string url = Context.GetCurrentVerisonFileUrl(this.mCurFileServerType);
             Logger.Info($"Start request remote resource manifest {url} .");
 
-            Context.AppendInfo($"Res current version : {Context.LocalResVersionNums[Context.CurrentResVersionIdx]} target version : {Context.ResVersionNums[Context.CurrentResVersionIdx]}");
+            Context.AppendInfo($"Res current version : {Context.ResUpdateTarget.LocalResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]} target version : {Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]}");
             Context.AppendInfo($"Current resource group name is {Context.GetCurrentLocalVersionFileName()} .");
 
             this.mCurState = InnerState.RequestingManifest;
@@ -176,8 +176,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             {
                 string resManifestContent = System.Text.Encoding.UTF8.GetString(netData);
 
-                var version = Context.ResVersions[Context.CurrentResVersionIdx];
-                this.mCurManifestParser = Context.ResVersionParsers[Context.CurrentResVersionIdx];
+                var version = Context.ResUpdateTarget.ResVersions[Context.ResUpdateTarget.CurrentResVersionIdx];
+                this.mCurManifestParser = Context.ResUpdateTarget.ResVersionParsers[Context.ResUpdateTarget.CurrentResVersionIdx];
                 Context.ProgressData.CurrentUpdateResourceType = this.mCurManifestParser.GetUpdateResourceType();
 
                 Logger.InfoFormat("veriosn : {0} , parser : {1} .",version, this.mCurManifestParser.GetType().Name);
@@ -225,11 +225,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             Logger.Info($"Start calculate resource difference !");
             this.mCurState = InnerState.CalculatingResDiff;
 
-            var localResManifestContents= AppVersionManager.LoadLocalResManifestContents(Context.LocalResFiles[Context.CurrentResVersionIdx]);
+            var localResManifestContents= AppVersionManager.LoadLocalResManifestContents(Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx]);
 
             if (string.IsNullOrEmpty(localResManifestContents))
             {
-                throw new FileNotFoundException(Context.LocalResFiles[Context.CurrentResVersionIdx]);
+                throw new FileNotFoundException(Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx]);
             }
 
             try
@@ -355,7 +355,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (this.CheckDownloadOperationIsCompleted())
                 {
-                    Context.AppendInfo($"Current resource version update to \"{Context.ResVersionNums[Context.CurrentResVersionIdx]}\".");
+                    Context.AppendInfo($"Current resource version update to \"{Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]}\".");
                     Logger.Info($"Update manifest that name is {Context.GetCurrentVersionFileName()} is success!");
                     this.mCurFileDownLoadState = FileDownLoadState.Idle;
                     this.mCurState = InnerState.ResUpdateCompleted;
@@ -474,13 +474,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
         private void SaveCurrentConfig(bool updateVerisonNum = true)
         {
-            string curManifestName = Context.LocalResFiles[Context.CurrentResVersionIdx];
+            string curManifestName = Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx];
             var json = this.mCurManifestParser.Serialize(this.mLocalManifest);
             AppVersionManager.SaveToLocalDataResManifest(json, curManifestName);
 
             if (updateVerisonNum)
             {
-                this.mCurManifestParser.WriteToAppInfo(Context.ResVersionNums[Context.CurrentResVersionIdx], Context.TargetResVersionNum);
+                this.mCurManifestParser.WriteToAppInfo(Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx], Context.ResUpdateTarget.TargetResVersionNum);
             }
         }
 

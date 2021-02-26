@@ -166,6 +166,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             s_mService.SetStorageInfoProvider(provider);
         }
 
+        public static void AppUpdaterSetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        {
+            CheckIsInitialize("AppUpdaterSetFileUpdateRuleFilter");
+            s_mService.SetFileUpdateRuleFilter(filter);
+        }
+
         /// <summary>
         /// 获取热更新进度数据
         /// </summary>

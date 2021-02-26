@@ -43,8 +43,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
         private void CheckResUpdateWasDone()
         {
-            Context.CurrentResVersionIdx++;
-            if (Context.CurrentResVersionIdx == Context.ResVersions.Length)// Resource update was Done!
+            Context.ResUpdateTarget.CurrentResVersionIdx++;
+            if (Context.ResUpdateTarget.CurrentResVersionIdx == Context.ResUpdateTarget.ResVersions.Length)// Resource update was Done!
             {
                 this.Target.ChangeState<AppUpdateCompletedState>();
             }
