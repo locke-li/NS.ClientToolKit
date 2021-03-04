@@ -373,56 +373,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (result > Version.VersionCompareResult.Equal)
                 {
-                    try
-                    {
-                        bool hasRetainedDataFolderName = string.IsNullOrEmpty(this.Target.RetainedDataFolderName);
-                        var pureRetainedDataFolderName = this.Target.RetainedDataFolderName;
-                        if (hasRetainedDataFolderName)
-                        {
-                            if (pureRetainedDataFolderName.StartsWith("/"))
-                                pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(1);
-                            if (pureRetainedDataFolderName.EndsWith("/"))
-                                pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(0, pureRetainedDataFolderName.Length - 1);
-                        }
-
-                        //Delete directories
-                        var lastVersionDirs = Directory.GetDirectories(AssetsFileSystem.RootFolder);
-                        foreach (var dir in lastVersionDirs)
-                        {
-                            var dirName = dir.Replace(@"\", "/");
-                            int idx = dirName.LastIndexOf("/");
-                            if (idx != -1)
-                            {
-                                dirName = dirName.Substring(idx + 1);
-                            }
-                            if (!string.Equals(dirName, pureRetainedDataFolderName))
-                            {
-                                Logger.Debug($"Deleting dirrectory that name is \"{dirName}\".");
-                                if (Directory.Exists(dir))
-                                {
-                                    Directory.Delete(dir, true);
-                                }
-                            }
-                        }
-
-                        var lastVersionFiles = Directory.GetFiles(AssetsFileSystem.RootFolder, "*.*");
-
-                        foreach (var fileName in lastVersionFiles)
-                        {
-                            Logger.Debug($"Deleting file that name is \"{fileName}\".");
-                            if (File.Exists(fileName))
-                                File.Delete(fileName);
-                        }
-                        Logger.Info($"Clear external app folder that name is \"{AssetsFileSystem.RootFolder}\" completed!");
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Fatal($"Error message : {ex.Message} \n StackTrace : {ex.StackTrace}");
-                        Context.ErrorType = AppUpdaterErrorType.DeleteExternalStorageFilesFailure;
-                        this.mState = LogicState.ReqLighthouseConfigFailure;
-                        return;
-                    }
-                    
+                    this.ClearExternalStorage();
                     Logger.Info("Make built appinfo as current!");
                     AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
                 }
@@ -445,6 +396,87 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
             }
             this.mState = LogicState.ReqLighthouseConfig;
+        }
+
+        private void ClearExternalStorage()
+        {
+            try
+            {
+                bool hasRetainedDataFolderName = this.Target.RetainedDataFolderNameList.Count > 0;
+                var pureRetainedDataFolderNameList = this.Target.RetainedDataFolderNameList;
+                if (hasRetainedDataFolderName)
+                {
+                    for (var i = 0; i < pureRetainedDataFolderNameList.Count; i++)
+                    {
+                        var pureRetainedDataFolderName = pureRetainedDataFolderNameList[i];
+                        if (pureRetainedDataFolderName.StartsWith("/"))
+                            pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(1);
+                        if (pureRetainedDataFolderName.EndsWith("/"))
+                            pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(0, pureRetainedDataFolderName.Length - 1);
+                        pureRetainedDataFolderNameList[i] = pureRetainedDataFolderName;
+                    }
+                }
+
+                //Delete directories
+                var lastVersionDirs = Directory.GetDirectories(AssetsFileSystem.RootFolder);
+                foreach (var dir in lastVersionDirs)
+                {
+                    if (hasRetainedDataFolderName)
+                    {
+                        var dirName = dir.Replace(@"\", "/");
+                        int idx = dirName.LastIndexOf("/", StringComparison.Ordinal);
+                        if (idx != -1)
+                        {
+                            dirName = dirName.Substring(idx + 1);
+                        }
+
+                        bool isDirInRetainedList = false;
+                        foreach (var pureRetainedDataFolderName in pureRetainedDataFolderNameList)
+                        {
+                            if (string.Equals(dirName, pureRetainedDataFolderName))
+                            {
+                                isDirInRetainedList = true;
+                                break;
+                            }
+                        }
+
+                        if (!isDirInRetainedList)
+                        {
+                            Logger.Debug($"Deleting dirrectory that name is \"{dirName}\".");
+                            if (Directory.Exists(dir))
+                            {
+                                Directory.Delete(dir, true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Directory.Exists(dir))
+                        {
+                            Directory.Delete(dir, true);
+                        }
+                    }
+
+                }
+
+                var lastVersionFiles = Directory.GetFiles(AssetsFileSystem.RootFolder, "*.*");
+
+                foreach (var fileName in lastVersionFiles)
+                {
+                    Logger.Debug($"Deleting file that name is \"{fileName}\".");
+                    if (File.Exists(fileName))
+                        File.Delete(fileName);
+                }
+                Logger.Info($"Clear external app folder that name is \"{AssetsFileSystem.RootFolder}\" completed!");
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal($"Error message : {ex.Message} \n StackTrace : {ex.StackTrace}");
+                Context.ErrorType = AppUpdaterErrorType.DeleteExternalStorageFilesFailure;
+                this.mState = LogicState.ReqLighthouseConfigFailure;
+                return;
+            }
+
         }
 
         #endregion

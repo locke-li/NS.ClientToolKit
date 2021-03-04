@@ -15,6 +15,7 @@
 ***************************************************************/
 
 using System;
+using System.Collections.Generic;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
 using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.AppUpdaterLib.Runtime.States.Concretes;
@@ -55,8 +56,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// <summary>
         /// 资源的保留目录，此目录在app覆盖安装后不会删除，用于多文件环境下的游戏中的更新
         /// </summary>
-        private string _retainedDataFolderName = string.Empty;
-        public string RetainedDataFolderName => _retainedDataFolderName;
+        private List<string> _retainedDataFolderNameList = new List<string>();
+        public List<string> RetainedDataFolderNameList => _retainedDataFolderNameList;
 
         private static readonly UnityResManifestParser UnityManifestParser = new UnityResManifestParser();
 
@@ -147,7 +148,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         
         public void SetRetainedDataFolderName(string name)
         {
-            this._retainedDataFolderName = name;
+            this._retainedDataFolderNameList.Add(name);
         }
 
         public void StartDownloadPartialDataRes()
