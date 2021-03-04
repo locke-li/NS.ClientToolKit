@@ -166,10 +166,23 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             s_mService.SetStorageInfoProvider(provider);
         }
 
-        public static void AppUpdaterSetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        /// <summary>
+        /// 绑定文件更新过滤器
+        /// </summary>
+        /// <param name="filter">文件更新过滤器</param>
+        public static void AppUpdaterBindFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
         {
-            CheckIsInitialize("AppUpdaterSetFileUpdateRuleFilter");
-            s_mService.SetFileUpdateRuleFilter(filter);
+            CheckIsInitialize("AppUpdaterBindFileUpdateRuleFilter");
+            s_mService.BindFileUpdateRuleFilter(filter);
+        }
+
+        /// <summary>
+        /// 解绑文件更新过滤器
+        /// </summary>
+        public static void AppUpdaterUnBindFileUpdateRuleFilter()
+        {
+            CheckIsInitialize("AppUpdaterUnBindFileUpdateRuleFilter");
+            s_mService.UnBindFileUpdateRuleFilter();
         }
 
         /// <summary>
@@ -189,6 +202,30 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         {
             CheckIsInitialize("AppUpdaterStartUpdateAgain");
             s_mService.StartUpdateAgain();
+        }
+
+        /// <summary>
+        /// 设置需要保留的文件夹名（相对于外部资源目录）
+        /// 用于在安装高版本后，设定不必删除的资源文件夹（一般这些目录的资源非常大，比如视频，在覆盖安装app后，不必将这些文件删除掉并重新下载）
+        /// </summary>
+        /// <param name="name">
+        /// 需要保留的文件夹名
+        /// 注意：目前只支持在资源根目录下，比如：此目录为"assets/effects",其中"assets"为资源根目录，则name为"effects"时，当内建版本
+        /// 大于外部记录的版本号时，清理老文件的时候会保留effects目录的内容
+        /// </param>
+        public static void AppUpdaterSetRetainedDataFolderName(string name)
+        {
+            CheckIsInitialize("AppUpdaterSetRetainedDataFolderName");
+            s_mService.SetRetainedDataFolderName(name);
+        }
+
+        /// <summary>
+        /// 开始更新子资源
+        /// </summary>
+        public static void AppUpdaterStartDownloadPartialDataRes()
+        {
+            CheckIsInitialize("AppUpdaterStartDownloadPartialDataRes");
+            s_mService.StartDownloadPartialDataRes();
         }
 
         /// <summary>

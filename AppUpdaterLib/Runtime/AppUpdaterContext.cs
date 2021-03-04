@@ -92,37 +92,85 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// <returns></returns>
         public string GetCurrentVerisonFileUrl(FileServerType fileServerType = FileServerType.CDN)
         {
-            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.ResVersions.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
-            {
-                throw new InvalidOperationException($"Get current version file url error ! CurrentResVersionIdx ：" +
-                                                    $"{this.ResUpdateTarget.CurrentResVersionIdx}");
-            }
-
-            string url = $"{GetRemoteRootUrl(fileServerType)}/version_list/{this.ResUpdateTarget.ResVersions[this.ResUpdateTarget.CurrentResVersionIdx]}";
+            string url = $"{GetRemoteRootUrl(fileServerType)}/version_list/{GetCurrentRemoteVersionFileName()}";
 
             return url;
         }
 
-        public string GetCurrentVersionFileName()
+        private VersionDesc GetCurrentVersionDesc()
         {
-            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.ResVersions.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
+            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.VersionDescs.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
             {
-                return null;
+                throw new IndexOutOfRangeException($"CurrentResVersionIdx ：{this.ResUpdateTarget.CurrentResVersionIdx} .");
             }
 
-            return this.ResUpdateTarget.ResVersions[this.ResUpdateTarget.CurrentResVersionIdx];
+            var curVersionDesc = this.ResUpdateTarget.VersionDescs[this.ResUpdateTarget.CurrentResVersionIdx];
+            return curVersionDesc;
+        }
+
+        public string GetCurrentLocalMd5()
+        {
+            var versionDesc = GetCurrentVersionDesc();
+
+            return versionDesc.LocalMd5;
+        }
+
+        public string GetCurrentRemoteMd5()
+        {
+            var versionDesc = GetCurrentVersionDesc();
+
+            return versionDesc.RemoteMd5;
+        }
+
+        public UpdateResourceType GetCurrentUpdateType()
+        {
+            var versionDesc = GetCurrentVersionDesc();
+
+            return versionDesc.Type;
+        }
+
+        private static string GetResManifestName(string version, UpdateResourceType type = UpdateResourceType.TableData, bool remote = true)
+        {
+            if (type == UpdateResourceType.TableData)
+            {
+                return remote ? $"res_data.json{CommonConst.WellNumUtf8}{version}"
+                    : "res_data.json";
+            }
+            else
+            {
+                return remote ? $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}"
+                    : $"res_{Utility.GetPlatformName().ToLower()}.json";
+            }
+        }
+
+        private string GetCurrentRemoteVersionFileName()
+        {
+            var curVersionInfo = GetCurrentVersionDesc();
+
+            return GetResManifestName(curVersionInfo.RemoteMd5 , curVersionInfo.Type);
         }
 
         public string GetCurrentLocalVersionFileName()
         {
-            if (this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.LocalResFiles.Length || this.ResUpdateTarget.CurrentResVersionIdx < 0)
-            {
-                return null;
-            }
+            var curVersionInfo = GetCurrentVersionDesc();
 
-            return this.ResUpdateTarget.LocalResFiles[this.ResUpdateTarget.CurrentResVersionIdx];
+            return GetResManifestName(curVersionInfo.LocalMd5, curVersionInfo.Type, false);
         }
-        
+
+
+        public bool IsNeedUpdate()
+        {
+            if (this.ResUpdateTarget.VersionDescs == null)
+            {
+                return false;
+            }
+            return this.ResUpdateTarget.VersionDescs.Length == 0;
+        }
+
+        public bool IsUpdateCompleted()
+        {
+            return this.ResUpdateTarget.CurrentResVersionIdx >= this.ResUpdateTarget.VersionDescs.Length;
+        }
 
         public string GetCurrentLanguageName()
         {
@@ -159,42 +207,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
             AppVersionManager.SaveCurrentAppInfo();
         }
-
-
-        private string GetCurUnityResManifestName(string version)
-        {
-            string manifestName = $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}";
-
-            return manifestName;
-        }
-
-        private string GetCurDataResManifestName(string version)
-        {
-            string manifestName = $"res_data.json{CommonConst.WellNumUtf8}{version}";
-            return manifestName;
-        }
-
-        public string GetResManifestName(UpdateResourceType type , string version)
-        {
-            if (type == UpdateResourceType.UnKnow)
-            {
-                throw new ArgumentException($"Method : AppUpdaterContext.GetResManifestName type : {type} .");
-            }
-            else if(type == UpdateResourceType.TableData)
-            {
-                return this.GetCurDataResManifestName(version);
-            }
-            else
-            {
-                return this.GetCurUnityResManifestName(version);
-            }
-        }
-
-        public bool HasResNeedUpdate()
-        {
-            return this.ResUpdateTarget.ResVersions.Length == 0;
-        }
-
+        
     }
 
 }

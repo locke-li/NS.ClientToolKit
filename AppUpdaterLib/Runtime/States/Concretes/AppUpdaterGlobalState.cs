@@ -34,8 +34,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 case AppUpdaterInnerEventType.StartPerformResUpdateOperation:
                     this.CheckResUpdateWasDone();
                     return true;
-                //case AppUpdaterInnerEventType.OnApplicationFocus:
-                //    return this.AppFocusHandleCallback(in eventArgs);
+                case AppUpdaterInnerEventType.StartPerformResPartialUpdateOperation:
+                    this.Target.ChangeState<AppUpdatePartialDataDownloadState>();
+                    return true;
             }
             return base.OnMessage(entity, in eventArgs);
         }
@@ -44,7 +45,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         private void CheckResUpdateWasDone()
         {
             Context.ResUpdateTarget.CurrentResVersionIdx++;
-            if (Context.ResUpdateTarget.CurrentResVersionIdx == Context.ResUpdateTarget.ResVersions.Length)// Resource update was Done!
+            if (Context.IsUpdateCompleted())// Resource update was Done!
             {
                 this.Target.ChangeState<AppUpdateCompletedState>();
             }
@@ -64,9 +65,5 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             this.Target.HandleMessage(in arg);
         }
 
-        //private bool AppFocusHandleCallback(in IRoutedEventArgs arg)
-        //{
-        //    return false;
-        //}
     }
 }

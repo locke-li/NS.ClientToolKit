@@ -144,9 +144,32 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             return this.mOwner.State == AppUpdaterFsmOwner.AppUpdaterState.Done;
         }
 
-        public void SetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        public void BindFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
         {
-            this.mOwner.SetFileUpdateRuleFilter(filter);
+            this.mOwner.BindFileUpdateRuleFilter(filter);
+        }
+
+        public void UnBindFileUpdateRuleFilter()
+        {
+            this.mOwner.UnBindFileUpdateRuleFilter();
+        }
+
+        public void SetRetainedDataFolderName(string name)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException(nameof(name));
+            s_mLogger.Value?.Debug($"Set retained data folder name : \"{name}\" .");
+            this.mOwner.SetRetainedDataFolderName(name);
+        }
+
+        public void StartDownloadPartialDataRes()
+        {
+            if (Context.IsFirstRun)
+            {
+                s_mLogger.Value?.Warn("Please call mathod that name is \"StartUpdate\" , because the appupdater is not running yet!");
+                return;
+            }
+            this.mOwner.StartDownloadPartialDataRes();
         }
 
         #region Unity Callbacks

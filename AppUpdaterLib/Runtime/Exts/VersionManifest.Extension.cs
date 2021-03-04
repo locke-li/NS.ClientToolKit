@@ -47,16 +47,29 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mDicIsInitialized = true;
         }
 
-        public List<FileDesc> CalculateDifference(VersionManifest other)
+        public List<FileDesc> CalculateDifference(VersionManifest other,ResSyncMode mode = ResSyncMode.FULL , AppUpdaterFileUpdateRuleFilter filter = null)
         {
+            if (mode == ResSyncMode.SUB_GROUP && filter == null)
+            {
+                throw new ArgumentNullException("filter");
+            }
             this.InitDic();
             List<FileDesc> diff = null;
 
             foreach (var fileDesc in other.Datas)
             {
-                if (this.mFileDscsDic.TryGetValue(fileDesc.N,out var desc))
+                if (mode == ResSyncMode.FULL)
                 {
-                    if (String.Compare(desc.H, fileDesc.H, StringComparison.Ordinal) != 0)
+                    if (this.mFileDscsDic.TryGetValue(fileDesc.N, out var desc))
+                    {
+                        if (String.Compare(desc.H, fileDesc.H, StringComparison.Ordinal) != 0)
+                        {
+                            if (diff == null)
+                                diff = new List<FileDesc>();
+                            diff.Add(fileDesc);
+                        }
+                    }
+                    else
                     {
                         if (diff == null)
                             diff = new List<FileDesc>();
@@ -65,15 +78,46 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                 }
                 else
                 {
-                    if(diff == null)
-                        diff = new List<FileDesc>();
-                    diff.Add(fileDesc);
+                    if (mode == ResSyncMode.LOCAL)
+                    {
+                        if (this.mFileDscsDic.TryGetValue(fileDesc.N, out var desc))
+                        {
+                            if (String.Compare(desc.H, fileDesc.H, StringComparison.Ordinal) != 0)
+                            {
+                                if (diff == null)
+                                    diff = new List<FileDesc>();
+                                diff.Add(fileDesc);
+                            }
+                        }
+                    }
+                    else if(mode == ResSyncMode.SUB_GROUP)//游戏中更新某个文件夹
+                    {
+                        if (filter(ref fileDesc.RN))
+                        {
+                            continue;
+                        }
+
+                        if (this.mFileDscsDic.TryGetValue(fileDesc.N, out var desc))
+                        {
+                            if (String.Compare(desc.H, fileDesc.H, StringComparison.Ordinal) != 0)
+                            {
+                                if (diff == null)
+                                    diff = new List<FileDesc>();
+                                diff.Add(fileDesc);
+                            }
+                        }
+                        else
+                        {
+                            if (diff == null)
+                                diff = new List<FileDesc>();
+                            diff.Add(fileDesc);
+                        }
+                    }
                 }
             }
 
             return diff;
         }
-
 
         public void UpdateInnerFile(FileDesc desc)
         {

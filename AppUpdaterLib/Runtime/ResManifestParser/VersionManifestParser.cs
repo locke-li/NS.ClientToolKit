@@ -68,7 +68,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.ResManifestParser
                 var val = doc[key].str;
                 var splitStrs = val.Split(wellNumChar);
 
-                var remoteName = splitStrs[0];
+                //var remoteName = splitStrs[0];
                 var size = Convert.ToInt32(splitStrs[1]);
                 var hash = splitStrs[2];
                 

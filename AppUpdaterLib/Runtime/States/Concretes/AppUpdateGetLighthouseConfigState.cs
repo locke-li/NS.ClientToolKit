@@ -31,16 +31,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             Idle,
 
             /// <summary>
-            ///     请求Lighthouse配置
-            /// </summary>
-            ReqLighthouseConfig,
-
-            /// <summary>
-            ///     请求Lighthouse配置中
-            /// </summary>
-            RequestingLighthouseConfig,
-
-            /// <summary>
             /// 加载app的版本信息
             /// </summary>
             LoadAppVerisonInfo,
@@ -49,6 +39,16 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             /// 正在加载app版本信息
             /// </summary>
             LoadingAppVerisonInfo,
+
+            /// <summary>
+            ///     请求Lighthouse配置
+            /// </summary>
+            ReqLighthouseConfig,
+
+            /// <summary>
+            ///     请求Lighthouse配置中
+            /// </summary>
+            RequestingLighthouseConfig,
 
             /// <summary>
             /// 检查本地资源清单
@@ -163,7 +163,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             if (Context.LighthouseConfigDownloader == null)
                 Context.LighthouseConfigDownloader = new LighthouseConfigDownloader(Context, Target.Request);
 
-            mState = LogicState.ReqLighthouseConfig;
+            mState = LogicState.LoadAppVerisonInfo;
         }
 
         public override void Execute(AppUpdaterFsmOwner entity)
@@ -175,11 +175,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
             switch (mState)
             {
-                case LogicState.ReqLighthouseConfig:
-                    StartReqLighthouseConfig();
-                    break;
                 case LogicState.LoadAppVerisonInfo:
                     LoadAppVersion();
+                    break;
+                case LogicState.ReqLighthouseConfig:
+                    StartReqLighthouseConfig();
                     break;
                 case LogicState.CheckLocalResManifest:
                     this.StartCheckResourceManifest();
@@ -263,7 +263,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                         {
                             Logger.Debug($"Lighthouse content : \r\n {contents}");
                             mCurrentLighthouseConfig = LighthouseConfig.ReadFromJson(contents);
-                            mState = LogicState.LoadAppVerisonInfo;
+                            if (!IsServersConfigValid(mCurrentLighthouseConfig))
+                            {
+                                AppVersionManager.MakeCurrentLighthouseConfig(this.mCurrentLighthouseConfig);
+                                Context.ErrorType = AppUpdaterErrorType.LighthouseConfigServersIsUnReachable;
+                                this.mState = LogicState.ReqLighthouseConfigFailure;
+                                return;
+                            }
+
+                            mState = LogicState.CheckLocalResManifest;
                         }
                         catch (Exception e)
                         {
@@ -328,33 +336,33 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
             }
-            
-            AppInfoManifest builtinAppInfo = null; 
+
+            AppInfoManifest builtinAppInfo;
             try
             {
                 builtinAppInfo = AppVersionManager.ParseAppInfo(bytes);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error($"Parse built app info failure , error stackTrace : {ex.StackTrace}");
                 Context.ErrorType = AppUpdaterErrorType.ParseBuiltinAppInfoFailure;
                 this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
             }
-            
-            AppInfoManifest localAppInfo = null; 
+
+            AppInfoManifest localAppInfo = null;
             try
             {
                 localAppInfo = AppVersionManager.LoadLocalAppInfo();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error($"Parse local app info failure , error stackTrace : {ex.StackTrace}");
                 Context.ErrorType = AppUpdaterErrorType.ParseLocalAppInfoFailure;
                 this.mState = LogicState.ReqLighthouseConfigFailure;
                 return;
-            } 
-            
+            }
+
             if (localAppInfo != null)
             {
                 Logger.Debug($"Local veriosn : {localAppInfo.version} , builtin verison : {builtinAppInfo.version}");
@@ -365,15 +373,56 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (result > Version.VersionCompareResult.Equal)
                 {
-                    var clearPath = new DirectoryInfo(string.Concat(AssetsFileSystem.PersistentDataPath,
-                        Path.DirectorySeparatorChar, AssetsFileSystem.RootFolderName));
-                    if (clearPath.Exists)
+                    try
                     {
-                        clearPath.Delete(true);
-                        clearPath.Create();
-                        Logger.Info($"Clear external app folder : {clearPath.FullName} ");
-                    }
+                        bool hasRetainedDataFolderName = string.IsNullOrEmpty(this.Target.RetainedDataFolderName);
+                        var pureRetainedDataFolderName = this.Target.RetainedDataFolderName;
+                        if (hasRetainedDataFolderName)
+                        {
+                            if (pureRetainedDataFolderName.StartsWith("/"))
+                                pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(1);
+                            if (pureRetainedDataFolderName.EndsWith("/"))
+                                pureRetainedDataFolderName = pureRetainedDataFolderName.Substring(0, pureRetainedDataFolderName.Length - 1);
+                        }
 
+                        //Delete directories
+                        var lastVersionDirs = Directory.GetDirectories(AssetsFileSystem.RootFolder);
+                        foreach (var dir in lastVersionDirs)
+                        {
+                            var dirName = dir.Replace(@"\", "/");
+                            int idx = dirName.LastIndexOf("/");
+                            if (idx != -1)
+                            {
+                                dirName = dirName.Substring(idx + 1);
+                            }
+                            if (!string.Equals(dirName, pureRetainedDataFolderName))
+                            {
+                                Logger.Debug($"Deleting dirrectory that name is \"{dirName}\".");
+                                if (Directory.Exists(dir))
+                                {
+                                    Directory.Delete(dir, true);
+                                }
+                            }
+                        }
+
+                        var lastVersionFiles = Directory.GetFiles(AssetsFileSystem.RootFolder, "*.*");
+
+                        foreach (var fileName in lastVersionFiles)
+                        {
+                            Logger.Debug($"Deleting file that name is \"{fileName}\".");
+                            if (File.Exists(fileName))
+                                File.Delete(fileName);
+                        }
+                        Logger.Info($"Clear external app folder that name is \"{AssetsFileSystem.RootFolder}\" completed!");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Fatal($"Error message : {ex.Message} \n StackTrace : {ex.StackTrace}");
+                        Context.ErrorType = AppUpdaterErrorType.DeleteExternalStorageFilesFailure;
+                        this.mState = LogicState.ReqLighthouseConfigFailure;
+                        return;
+                    }
+                    
                     Logger.Info("Make built appinfo as current!");
                     AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
                 }
@@ -387,6 +436,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 {
                     Logger.Info("Make local appinfo as current!");
                     AppVersionManager.MakeCurrentAppInfo(localAppInfo);
+
                 }
             }
             else
@@ -394,17 +444,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 Logger.Info("Local appinfo file is not exist , make built appinfo file as current!");
                 AppVersionManager.MakeCurrentAppInfo(builtinAppInfo);
             }
-
-            if (!IsServersConfigValid(mCurrentLighthouseConfig))
-            {
-                AppVersionManager.MakeCurrentLighthouseConfig(this.mCurrentLighthouseConfig);
-                Context.ErrorType = AppUpdaterErrorType.LighthouseConfigServersIsUnReachable;
-                this.mState = LogicState.ReqLighthouseConfigFailure;
-            }
-            else
-            {
-                this.mState = LogicState.CheckLocalResManifest;
-            }
+            this.mState = LogicState.ReqLighthouseConfig;
         }
 
         #endregion
@@ -470,7 +510,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     AppVersionManager.SaveToLocalDataResManifest(data, AssetsFileSystem.AppDataResManifestName);
                     this.StartCheckUnityDataRes();
                 }
-                else if(this.mCheckingResManifestType == CheckingResManifestType.UnityRes)
+                else if (this.mCheckingResManifestType == CheckingResManifestType.UnityRes)
                 {
                     Logger.Info("Load builtin untiy resource manifest completd !");
                     this.mCheckingResManifestType = CheckingResManifestType.Done;
@@ -509,7 +549,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 info =>
                 {
                     Logger.Debug($"info != null : {info != null} .");
-                    if(info != null)
+                    if (info != null)
                         Logger.Debug($"string.IsNullOrEmpty(info.lighthouseId) : {string.IsNullOrEmpty(info.lighthouseId)}");
                     if (info != null && !string.IsNullOrEmpty(info.lighthouseId))
                     {

@@ -100,27 +100,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         #region Methods
         //--------------------------------------------------------------
 
-
-        public override void Enter(AppUpdaterFsmOwner entity, params object[] args)
-        {
-            base.Enter(entity, args);
-
-            //if (Context.RemoteFileDownloader == null)
-            //{
-            //    Context.RemoteFileDownloader = new RemoteFileDownloader(Context,this.Target.Request);
-            //}
-            //else
-            //{
-            //    Context.RemoteFileDownloader.Clear();
-            //}
-        }
-
-        
-
         public override void Execute(AppUpdaterFsmOwner entity)
         {
             base.Execute(entity);
-            //Context.RemoteFileDownloader.Update();
             switch (mCurState)
             {
                 case InnerState.StartRequestResManifest:
@@ -151,9 +133,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             string url = Context.GetCurrentVerisonFileUrl(this.mCurFileServerType);
             Logger.Info($"Start request remote resource manifest {url} .");
 
-            Context.AppendInfo($"Res current version : {Context.ResUpdateTarget.LocalResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]} target version : {Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]}");
-            Context.AppendInfo($"Current resource group name is {Context.GetCurrentLocalVersionFileName()} .");
-
+            Context.AppendInfo($"ResourceType : {Context.GetCurrentUpdateType()}  MD5 : C:{Context.GetCurrentLocalMd5()} --> R:{Context.GetCurrentRemoteMd5()}");
             this.mCurState = InnerState.RequestingManifest;
             this.Target.Request.Load(url, OnResponseResManifestCallback);
         }
@@ -176,11 +156,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             {
                 string resManifestContent = System.Text.Encoding.UTF8.GetString(netData);
 
-                var version = Context.ResUpdateTarget.ResVersions[Context.ResUpdateTarget.CurrentResVersionIdx];
-                this.mCurManifestParser = Context.ResUpdateTarget.ResVersionParsers[Context.ResUpdateTarget.CurrentResVersionIdx];
+                var version = Context.GetCurrentRemoteMd5();
+                this.mCurManifestParser = this.Target.GetResManifestParserByType(Context.GetCurrentUpdateType());
                 Context.ProgressData.CurrentUpdateResourceType = this.mCurManifestParser.GetUpdateResourceType();
 
-                Logger.InfoFormat("veriosn : {0} , parser : {1} .",version, this.mCurManifestParser.GetType().Name);
+                Logger.InfoFormat($"veriosn : {version} , parser : {this.mCurManifestParser.GetType().Name} .");
 
                 try
                 {
@@ -222,14 +202,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
         private void ProcessCalculateResDifference()
         {
-            Logger.Info($"Start calculate resource difference !");
+            Logger.Debug($"Start calculate resource difference !");
             this.mCurState = InnerState.CalculatingResDiff;
 
-            var localResManifestContents= AppVersionManager.LoadLocalResManifestContents(Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx]);
+            var localResManifestContents= AppVersionManager.LoadLocalResManifestContents(Context.GetCurrentLocalVersionFileName());
 
             if (string.IsNullOrEmpty(localResManifestContents))
             {
-                throw new FileNotFoundException(Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx]);
+                throw new FileNotFoundException(Context.GetCurrentLocalVersionFileName());
             }
 
             try
@@ -247,7 +227,20 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 return;
             }
 
-            var diff = this.mLocalManifest.CalculateDifference(this.mCurRemoteManifest);
+            List<FileDesc> diff = null;
+            var updateType = Context.GetCurrentUpdateType();
+            if (updateType == UpdateResourceType.TableData)
+            {
+                Logger.Debug("Start sync table data!");
+                diff = this.mLocalManifest.CalculateDifference(this.mCurRemoteManifest);
+            }
+            else
+            {
+                var syncMode = Context.ResUpdateConfig.Mode;
+                var filter = Context.ResUpdateConfig.Filter;
+                Logger.Debug($"Start sync unity resource , syncMode : {syncMode}  , filter null : {filter == null}");
+                diff = this.mLocalManifest.CalculateDifference(this.mCurRemoteManifest, syncMode,filter);
+            }
             
             if (diff != null && diff.Count > 0)
             {
@@ -278,7 +271,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Logger.Info($"The current remote manifest file that name is {Context.GetCurrentVersionFileName()} is the same as local .");
+                Logger.Info($"The current remote manifest file that name is {Context.GetCurrentLocalVersionFileName()} is the same as local .");
                 this.mCurState = InnerState.ResUpdateCompleted;
             }
         }
@@ -324,10 +317,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         {
             var fileDesc = this.mCurDownloadTasks[this.mCurrentDownloadIndex];
             Context.ProgressData.CurrentDownloadingFileSize = (ulong)fileDesc.S;
-            //string fileName = this.mCurManifestParser.GetRemotePath(fileDesc);
-
-            //Context.RemoteFileDownloader.StartLoadResFileFromRemote(OnFileDownloaded , fileName);
-
+           
             this.mCurFileDownLoadState = FileDownLoadState.DownLoading;
 
             var service = ServiceLocator.Current.GetInstance<IRemoteFileDownloadService>();
@@ -355,8 +345,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
                 if (this.CheckDownloadOperationIsCompleted())
                 {
-                    Context.AppendInfo($"Current resource version update to \"{Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx]}\".");
-                    Logger.Info($"Update manifest that name is {Context.GetCurrentVersionFileName()} is success!");
+                    Context.AppendInfo($"Current resource version update to \"{Context.GetCurrentRemoteMd5()}\".");
+                    Logger.Info($"Update manifest that name is {Context.GetCurrentLocalVersionFileName()} is success!");
                     this.mCurFileDownLoadState = FileDownLoadState.Idle;
                     this.mCurState = InnerState.ResUpdateCompleted;
                 }
@@ -367,49 +357,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 }
             }
         }
-
-        /*
-        private void OnFileDownloaded(bool success , byte[] data)
-        {
-            if (!success)
-            {
-                Context.ErrorType = AppUpdaterErrorType.DownloadFileFailure;
-                this.mCurState = InnerState.ResUpdateFailed;
-                this.mCurFileDownLoadState = FileDownLoadState.DownloadFail;
-
-                Logger.Error($"Download file that name is \"{this.mCurDownloadTasks[this.mCurrentDownloadIndex].N}\" failure! ");
-
-                this.SaveCurrentConfig(false);
-            }
-            else
-            {
-                this.WriteRemoteFileDataToLocal(data);
-            }
-        }
-
-        private void WriteRemoteFileDataToLocal(byte[] data)
-        {
-            Context.ProgressData.CurrentDownloadSize += (ulong)data.Length;
-            Context.ProgressData.CurrentDownloadFileCount++;
-            Context.ProgressData.Progress = Context.ProgressData.CurrentDownloadSize / ((float)Context.ProgressData.TotalDownloadSize);
-
-            string path = AssetsFileSystem.GetWritePath($"{this.mCurManifestParser.GetLocalRoot(this.mCurDownloadTasks[this.mCurrentDownloadIndex])}", true);
-            File.WriteAllBytes(path, data);
-            this.mLocalManifest.UpdateInnerFile(this.mCurDownloadTasks[this.mCurrentDownloadIndex]);
-
-            if (this.CheckDownloadOperationIsCompleted())
-            {
-                Context.AppendInfo($"Current resource version update to \"{Context.ResVersionNums[Context.CurrentResVersionIdx]}\".");
-                Logger.Info($"Update manifest that name is {Context.GetCurrentVersionFileName()} is success!");
-                this.mCurFileDownLoadState = FileDownLoadState.Idle;
-                this.mCurState = InnerState.ResUpdateCompleted;
-            }
-            else
-            {
-                Logger.Info($"Download file that name is {this.mCurDownloadTasks[this.mCurrentDownloadIndex].N} completed!");
-                this.mCurFileDownLoadState = FileDownLoadState.DownLoadCompleted;
-            }
-        }*/
 
         private void ProcessDownLoading()
         {
@@ -441,7 +388,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
         private void ProcessResUpdateCompleted()
         {
             this.SaveCurrentConfig();
-            Logger.Info($"Update current resource completed , remote manifest name is \"{Context.GetCurrentVersionFileName()}\" .");
+            Logger.Info($"Update current resource completed , remote manifest name is \"{Context.GetCurrentLocalVersionFileName()}\" .");
             IRoutedEventArgs arg = new RoutedEventArgs()
             {
                 EventType = (int)AppUpdaterInnerEventType.OnCurrentResUpdateCompleted
@@ -474,13 +421,13 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 
         private void SaveCurrentConfig(bool updateVerisonNum = true)
         {
-            string curManifestName = Context.ResUpdateTarget.LocalResFiles[Context.ResUpdateTarget.CurrentResVersionIdx];
+            string curManifestName = Context.GetCurrentLocalVersionFileName();
             var json = this.mCurManifestParser.Serialize(this.mLocalManifest);
             AppVersionManager.SaveToLocalDataResManifest(json, curManifestName);
 
             if (updateVerisonNum)
             {
-                this.mCurManifestParser.WriteToAppInfo(Context.ResUpdateTarget.ResVersionNums[Context.ResUpdateTarget.CurrentResVersionIdx], Context.ResUpdateTarget.TargetResVersionNum);
+                this.mCurManifestParser.WriteToAppInfo(Context.GetCurrentRemoteMd5(), Context.ResUpdateTarget.TargetResVersionNum);
             }
         }
 

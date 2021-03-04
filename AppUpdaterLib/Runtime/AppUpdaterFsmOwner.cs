@@ -16,10 +16,9 @@
 
 using System;
 using CenturyGame.AppUpdaterLib.Runtime.Configs;
+using CenturyGame.AppUpdaterLib.Runtime.ResManifestParser;
 using CenturyGame.AppUpdaterLib.Runtime.States.Concretes;
 using CenturyGame.Core.FSM;
-using CenturyGame.Core.MessengerSystem;
-using UnityEngine;
 
 namespace CenturyGame.AppUpdaterLib.Runtime
 {
@@ -51,6 +50,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         private AppUpdaterCallBacks mCallBacks = new AppUpdaterCallBacks();
 
         private AppUpdaterFileUpdateRuleFilter _fileUpdateRuleFilter = null;
+        public AppUpdaterFileUpdateRuleFilter FileUpdateRuleFilter => _fileUpdateRuleFilter;
+
+        /// <summary>
+        /// 资源的保留目录，此目录在app覆盖安装后不会删除，用于多文件环境下的游戏中的更新
+        /// </summary>
+        private string _retainedDataFolderName = string.Empty;
+        public string RetainedDataFolderName => _retainedDataFolderName;
+
+        private static readonly UnityResManifestParser UnityManifestParser = new UnityResManifestParser();
+
+        private static readonly DataResManifestParser DataResManifestParser = new DataResManifestParser(); 
 
         #region Inner FSM
 
@@ -124,9 +134,31 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         }
 
 
-        public void SetFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
+        public void BindFileUpdateRuleFilter(AppUpdaterFileUpdateRuleFilter filter)
         {
             this._fileUpdateRuleFilter = filter;
+        }
+
+        public void UnBindFileUpdateRuleFilter()
+        {
+            this._fileUpdateRuleFilter = null;
+        }
+
+        
+        public void SetRetainedDataFolderName(string name)
+        {
+            this._retainedDataFolderName = name;
+        }
+
+        public void StartDownloadPartialDataRes()
+        {
+            this.Clear();
+            Context.AppendInfo("Start resource partial update operation again !");
+            IRoutedEventArgs arg = new RoutedEventArgs()
+            {
+                EventType = (int)AppUpdaterInnerEventType.StartPerformResPartialUpdateOperation
+            };
+            this.HandleMessage(in arg);
         }
 
         public void ManualStartAppUpdate()
@@ -137,6 +169,22 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             };
             this.HandleMessage(in arg);
         }
+
+
+        public BaseResManifestParser GetResManifestParserByType(UpdateResourceType type)
+        {
+            if (type == UpdateResourceType.TableData)
+            {
+                return DataResManifestParser;
+            }
+            else if (type == UpdateResourceType.NormalResource)
+            {
+                return UnityManifestParser;
+            }
+
+            throw new ArgumentException($"UpdateResourceType : {type}");
+        }
+            
 
         internal void Clear()
         {

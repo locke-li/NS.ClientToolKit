@@ -263,10 +263,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
                         if (!string.IsNullOrEmpty(this.mMd5))//Need check file md5
                         {
                             var tempFileMd5 = CryptoUtility.GetHash(this.mTemporyPath);
-                            s_mLogger.Value?.Debug($"Target file md5 : {this.mMd5} , downloaded file md5 : {tempFileMd5} .");
+                            
                             if (string.Equals(this.mMd5,tempFileMd5,StringComparison.OrdinalIgnoreCase))
                             {
-                                s_mLogger.Value?.Debug($"Check md5 success !");
+                                s_mLogger.Value?.Debug($"Verify file that was downloaded successful! MD5 : {tempFileMd5}");
                                 if (File.Exists(this.mFilePath))
                                 {
                                     File.Delete(this.mFilePath);
@@ -283,9 +283,10 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
                             }
                             else
                             {
+                                s_mLogger.Value?.Debug($"Target md5 : {this.mMd5} , temporary file md5 : {tempFileMd5} .");
                                 File.Delete(this.mTemporyPath);
                                 this.mState = DownloadState.DownloadAgain;
-                                s_mLogger.Value?.Debug($"Check md5 failure , delete it and retry download. Original file path is \"{this.mFilePath}\" .");
+                                s_mLogger.Value?.Debug($"Download failure , delete it and retry download. Original file path is \"{this.mFilePath}\" .");
                             }
                         }
                         else

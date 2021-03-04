@@ -25,7 +25,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         PerformAppUpdate,
 
+        /// <summary>
+        /// 开始执行资源更新操作
+        /// </summary>
         StartPerformResUpdateOperation,
+
+        /// <summary>
+        /// 更新部分资源
+        /// </summary>
+        StartPerformResPartialUpdateOperation,
 
         OnCurrentResUpdateCompleted,
 
@@ -33,7 +41,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         OnApplicationFocus,
 
-        OnApplicationQuit,
+        OnApplicationQuit
     }
 
 
@@ -84,6 +92,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         AppBuiltInVersionNumNotCompatibleToExternal,//app内建版本号与外部不兼容
 
+        DeleteExternalStorageFilesFailure,//删除App外部目录失败
+
         Unknow,
     }
 
@@ -105,6 +115,16 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         LOWER_LUA_NAME,//lua路径小写，解决针对ios大小写敏感相关问题
         MANUAL_PERFORM_APP_UPDATE,//手动进入app更新
         ENABLE_TABLE_DATA_UPDATE,//激活数据表更新（默认打开）
+        ENABLE_RES_INCREMENTAL_UPDATE,//激活资源增量式更新
+    }
+
+    public enum ResSyncMode
+    {
+        FULL,//同步远端所有的资源
+
+        LOCAL,//只同步本地清单资源
+
+        SUB_GROUP,//只同步子组的资源
     }
 
     public enum AppUpdaterBool

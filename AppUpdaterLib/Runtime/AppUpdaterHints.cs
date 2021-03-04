@@ -46,13 +46,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         /// </summary>
         public bool AllowResNumLocalNewerToRemote = true;
 
+        /// <summary>
+        /// 激活资源增量式更新
+        /// </summary>
+        public bool EnableResIncrementalUpdate = false;
 
-        //private void SetBoolean
-
-        //private bool CheckHintBoolean(AppUpdaterHintName hintName)
-        //{
-
-        //}
 
         public void SetHintValue(AppUpdaterHintName hintName , int hintVal)
         {
@@ -100,9 +98,25 @@ namespace CenturyGame.AppUpdaterLib.Runtime
                         throw new ArgumentException($"hintName : {hintName}  , hintVal : {hintVal} .");
                     }
                     break;
+                case AppUpdaterHintName.ENABLE_RES_INCREMENTAL_UPDATE:
+                    if (hintVal == (int)AppUpdaterBool.FALSE)
+                    {
+                        EnableResIncrementalUpdate = false;
+                    }
+                    else if (hintVal == (int)AppUpdaterBool.TRUE)
+                    {
+                        EnableResIncrementalUpdate = true;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"hintName : {hintName}  , hintVal : {hintVal} .");
+                    }
+                    break;
                 default:
                     break;
             }
+
+            
         }
     }
 }

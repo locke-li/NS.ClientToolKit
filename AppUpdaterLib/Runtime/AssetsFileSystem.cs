@@ -58,6 +58,18 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
         }
 
+        public static readonly string UserFolderName = "k_u";
+        private static string s_mUserFolder = string.Empty;
+        public static string UserFolder
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(s_mUserFolder))
+                    s_mUserFolder = $"{PersistentDataPath}/{UserFolderName}";
+                return s_mUserFolder;
+            }
+        }
+
         public static ABConfigInfoClient ConfigInfoClient = null;
 
         #endregion

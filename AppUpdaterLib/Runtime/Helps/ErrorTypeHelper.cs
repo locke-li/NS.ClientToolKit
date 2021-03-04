@@ -58,6 +58,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Helps
                     return "The servers data from lighthouse config is not reachable!";
                 case AppUpdaterErrorType.AppBuiltInVersionNumNotCompatibleToExternal:
                     return "The builtIn version is not compatible to external!";
+                case AppUpdaterErrorType.DeleteExternalStorageFilesFailure:
+                    return "Delete the files that form external storage failure!";
                 default:
                     return "Error ! Unknow appupdater error! ";
             } 

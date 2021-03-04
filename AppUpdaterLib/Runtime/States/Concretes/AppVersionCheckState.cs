@@ -191,66 +191,85 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
 #elif UNITY_IPHONE
             unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
 #endif      
-            List<string> resList = new List<string>();
-            List<string> resVersionList = new List<string>();
-            List<string> localResVersionList = new List<string>();
-            List<string> localResFileNameList = new List<string>();
-            List<BaseResManifestParser> parsers = new List<BaseResManifestParser>();
-
+            List<VersionDesc> descs = null;
             if (AppVersionManager.AppInfo.unityDataResVersion != unityDataResVersion)
             {
-                //resList.Add(Context.GetCurUnityResManifestName(unityDataResVersion));
-                resVersionList.Add(unityDataResVersion);
-                localResVersionList.Add(AppVersionManager.AppInfo.unityDataResVersion);
-                localResFileNameList.Add(AssetsFileSystem.UnityResManifestName);
-                parsers.Add(new UnityResManifestParser());
+                descs = new List<VersionDesc>();
+                VersionDesc info = new VersionDesc
+                {
+                    Type = UpdateResourceType.NormalResource,
+                    LocalMd5 = AppVersionManager.AppInfo.unityDataResVersion,
+                    RemoteMd5 = unityDataResVersion,
+                };
+                Logger.Info($"Add Descs : Type : {info.Type} , LocalMd5 : {info.LocalMd5} RemoteMd5 : {info.RemoteMd5} .");
+                descs.Add(info);
             }
 
             if (AppUpdaterHints.Instance.EnableTableDataUpdate)
             {
+                var dataVersion = Context.GetVersionResponseInfo.update_detail.DataVersion;
                 if (AppVersionManager.AppInfo.dataResVersion !=
-                    Context.GetVersionResponseInfo.update_detail.DataVersion)
+                    dataVersion)
                 {
-                    //resList.Add(Context.GetCurDataResManifestName(Context.GetVersionResponseInfo.update_detail.DataVersion));
-                    resVersionList.Add(Context.GetVersionResponseInfo.update_detail.DataVersion);
-                    localResVersionList.Add(AppVersionManager.AppInfo.dataResVersion);
-                    localResFileNameList.Add(AssetsFileSystem.AppDataResManifestName);
-                    parsers.Add(new DataResManifestParser());
+                    if (descs == null)
+                        descs = new List<VersionDesc>();
+                    VersionDesc info = new VersionDesc
+                    {
+                        Type = UpdateResourceType.TableData,
+                        LocalMd5 = AppVersionManager.AppInfo.dataResVersion,
+                        RemoteMd5 = dataVersion
+                    };
+                    Logger.Info($"Add Descs : Type : {info.Type} , LocalMd5 : {info.LocalMd5} RemoteMd5 : {info.RemoteMd5} .");
+                    descs.Add(info);
                 }
             }
 
-            Context.ResUpdateTarget.ResVersions = resList.ToArray();
-            Context.ResUpdateTarget.ResVersionNums = resVersionList.ToArray();
-            Context.ResUpdateTarget.LocalResVersionNums = localResVersionList.ToArray(); 
-            Context.ResUpdateTarget.ResVersionParsers = parsers.ToArray();
-            Context.ResUpdateTarget.LocalResFiles = localResFileNameList.ToArray();
+            if (descs != null)
+            {
+                Logger.Info($"Update round :  {descs.Count} .");
+                Context.ResUpdateTarget.VersionDescs = descs.ToArray();
+            }
+
             this.StartUpdateRes();
         }
 
         private void SetTargetVersionInfo()
         {
             var detail = Context.GetVersionResponseInfo.update_detail;
-            var revision = System.Convert.ToInt32(Context.GetVersionResponseInfo.update_detail.ResVersionNum);
+            var revision = System.Convert.ToInt32(detail.ResVersionNum);
             var version = new Version(AppVersionManager.AppInfo.version);
             version.Patch = revision.ToString();
             AppInfoManifest targetAppInfo = new AppInfoManifest();
             targetAppInfo.version = version.GetVersionString();
-            targetAppInfo.dataResVersion = Context.GetVersionResponseInfo.update_detail.DataVersion;
+            targetAppInfo.dataResVersion = detail.DataVersion;
             targetAppInfo.TargetPlatform = Utility.GetPlatformName();
 #if UNITY_ANDROID
-            targetAppInfo.unityDataResVersion = Context.GetVersionResponseInfo.update_detail.AndroidVersion;
+            targetAppInfo.unityDataResVersion = detail.AndroidVersion;
 #elif UNITY_IPHONE
-            targetAppInfo.unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
+            targetAppInfo.unityDataResVersion = detail.IOSVersion;
 #endif
             Logger.Debug($"Target app info : \n{JsonUtility.ToJson(targetAppInfo, true)}");
             AppVersionManager.SetTargetVersion(targetAppInfo);
             this.Target.OnnTargetVersionObtainCallback(targetAppInfo.version);
         }
 
+        private void SetUpdateMode()
+        {
+            if (AppUpdaterHints.Instance.EnableResIncrementalUpdate)
+            {
+                Context.ResUpdateConfig.Mode = ResSyncMode.LOCAL;
+            }
+            else
+            {
+                Context.ResUpdateConfig.Mode = ResSyncMode.FULL;
+            }
+        }
+
         private void StartUpdateRes()
         {
             this.SetTargetVersionInfo();
-            if (Context.ResUpdateTarget.ResVersions.Length == 0)
+            this.SetUpdateMode();
+            if (Context.IsNeedUpdate())
             {
                 Context.AppendInfo("The game resource is not change , enter game direct!");
                 Logger.Info("The game resource is not change , enter game direct!");
@@ -259,7 +278,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             else
             {
-                Context.AppendInfo($"The resource group that you needed to update has {Context.ResUpdateTarget.ResVersions.Length} files to update , startup update the game resource . ");
                 IRoutedEventArgs arg = new RoutedEventArgs()
                 {
                     EventType = (int)AppUpdaterInnerEventType.StartPerformResUpdateOperation
