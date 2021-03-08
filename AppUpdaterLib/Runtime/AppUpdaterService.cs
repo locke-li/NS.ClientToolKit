@@ -53,6 +53,14 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.InitializeComponent();
         }
 
+        void Start()
+        {
+            if (!AppUpdaterHints.Instance.ManualPerformAppUpdate)
+            {
+                this.StartUpdate();
+            }
+        }
+
         public void InitializeComponent()
         {
             this.CreateFSMOwner();
