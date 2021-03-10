@@ -172,11 +172,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime
 
         public void StartDownloadPartialDataRes()
         {
-            if (AppUpdaterConfigManager.AppUpdaterConfig.skipAppUpdater)
-            {
-                s_mLogger.Value?.Warn("You can't download partial data resources, because current runing mode will skip appupdate operation!");
-                return;
-            }
             if (Context.IsFirstRun)
             {
                 s_mLogger.Value?.Warn("Please call mathod that name is \"StartUpdate\" , because the appupdater is not running yet!");
