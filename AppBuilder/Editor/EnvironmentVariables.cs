@@ -44,6 +44,10 @@ namespace CenturyGame.AppBuilder.Editor
         /// </summary>
         public const string LUA_AB_PATH_KEY = "LUA_AB_PATH";
 
+        /// <summary>
+        /// 游戏表数据仓库分支名
+        /// </summary>
+        public const string GAME_TABLE_DATA_REPOSITORY_BRANCH_NAME = "GAME_TABLE_DATA_REPOSITORY_BRANCH_NAME";
 
     }
 }

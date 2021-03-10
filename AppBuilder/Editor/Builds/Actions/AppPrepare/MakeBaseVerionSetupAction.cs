@@ -77,18 +77,18 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
         }
 
 
-        private bool CheckGameConfigs()
-        {
-            var configsPath = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
-            if (!Directory.Exists(configsPath))
-            {
-                Logger.Error($"The table config git repo that path is \"{configsPath}\" is not exist !" +
-                             $" Pleause specify a valid path!");
-                return false;
-            }
+        //private bool CheckGameConfigs()
+        //{
+        //    var configsPath = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
+        //    if (!Directory.Exists(configsPath))
+        //    {
+        //        Logger.Error($"The table config git repo that path is \"{configsPath}\" is not exist !" +
+        //                     $" Pleause specify a valid path!");
+        //        return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
@@ -100,10 +100,10 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
                 return false;
             }
 
-            if (!CheckGameConfigs())
-            {
-                return false;
-            }
+            //if (!CheckGameConfigs())
+            //{
+            //    return false;
+            //}
 
             return true;
         }
