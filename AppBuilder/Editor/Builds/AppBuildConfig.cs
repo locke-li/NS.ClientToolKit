@@ -71,10 +71,21 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             Python3
         }
 
+        public enum VcsType
+        {
+            Git,
+            Svn
+        }
+
         /// <summary>
-        /// 数据表配置仓库
+        /// Version control systems type
         /// </summary>
-        public string dataResAbsolutePath = "";
+        public VcsType vcsType = VcsType.Git;
+
+        /// <summary>
+        /// 表配置仓库的地址
+        /// </summary>
+        public string gameTableDataRepositoryRemotePath = "";
 
         /// <summary>
         /// 本地上传目录名
@@ -150,6 +161,15 @@ namespace CenturyGame.AppBuilder.Editor.Builds
 
         [Header("制作Patch版本时自增修订号")]
         public bool incrementRevisionNumberForPatchBuild = true;
+
+
+        /// <summary>
+        /// 数据表配置仓库
+        /// </summary>
+        public string GameTableDataConfigPath
+        {
+            get { return EditorUtils.OptimazePath($"{Application.dataPath}/../Library/GameTableDataLocalPath"); }
+        }
 
         public static AppBuildConfig GetAppBuildConfigInst()
         {

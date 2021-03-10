@@ -243,7 +243,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Contexts
         /// <returns></returns>
         public string GetConfLocalVerisonControlTargetFodlerPath()
         {
-            string path = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            string path = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
 
             if (string.IsNullOrEmpty(path))
             {

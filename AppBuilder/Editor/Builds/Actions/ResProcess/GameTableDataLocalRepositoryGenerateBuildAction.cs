@@ -1,35 +1,30 @@
 /***************************************************************
 
- *  类名称：        UploadFilesAction
+ *  类名称：        GameTableDataLocalRepositoryGenerateBuildAction
 
- *  描述：				
+ *  描述：			表数据本地仓库生成的行为
 
  *  作者：          Chico(wuyuanbing)
 
- *  创建时间：      2020/4/27 13:21:00
+ *  创建时间：      2021/3/9 15:24:46
 
  *  最后修改人：
 
- *  版权所有 （C）:   diandiangames
+ *  版权所有 （C）:   CenturyGames
 
 ***************************************************************/
 
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.Remoting.Channels;
-using CenturyGame.AppBuilder.Editor.Builds.Contexts;
-using UnityEngine;
 using CenturyGame.Core.Pipeline;
-using CenturyGame.Editor.UploadUtilitis.WinSCP;
-using CenturyGame.AppBuilder.Editor.UploadUtilitis.AmazonS3;
+using UnityEngine;
+using System.IO;
 using UnityEditor;
 using Debug = UnityEngine.Debug;
-using File = CenturyGame.Core.IO.File;
 
-namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
+// ReSharper disable once CheckNamespace
+namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResProcess
 {
-    class UploadFilesAction : BaseBuildFilterAction
+    class GameTableDataLocalRepositoryGenerateBuildAction : BaseBuildFilterAction
     {
         //--------------------------------------------------------------
         #region Fields
@@ -55,41 +50,20 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
-
-            pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
-            Logger.Info($"Lua projecet root path : {pythonScripPath} .");
-
-            if (!File.Exists(pythonScripPath))
-            {
-                AppBuildContext.ErrorSb.AppendLine($"The target upload script that path is \"{pythonScripPath}\" is not exist!");
-                return false;
-            }
-            
-            return true;
+            return base.Test(filter, input);
         }
 
         public override void Execute(IFilter filter, IPipelineInput input)
         {
-            var resStorage = AppBuildContext.GetResStoragePath();
-
-            Logger.Info($"Start upload files , path is \" {resStorage}\" .");
-
-            var result = this.UploadFiles(resStorage,input);
-            if (result)
-            {
-                this.State = ActionState.Completed;
-            }
-            else
-            {
-                this.State = ActionState.Error;
-            }
+            this.UpdateRepository(filter,input);
+            this.State = ActionState.Completed;
         }
 
-        private bool UploadFiles(string sourceFolder, IPipelineInput input)
+
+        private bool UpdateRepository(IFilter filter, IPipelineInput input)
         {
             string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
-            
+
             pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
             Logger.Info($"Lua projecet root path : {pythonScripPath} .");
 
@@ -99,7 +73,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             {
                 throw new DirectoryNotFoundException(configRepoPath);
             }
-
+            
             var protokitgoConfigName = appBuildConfig.upLoadInfo.protokitgoConfigName;
 
             var uploadFolder = sourceFolder;
@@ -118,7 +92,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
             var makeBaseVersion = input.GetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
             var appVersion = AppBuildContext.GetTargetAppVersion(makeBaseVersion);
-            
+
             var resVersion = appVersion.Patch;
 
             var noUpload = "false";
@@ -127,7 +101,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             else
                 noUpload = "true";
 
-            string remoteDir = uploadInfo.remoteDir; 
+            string remoteDir = uploadInfo.remoteDir;
             if (string.IsNullOrEmpty(remoteDir) || string.IsNullOrWhiteSpace(remoteDir))
             {
                 remoteDir = "**NOROOT**";
@@ -136,7 +110,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             string commandLineArgs =
                 $"{pythonScripPath} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
 
-            
+
             Debug.Log($"commandline args : {commandLineArgs}");
 
             var pStartInfo = new ProcessStartInfo();
@@ -211,6 +185,5 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
 
         #endregion
-
     }
 }
