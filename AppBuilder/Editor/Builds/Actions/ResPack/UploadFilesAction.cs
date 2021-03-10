@@ -88,7 +88,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         private bool UploadFiles(string sourceFolder, IPipelineInput input)
         {
-            string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
+            string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploaderExt.py";
             
             pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
             Logger.Info($"Lua projecet root path : {pythonScripPath} .");
@@ -133,8 +133,9 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
                 remoteDir = "**NOROOT**";
             }
 
+            var vscTypeStr = appBuildConfig.repositoryInfo.vcsType == VcsType.Git ? "GIT" : "SVN";
             string commandLineArgs =
-                $"{pythonScripPath} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
+                $"{pythonScripPath} {vscTypeStr} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
 
             
             Debug.Log($"commandline args : {commandLineArgs}");
