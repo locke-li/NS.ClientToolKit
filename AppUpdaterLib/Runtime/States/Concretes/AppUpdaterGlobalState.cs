@@ -15,6 +15,7 @@
 ***************************************************************/
 
 
+using CenturyGame.AppUpdaterLib.Runtime.Managers;
 using CenturyGame.Core.FSM;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
@@ -35,7 +36,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     this.CheckResUpdateWasDone();
                     return true;
                 case AppUpdaterInnerEventType.StartPerformResPartialUpdateOperation:
-                    this.Target.ChangeState<AppUpdatePartialDataDownloadState>();
+                    if (AppUpdaterConfigManager.AppUpdaterConfig.skipAppUpdater)
+                    {
+                        Logger.Warn("You can't download partial data resources, because current runing mode will skip appupdate operation!");
+                        this.Target.ChangeState<AppUpdateCompletedState>();
+                    }
+                    else
+                    {
+                        this.Target.ChangeState<AppUpdatePartialDataDownloadState>();
+                    }
                     return true;
             }
             return base.OnMessage(entity, in eventArgs);
