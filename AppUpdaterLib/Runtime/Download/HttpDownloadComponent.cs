@@ -296,7 +296,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
                             s_mLogger.Value?.Debug("Download file success.");
                         }
                     }
+
+                    request.Dispose();
                 }
+
+                headRequest.Dispose();
             }
         }
 
