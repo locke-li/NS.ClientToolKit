@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "DynamicAtlas/GraphicBlit" {
+Shader "RuntimeAtlas/GraphicBlit" {
 	Properties {
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "black" {}
 	}

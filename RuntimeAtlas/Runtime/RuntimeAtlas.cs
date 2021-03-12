@@ -11,7 +11,7 @@ namespace CenturyGame.RuntimeAtlas.Runtime
         public int AtlasWidth { get; private set; }
         public int AtlasHeight { get; private set; }
         public int Padding { get; } = 3;
-        public float Offset { get; } = 1;
+        public float Offset { get; } = 0;
 
         public List<Texture2D> Texture2Ds { get; private set; } = new List<Texture2D>();
 
@@ -27,7 +27,7 @@ namespace CenturyGame.RuntimeAtlas.Runtime
 
         public RuntimeAtlasGroup AtlasGroup { get; set; }
 
-        public bool UsingCopyTexture { get; private set; } = true;
+        public bool UsingCopyTexture { get; private set; } = false;
 
         public TextureFormat AtlasTextureFormat = TextureFormat.RGBA32;
 
@@ -49,7 +49,7 @@ namespace CenturyGame.RuntimeAtlas.Runtime
             }
             if (!UsingCopyTexture)
             {
-                blitMaterial = new Material(Shader.Find("DynamicAtlas/GraphicBlit"));
+                blitMaterial = new Material(Shader.Find("RuntimeAtlas/GraphicBlit"));
                 blitParamId = Shader.PropertyToID("_DrawRect");
             }
             AtlasWidth = length;
@@ -282,6 +282,14 @@ namespace CenturyGame.RuntimeAtlas.Runtime
             return result;
         }
 
+        /// <summary>
+        /// 获取可用的空闲区域
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="index"></param>
+        /// <param name="justRightSize"></param>
+        /// <returns></returns>
         private IntegerRectangle GetFreeArea(int width, int height, out int index, out bool justRightSize)
         {
             index = -1;
