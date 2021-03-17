@@ -136,7 +136,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
 #endif
 
-            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
 
             var resListPath = $"{configRepoPath}/gen/rawdata/version_list/res_{platformName}.json";
 
@@ -159,7 +159,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
         private void CopyDataResFileList()
         {
             var streamingPath = AppBuildContext.GetAssetsOutputPath();
-            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            var configRepoPath = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
 
             var dataResListPath = $"{configRepoPath}/gen/rawdata/version_list/res_data.json";
 

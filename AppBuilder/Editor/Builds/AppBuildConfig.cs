@@ -62,6 +62,37 @@ namespace CenturyGame.AppBuilder.Editor.Builds
         }
     }
 
+    public enum VcsType
+    {
+        Git,
+        Svn
+    }
+
+    [Serializable]
+    public class RepositoryInfo
+    {
+        /// <summary>
+        /// Version control systems type
+        /// </summary>
+        public VcsType vcsType = VcsType.Git;
+
+        /// <summary>
+        /// 表配置仓库的地址
+        /// </summary>
+        public string gameTableDataRepositoryRemotePath = "";
+
+        /// <summary>
+        /// 分支名或路径
+        /// </summary>
+        public string branchName = "master";
+
+        /// <summary>
+        /// 表配置本地仓库目录名
+        /// </summary>
+        public string gameTableDataRepositoryLocalDirName = "conf";
+    }
+
+
     [System.Serializable]
     public class FilesUpLoadInfo
     {
@@ -70,11 +101,6 @@ namespace CenturyGame.AppBuilder.Editor.Builds
             Python,
             Python3
         }
-
-        /// <summary>
-        /// 数据表配置仓库
-        /// </summary>
-        public string dataResAbsolutePath = "";
 
         /// <summary>
         /// 本地上传目录名
@@ -145,11 +171,38 @@ namespace CenturyGame.AppBuilder.Editor.Builds
 
         public string TargetAssetGraphConfigAssetsPath => $"{targetAssetGraphConfigRelativeToProjectPath}";
 
+        [Header("数据仓库信息")]
+        public RepositoryInfo repositoryInfo;
+
         [Header("资源上传信息")]
         public FilesUpLoadInfo upLoadInfo;
 
         [Header("制作Patch版本时自增修订号")]
         public bool incrementRevisionNumberForPatchBuild = true;
+
+        /// <summary>
+        /// 数据表配置仓库父目录
+        /// </summary>
+        public string GameTableDataConfigParentPath
+        {
+            get
+            {
+                var dir = EditorUtils.OptimazePath($"{Application.dataPath}/../Library/GameTableDataLocalPath");
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                return dir;
+            }
+        }
+
+        /// <summary>
+        /// 数据表配置仓库目录
+        /// </summary>
+        public string GameTableDataConfigPath
+        {
+            get { return $"{GameTableDataConfigParentPath}/{this.repositoryInfo.gameTableDataRepositoryLocalDirName}"; }
+        }
 
         public static AppBuildConfig GetAppBuildConfigInst()
         {

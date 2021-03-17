@@ -1,35 +1,31 @@
 /***************************************************************
 
- *  类名称：        UploadFilesAction
+ *  类名称：        GameTableDataLocalRepositoryGenerateBuildAction
 
- *  描述：				
+ *  描述：			表数据本地仓库生成的行为
 
  *  作者：          Chico(wuyuanbing)
 
- *  创建时间：      2020/4/27 13:21:00
+ *  创建时间：      2021/3/9 15:24:46
 
  *  最后修改人：
 
- *  版权所有 （C）:   diandiangames
+ *  版权所有 （C）:   CenturyGames
 
 ***************************************************************/
 
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.Remoting.Channels;
-using CenturyGame.AppBuilder.Editor.Builds.Contexts;
-using UnityEngine;
 using CenturyGame.Core.Pipeline;
-using CenturyGame.Editor.UploadUtilitis.WinSCP;
-using CenturyGame.AppBuilder.Editor.UploadUtilitis.AmazonS3;
+using UnityEngine;
+using System.IO;
 using UnityEditor;
 using Debug = UnityEngine.Debug;
-using File = CenturyGame.Core.IO.File;
 
-namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
+// ReSharper disable once CheckNamespace
+namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResProcess
 {
-    class UploadFilesAction : BaseBuildFilterAction
+    class GameTableDataLocalRepositoryGenerateBuildAction : BaseBuildFilterAction
     {
         //--------------------------------------------------------------
         #region Fields
@@ -55,93 +51,62 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
         public override bool Test(IFilter filter, IPipelineInput input)
         {
-            string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploader.py";
-
-            pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
-            Logger.Info($"Lua projecet root path : {pythonScripPath} .");
-
-            if (!File.Exists(pythonScripPath))
+            var appBuildConfig = AppBuildConfig.GetAppBuildConfigInst();
+            if (string.IsNullOrEmpty(appBuildConfig.repositoryInfo.gameTableDataRepositoryRemotePath))
             {
-                AppBuildContext.ErrorSb.AppendLine($"The target upload script that path is \"{pythonScripPath}\" is not exist!");
-                return false;
+                AppBuildContext.ErrorSb.AppendLine($"The gameTableDataRepositoryRemotePath is not set!");
             }
-            
+
+            if (string.IsNullOrEmpty(appBuildConfig.repositoryInfo.gameTableDataRepositoryLocalDirName))
+            {
+                AppBuildContext.ErrorSb.AppendLine($"The gameTableDataRepositoryLocalDirName is not set!");
+            }
+
             return true;
         }
 
         public override void Execute(IFilter filter, IPipelineInput input)
         {
-            var resStorage = AppBuildContext.GetResStoragePath();
-
-            Logger.Info($"Start upload files , path is \" {resStorage}\" .");
-
-            var result = this.UploadFiles(resStorage,input);
-            if (result)
-            {
-                this.State = ActionState.Completed;
-            }
-            else
-            {
-                this.State = ActionState.Error;
-            }
+            this.UpdateRepository(filter,input);
+            this.State = ActionState.Completed;
         }
 
-        private bool UploadFiles(string sourceFolder, IPipelineInput input)
+
+        private bool UpdateRepository(IFilter filter, IPipelineInput input)
         {
-            string pythonScripPath = $"{Application.dataPath}/../Tools/ProtokitUpload/ProtokitGoUploaderExt.py";
-            
+            string pythonScripPath = $"{Application.dataPath}/../Tools/GameTableDataRepository/DataRepositoryGenerator.py";
+
             pythonScripPath = EditorUtils.OptimazePath(pythonScripPath);
             Logger.Info($"Lua projecet root path : {pythonScripPath} .");
 
             var appBuildConfig = AppBuildConfig.GetAppBuildConfigInst();
             var configRepoPath = appBuildConfig.GameTableDataConfigPath;
-            if (!Directory.Exists(configRepoPath))
-            {
-                throw new DirectoryNotFoundException(configRepoPath);
-            }
-
-            var protokitgoConfigName = appBuildConfig.upLoadInfo.protokitgoConfigName;
-
-            var uploadFolder = sourceFolder;
-
-            string platformName = string.Empty;
-#if UNITY_EDITOR && UNITY_ANDROID
-            platformName = "android";
-#elif UNITY_EDITOR && UNITY_IPHONE
-            platformName = "ios";
-#else
-            throw new InvalidOperationException($"Unsupport build platform : {EditorUserBuildSettings.activeBuildTarget} .");
-#endif
-
-            var uploadInfo = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo;
-            var uploadFilesPattern = uploadInfo.uploadFilesPattern;
-
-            var makeBaseVersion = input.GetData(EnvironmentVariables.MAKE_BASE_APP_VERSION_KEY, false);
-            var appVersion = AppBuildContext.GetTargetAppVersion(makeBaseVersion);
             
-            var resVersion = appVersion.Patch;
+            var repositoryInfo = AppBuildConfig.GetAppBuildConfigInst().repositoryInfo;
+            var vscTypeStr = repositoryInfo.vcsType == VcsType.Git ? "GIT" : "SVN";
 
-            var noUpload = "false";
-            if (uploadInfo.isUploadToRemote)
-                noUpload = "false";
-            else
-                noUpload = "true";
+            var _localDirName = repositoryInfo.gameTableDataRepositoryLocalDirName.Trim();
+            var localDirName = string.IsNullOrEmpty(_localDirName) ? "conf" : _localDirName;
 
-            string remoteDir = uploadInfo.remoteDir; 
-            if (string.IsNullOrEmpty(remoteDir) || string.IsNullOrWhiteSpace(remoteDir))
+            var branchName = input.GetData<string>(EnvironmentVariables.GAME_TABLE_DATA_REPOSITORY_BRANCH_NAME,"");
+            if (string.IsNullOrEmpty(branchName))
             {
-                remoteDir = "**NOROOT**";
+                branchName = repositoryInfo.branchName.Trim();
+            }
+            if (string.IsNullOrEmpty(branchName))
+            {
+                branchName = "None";
             }
 
-            var vscTypeStr = appBuildConfig.repositoryInfo.vcsType == VcsType.Git ? "GIT" : "SVN";
             string commandLineArgs =
-                $"{pythonScripPath} {vscTypeStr} {configRepoPath} {protokitgoConfigName} {platformName} {uploadFilesPattern} {uploadFolder} {remoteDir} {appVersion.Major}.{appVersion.Minor} {resVersion} {noUpload}";
+                $"{pythonScripPath} {vscTypeStr} {repositoryInfo.gameTableDataRepositoryRemotePath} {branchName} {appBuildConfig.GameTableDataConfigParentPath} {localDirName}";
 
-            
+
             Debug.Log($"commandline args : {commandLineArgs}");
 
             var pStartInfo = new ProcessStartInfo();
 
+            var uploadInfo = appBuildConfig.upLoadInfo;
 #if UNITY_EDITOR_WIN
             if (uploadInfo.pythonType == FilesUpLoadInfo.PythonType.Python)
             {
@@ -178,8 +143,8 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             pStartInfo.WindowStyle = ProcessWindowStyle.Normal;
             pStartInfo.Arguments = commandLineArgs;
 
-            pStartInfo.StandardErrorEncoding = System.Text.UTF8Encoding.UTF8;
-            pStartInfo.StandardOutputEncoding = System.Text.UTF8Encoding.UTF8;
+            pStartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
+            pStartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
 
             var proces = Process.Start(pStartInfo);
             proces.ErrorDataReceived += (s, e) =>
@@ -201,7 +166,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
             }
             else
             {
-                Logger.Debug("Upload files successful!");
+                Logger.Debug("Update repository successful!");
             }
             proces.Close();
 
@@ -212,6 +177,5 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.ResPack
 
 
         #endregion
-
     }
 }

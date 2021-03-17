@@ -91,7 +91,7 @@ namespace CenturyGame.AppBuilder.Editor.Builds.Actions.AppPrepare
 
         private bool CheckGameConfigs()
         {
-            var configsPath = AppBuildConfig.GetAppBuildConfigInst().upLoadInfo.dataResAbsolutePath;
+            var configsPath = AppBuildConfig.GetAppBuildConfigInst().GameTableDataConfigPath;
             if (!Directory.Exists(configsPath))
             {
                 Logger.Error($"The table config git repo that path is \"{configsPath}\" is not exist !" +

@@ -57,7 +57,7 @@ namespace CenturyGame.AppBuilder.Editor.Commands
             AppBuilderPipelineProcessor processor = new AppBuilderPipelineProcessor();
 
             ResourcesProcessFilter resourcesProcessFilter = new ResourcesProcessFilter(false);
-            resourcesProcessFilter.Enqueue(new TestOtherFilesExportAction());
+            //resourcesProcessFilter.Enqueue(new TestOtherFilesExportAction());
             //ResourcesPackageFilter resourcesPackageFilter = new ResourcesPackageFilter(true);
 
             processor.Register(resourcesProcessFilter);
