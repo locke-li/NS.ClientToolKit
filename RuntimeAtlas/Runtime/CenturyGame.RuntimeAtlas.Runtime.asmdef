@@ -1,8 +1,8 @@
 {
     "name": "CenturyGame.RuntimeAtlas.Runtime",
     "references": [
-        "CenturyGame.FrameworkModule",
-        "CenturyGame.AssetBundleManager"
+        "CenturyGame.AssetBundleManager",
+        "CenturyGame.Core"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

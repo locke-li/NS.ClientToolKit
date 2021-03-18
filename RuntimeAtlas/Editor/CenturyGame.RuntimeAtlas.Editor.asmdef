@@ -1,7 +1,8 @@
 {
     "name": "CenturyGame.RuntimeAtlas.Editor",
     "references": [
-        "CenturyGame.RuntimeAtlas.Runtime"
+        "CenturyGame.RuntimeAtlas.Runtime",
+        "CenturyGame.Core"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

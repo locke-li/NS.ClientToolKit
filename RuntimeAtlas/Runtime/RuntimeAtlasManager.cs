@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using CenturyGame.Framework.Base;
+using CenturyGame.Core.Primitives;
 
 namespace CenturyGame.RuntimeAtlas.Runtime
 {

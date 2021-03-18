@@ -21,7 +21,7 @@ namespace CenturyGame.RuntimeAtlas.Runtime
 
         private List<GetAtlasImageTask> GetImageTasks = new List<GetAtlasImageTask>();
 
-        private List<List<IntegerRectangle>> FreeAreas = new List<List<IntegerRectangle>>();
+        public List<List<IntegerRectangle>> FreeAreas { get; private set; } = new List<List<IntegerRectangle>>();
 
         private List<Material> Materials = new List<Material>();
 
@@ -469,6 +469,23 @@ namespace CenturyGame.RuntimeAtlas.Runtime
                 colors[i] = Color.clear;
             dstTex.SetPixels32((int)rect.x, (int)rect.y, width, height, colors);
             dstTex.Apply();
+        }
+
+        public void ClearTextureWithBlit()
+        {
+            int freeAreasCount = FreeAreas.Count;
+            for (int i = 0; i < freeAreasCount; i++)
+            {
+                var list = FreeAreas[i];
+                int listCount = list.Count;
+                RenderTexture dest = RenderTextures[i];
+                foreach (IntegerRectangle rect in list)
+                {
+                    Rect uv = new Rect(rect.X * UVXDiv, rect.Y * UVYDiv, rect.Width * UVXDiv, rect.Height * UVYDiv);
+                    Texture2D srcTex = new Texture2D(2, 2, AtlasTextureFormat, false);
+                    GraphicsBlit(uv, srcTex, dest, blitMaterial);
+                }
+            }
         }
     }
 }

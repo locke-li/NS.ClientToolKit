@@ -26,6 +26,7 @@ namespace CenturyGame.RuntimeAtlas.Editor
             {
                 if (GUILayout.Button("Show RuntimeAtlas"))
                 {
+                    RuntimeAtlasWindow.ShowWindow(script.AtlasGroup);
                 }
             }
             else
