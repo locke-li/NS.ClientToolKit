@@ -138,6 +138,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
         private string GetLocalFilePath()
         {
             FileDesc desc = this.mCurDownloadInfo;
+            var config = AppUpdaterConfigManager.AppUpdaterConfig;
+            string localDataRoot = config.localDataRoot;
             string relativePath;
 
             if (desc.RN.StartsWith("resource/"))
@@ -148,11 +150,17 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Download
             {
                 if (AppUpdaterHints.Instance.LowerLuaName)
                 {
-                    relativePath = $"lua/gen/{desc.N.ToLower()}";
+                    if (!string.IsNullOrEmpty(localDataRoot))
+                        relativePath = $"{localDataRoot}/{desc.N.ToLower()}";
+                    else
+                        relativePath = desc.N.ToLower();
                 }
                 else
                 {
-                    relativePath = $"lua/gen/{desc.N}";
+                    if (!string.IsNullOrEmpty(localDataRoot))
+                        relativePath = $"{localDataRoot}/{desc.N}";
+                    else
+                        relativePath = desc.N;
                 }
             }
            

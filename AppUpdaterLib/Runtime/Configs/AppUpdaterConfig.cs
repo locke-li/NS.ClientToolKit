@@ -57,6 +57,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
         /// </summary>
         public bool skipAppUpdater = false;
 
+        /// <summary>
+        /// 配置数据更新存放的根目录
+        /// </summary>
+        public string localDataRoot = "";
+
         #endregion
 
 
