@@ -151,6 +151,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             s_mService.SetPerformCompletedCallback(callback);
         }
 
+        public static void AppUpdaterSetStartDownloadCallback(AppUpdaterStartDownloadCallback callback)
+        {
+            CheckIsInitialize("AppUpdaterSetStartDownloadCallback");
+            s_mService.SetStartDownloadCallback(callback);
+        }
+
         /// <summary>
         /// 设置磁盘信息获取提供者
         /// </summary>

@@ -110,6 +110,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             this.mOwner.SetPerformCompletedCallback(callback);
         }
 
+        public void SetStartDownloadCallback(AppUpdaterStartDownloadCallback callback)
+        {
+            this.mOwner.SetStartDownloadCallback(callback);
+        }
+
         #endregion
 
         public void SetAppUpdaterRequester(IAppUpdaterRequester requester)

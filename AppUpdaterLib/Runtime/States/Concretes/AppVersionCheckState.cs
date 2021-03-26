@@ -283,6 +283,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                     EventType = (int)AppUpdaterInnerEventType.StartPerformResUpdateOperation
                 };
                 this.Target.HandleMessage(in arg);
+                this.Target.OnStartDownloadCallback();
             }
 
             this.mState = InnerState.VersionCheckCompleted;

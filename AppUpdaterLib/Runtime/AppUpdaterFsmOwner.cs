@@ -42,6 +42,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             public AppUpdaterForceUpdateCallback ForceUpdateCallback;
             public AppUpdaterOnTargetVersionObtainCallback OnTargetVersionObtainCallback;
             public AppUpdaterPerformCompletedCallback PerformCompletedCallback;
+            public AppUpdaterStartDownloadCallback StartDownloadCallback;
         }
 
         #region
@@ -225,6 +226,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             mCallBacks.PerformCompletedCallback = callback;
         }
 
+        public void SetStartDownloadCallback(AppUpdaterStartDownloadCallback callback)
+        {
+            mCallBacks.StartDownloadCallback = callback;
+        }
+
         #endregion
 
         #region Callbacks
@@ -259,6 +265,11 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         {
             this.State = AppUpdaterState.Done;
             this.mCallBacks.PerformCompletedCallback?.Invoke();
+        }
+
+        public void OnStartDownloadCallback()
+        {
+            this.mCallBacks.StartDownloadCallback?.Invoke();
         }
 
         #endregion

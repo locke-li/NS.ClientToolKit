@@ -54,4 +54,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
     /// <param name="remoteName">文件所在的远程路径名（例如：resource/xxx.x）</param>
     /// <returns></returns>
     public delegate bool AppUpdaterFileUpdateRuleFilter(ref string remoteName);
+
+    /// <summary>
+    /// 热更新模块开始下载时的回调
+    /// </summary>
+    public delegate void AppUpdaterStartDownloadCallback();
 }
