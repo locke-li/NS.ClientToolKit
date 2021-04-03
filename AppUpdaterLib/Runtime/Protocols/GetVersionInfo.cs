@@ -22,7 +22,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Protocols
     public class ResUpdateDetail
     {
         /// <summary>
-        /// 表数据版本
+        /// 表数据版本hash
         /// </summary>
         public string DataVersion;
 
@@ -32,14 +32,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Protocols
         public string ResVersionNum;
 
         /// <summary>
-        /// android资源版本
+        /// 资源版本hash
         /// </summary>
-        public string AndroidVersion;
-
-        /// <summary>
-        /// ios端资源版本
-        /// </summary>
-        public string IOSVersion;
+        public string ResVersion;
     }
 
     public class GetVersionResponseInfo

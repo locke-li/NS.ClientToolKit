@@ -132,14 +132,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 return false;
             }
 
-            string unityDataResVersion = null;
-
-#if UNITY_ANDROID
-            unityDataResVersion = Context.GetVersionResponseInfo.update_detail.AndroidVersion;
-#elif UNITY_IPHONE
-            unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
-#endif
-
+            string unityDataResVersion = Context.GetVersionResponseInfo.update_detail.ResVersion;
             Logger.Info($"EnableTableDataUpdate : {AppUpdaterHints.Instance.EnableTableDataUpdate }.");
             if (AppUpdaterHints.Instance.EnableTableDataUpdate && string.IsNullOrEmpty(Context.GetVersionResponseInfo.update_detail.DataVersion))
             {
@@ -184,13 +177,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             }
             
             Context.ResUpdateTarget.TargetResVersionNum = Context.GetVersionResponseInfo.update_detail.ResVersionNum;
-            string unityDataResVersion = null;
-
-#if UNITY_ANDROID
-            unityDataResVersion = Context.GetVersionResponseInfo.update_detail.AndroidVersion;
-#elif UNITY_IPHONE
-            unityDataResVersion = Context.GetVersionResponseInfo.update_detail.IOSVersion;
-#endif      
+            string unityDataResVersion = Context.GetVersionResponseInfo.update_detail.ResVersion;
             List<VersionDesc> descs = null;
             if (AppVersionManager.AppInfo.unityDataResVersion != unityDataResVersion)
             {
@@ -243,11 +230,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
             targetAppInfo.version = version.GetVersionString();
             targetAppInfo.dataResVersion = detail.DataVersion;
             targetAppInfo.TargetPlatform = Utility.GetPlatformName();
-#if UNITY_ANDROID
-            targetAppInfo.unityDataResVersion = detail.AndroidVersion;
-#elif UNITY_IPHONE
-            targetAppInfo.unityDataResVersion = detail.IOSVersion;
-#endif
+            targetAppInfo.unityDataResVersion = detail.ResVersion;
             Logger.Debug($"Target app info : \n{JsonUtility.ToJson(targetAppInfo, true)}");
             AppVersionManager.SetTargetVersion(targetAppInfo);
             this.Target.OnnTargetVersionObtainCallback(targetAppInfo.version);
