@@ -47,12 +47,15 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
                 {
                     var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
                     mAppUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
+                    var channel = mAppUpdaterConfig.channel;
+                    Platform = channel.Substring(channel.LastIndexOf('.') + 1);
                 }
-
                 return mAppUpdaterConfig;
             }
             set => mAppUpdaterConfig = value;
         }
+
+        public static string Platform { get; private set; }
         #endregion
 
         //--------------------------------------------------------------

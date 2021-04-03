@@ -138,8 +138,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             }
             else
             {
-                return remote ? $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}"
-                    : $"res_{Utility.GetPlatformName().ToLower()}.json";
+                var platform = AppUpdaterConfigManager.Platform;
+                return remote ? $"res_{platform}.json{CommonConst.WellNumUtf8}{version}"
+                    : $"res_{platform}.json";
             }
         }
 
