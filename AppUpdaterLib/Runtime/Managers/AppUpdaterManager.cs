@@ -75,10 +75,6 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         {
             var container = new ServiceContainer();
             ServiceLocator.SetLocatorProvider(() => container);
-            var go = new GameObject("RemoteFileDownloadService");
-            Object.DontDestroyOnLoad(go);
-            var service = go.AddComponent<RemoteFileDownloadService>();
-            container.Register<IRemoteFileDownloadService>(null, service);
 
             const string serviceName = "AppUpdater";
             var servicePfb = Resources.Load<GameObject>(serviceName);
@@ -89,6 +85,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
             var serviceGo = Object.Instantiate(servicePfb);
             serviceGo.name = serviceName;
             s_mService = serviceGo.GetComponent<AppUpdaterService>();
+            var service = serviceGo.AddComponent<RemoteFileDownloadService>();
+            container.Register<IRemoteFileDownloadService>(null, service);
         }
 
         /// <summary>
