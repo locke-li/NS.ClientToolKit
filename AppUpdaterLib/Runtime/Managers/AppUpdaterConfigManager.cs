@@ -25,7 +25,7 @@ using UnityEngine;
 // ReSharper disable once CheckNamespace
 namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 {
-    internal class AppUpdaterConfigManager
+    public class AppUpdaterConfigManager
     {
         //--------------------------------------------------------------
         #region Fields
@@ -51,6 +51,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 
                 return mAppUpdaterConfig;
             }
+            set => mAppUpdaterConfig = value;
         }
         #endregion
 
