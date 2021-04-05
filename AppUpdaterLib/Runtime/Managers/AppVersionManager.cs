@@ -25,7 +25,7 @@ using ILogger = CenturyGame.LoggerModule.Runtime.ILogger;
 
 namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 {
-    internal class AppVersionManager
+    public class AppVersionManager
     {
         //--------------------------------------------------------------
         #region Fields
