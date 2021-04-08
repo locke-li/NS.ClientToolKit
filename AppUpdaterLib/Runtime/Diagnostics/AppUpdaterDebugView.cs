@@ -111,9 +111,12 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Diagnostics
 
                 AppUpdaterManager.AppUpdaterStartUpdateAgain();
 
-        }
-
+            }
 #endif
+            if (GUILayout.Button("关闭调试窗口", GUILayout.Width(Screen.width * (1 / 8.0f))))
+            {
+                Show = false;
+            }
 
             //if (GUILayout.Button("打开日志窗口", GUILayout.Width(Screen.width * (1 / 8.0f))))
             //{
