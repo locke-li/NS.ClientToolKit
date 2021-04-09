@@ -65,7 +65,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
         /// <summary>
         /// 渠道名
         /// </summary>
-        public static string Channel { private set; get; }
+        public static string Channel => AppUpdaterManager.AppUpdaterConfig.channel;
 
         #endregion
 
@@ -149,7 +149,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Managers
 
         public static void SetChannel(string channel)
         {
-            Channel = channel;
+            
         }
 
         public static void SetTargetVersion(AppInfoManifest targetAppInfo)
