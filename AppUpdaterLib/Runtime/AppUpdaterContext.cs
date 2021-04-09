@@ -146,7 +146,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime
         }
         public string GetCurUnityResManifestName(string version)
         {
-            string manifestName = $"res_{Utility.GetPlatformName().ToLower()}.json{CommonConst.WellNumUtf8}{version}";
+            var platform = AppUpdaterManager.AppUpdaterConfig.platform;
+            string manifestName = $"res_{platform}.json{CommonConst.WellNumUtf8}{version}";
 
             return manifestName;
         }

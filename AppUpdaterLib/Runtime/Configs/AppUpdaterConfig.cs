@@ -57,6 +57,8 @@ namespace CenturyGame.AppUpdaterLib.Runtime.Configs
         /// </summary>
         public bool skipAppUpdater = false;
 
+        public string platform;
+
         #endregion
 
 

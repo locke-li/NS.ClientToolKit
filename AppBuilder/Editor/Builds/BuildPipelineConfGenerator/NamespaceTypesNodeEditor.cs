@@ -15,7 +15,7 @@
 ***************************************************************/
 
 using System;
-using Boo.Lang;
+using System.Collections.Generic;
 using CenturyGame.AppBuilder.Editor.Builds.BuildPipelineConfGenerator;
 using UnityEngine;
 using XNodeEditor;
