@@ -31,9 +31,7 @@ namespace CenturyGame.AppUpdaterLib.Runtime
             {
                 if (mCurrent == null)
                 {
-                    var appUpdaterConfigText = Resources.Load<TextAsset>("appupdater");
-                    var appUpdaterConfig = JsonUtility.FromJson<AppUpdaterConfig>(appUpdaterConfigText.text);
-                    mCurrent = new AppUpdaterContext(appUpdaterConfig);
+                    mCurrent = new AppUpdaterContext(AppUpdaterManager.AppUpdaterConfig);
                 }
                     
                 return mCurrent;
