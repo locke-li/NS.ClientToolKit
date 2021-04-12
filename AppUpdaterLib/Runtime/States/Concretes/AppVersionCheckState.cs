@@ -149,8 +149,9 @@ namespace CenturyGame.AppUpdaterLib.Runtime.States.Concretes
                 var localRevision = version.PatchNum;
                 if (localRevision > revision)
                 {
-                    Context.ErrorType = AppUpdaterErrorType.RequestAppRevisionNumIsSmallToLocal;
-                    Logger.Error($"revision : {revision} , local revision : {localRevision} .");
+                    Target.ChangeState<AppUpdateCompletedState>();
+                    //Context.ErrorType = AppUpdaterErrorType.RequestAppRevisionNumIsSmallToLocal;
+                    Logger.Warn($"revision : {revision} , local revision : {localRevision} .");
                     return false;
                 }
             }
